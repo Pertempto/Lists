@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-/**************************************************************
-ListWidget: 
-  - a widget representing a page containing a single list in the 
-  app, such as a to-do list, a shopping list, etc.
-***************************************************************/
+///ListWidget: 
+///  - a widget representing a page containing a single list in the 
+///  app, such as a to-do list, a shopping list, etc.
 
 class ListWidget extends StatefulWidget {
   const ListWidget({super.key});
@@ -35,13 +33,13 @@ class _ListWidgetState extends State<ListWidget> {
     return ListView(
       children: listItems
           .map(
-            (item) => _buildItem(item),
+            (item) => _buildItemWidget(item),
           )
           .toList(),
     );
   }
 
-  Widget _buildItem(String item) {
+  Widget _buildItemWidget(String item) {
     final itemTextStyle = Theme.of(context).textTheme.titleLarge;
     return ListTile(
       title: Text(
