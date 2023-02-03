@@ -8,8 +8,6 @@ class ListWidget extends StatefulWidget {
 }
 
 class _ListWidgetState extends State<ListWidget> {
-  static const itemTextStyle = TextStyle(fontSize: 20);
-
   final list = <Widget>[];
 
   @override
@@ -39,6 +37,7 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   void _addNewItem() {
+    const itemTextStyle = Theme.of(context).textTheme.titleLarge;
     final itemToAdd = ListTile(
       title: Text(
         'New item',
