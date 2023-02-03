@@ -14,7 +14,7 @@ class ListWidget extends StatefulWidget {
 }
 
 class _ListWidgetState extends State<ListWidget> {
-  final list = <Widget>[];
+  final listItems = <String>[];
 
   @override
   Widget build(BuildContext context) {
@@ -32,25 +32,28 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildListView() {
-    // note:
-    // I set children equal to a copy of list instead of just
-    // list because ListView expects that its children parameter will
-    // not be modified once it is passed in.
-    //
     return ListView(
-      children: list.toList(),
+      children: listItems
+          .map(
+            (item) => _buildItem(item),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _buildItem(String item) {
+    final itemTextStyle = Theme.of(context).textTheme.titleLarge;
+    return ListTile(
+      title: Text(
+        item,
+        style: itemTextStyle,
+      ),
     );
   }
 
   void _addNewItem() {
-    const itemTextStyle = Theme.of(context).textTheme.titleLarge;
-    final itemToAdd = ListTile(
-      title: Text(
-        'New item',
-        style: itemTextStyle,
-      ),
-    );
+    final itemToAdd = 'New Item';
 
-    setState(() => list.add(itemToAdd));
+    setState(() => listItems.add(itemToAdd));
   }
 }
