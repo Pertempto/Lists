@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+/**************************************************************
+ListWidget: 
+  - a widget representing a page containing a single list in the 
+  app, such as a to-do list, a shopping list, etc.
+***************************************************************/
+
 class ListWidget extends StatefulWidget {
   const ListWidget({super.key});
 
