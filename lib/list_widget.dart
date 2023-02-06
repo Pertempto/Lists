@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lists/item.dart';
+import 'package:lists/item_widget.dart';
 
 /// ListWidget:
 ///   - a widget representing a page containing a single list in the
@@ -11,7 +13,7 @@ class ListWidget extends StatefulWidget {
 }
 
 class _ListWidgetState extends State<ListWidget> {
-  final listItems = <String>[];
+  final listItems = <Item>[];
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +30,10 @@ class _ListWidgetState extends State<ListWidget> {
     );
   }
 
-  ListView _buildListView() => ListView(
-      children: listItems.map((item) => _buildItemWidget(item)).toList());
-
-  Widget _buildItemWidget(String item) {
-    final itemTextStyle = Theme.of(context).textTheme.titleLarge;
-    return ListTile(title: Text(item, style: itemTextStyle));
-  }
+  ListView _buildListView() =>
+      ListView(children: listItems.map((item) => ItemWidget(item)).toList());
 
   void _addNewItem() {
-    final itemToAdd = 'New Item';
-    setState(() => listItems.add(itemToAdd));
+    setState(() => listItems.add(Item()));
   }
 }
