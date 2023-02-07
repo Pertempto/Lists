@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lists/item.dart';
-import 'package:lists/item_widget.dart';
+import 'package:lists/model/item.dart';
+import 'package:lists/view/item_widget.dart';
 
 /// ListWidget:
 ///   - a widget representing a page containing a single list in the

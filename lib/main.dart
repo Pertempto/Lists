@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lists/list_widget.dart';
+import 'package:lists/view/list_widget.dart';
 
 void main() {
   runApp(const MyApp());
