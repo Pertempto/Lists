@@ -3,7 +3,7 @@ import 'package:lists/model/item.dart';
 
 /// ItemWidget:
 ///   - a widget representing the view of a single item
-///   in a list (see Item)
+///     in a list (see Item)
 class ItemWidget extends StatefulWidget {
   final Item item;
   const ItemWidget(this.item, {super.key});
@@ -13,9 +13,6 @@ class ItemWidget extends StatefulWidget {
 }
 
 class _ItemWidgetState extends State<ItemWidget> {
-  // I think it is better to have a the TextEditingController in the
-  // State rather than the widget (since the user of the widget doesn't
-  // need to access the controller), but I am open to other views.
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
@@ -44,9 +41,6 @@ class _ItemWidgetState extends State<ItemWidget> {
     return TextFormField(
       controller: _textEditingController,
       autofocus: true,
-      // Note: I know there is some duplication here, since the user
-      // can submit an item both through the submit action button and
-      // pressing enter in the text form field. Is this duplication useful.
       onFieldSubmitted: (_) => _submitNewItemValue(context: context),
     );
   }
