@@ -32,10 +32,11 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildListView() => ListView(
-      children: Utils.mapIndexed(listItems, _buildItemWidget).toList());
-
-  ItemWidget _buildItemWidget(int index, Item item) => ItemWidget(item,
-      deleteThisItem: () => setState(() => listItems.removeAt(index)));
+      children: Utils.mapIndexed(
+          listItems,
+          (index, item) => ItemWidget(item,
+              deleteThisItem: () =>
+                  setState(() => listItems.removeAt(index)))).toList());
 
   void _addNewItem() {
     setState(() => listItems.add(Item()));
