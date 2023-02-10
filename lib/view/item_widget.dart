@@ -6,8 +6,8 @@ import 'package:lists/model/item.dart';
 ///     in a list (see Item)
 class ItemWidget extends StatefulWidget {
   final Item item;
-  final void Function() deleteThisItem;
-  const ItemWidget(this.item, {required this.deleteThisItem, super.key});
+  final void Function() onDelete;
+  const ItemWidget(this.item, {required this.onDelete, super.key});
 
   @override
   State<ItemWidget> createState() => _ItemWidgetState();
@@ -44,7 +44,7 @@ class _ItemWidgetState extends State<ItemWidget> {
           ),
           IconButton(
             onPressed: () {
-              widget.deleteThisItem();
+              widget.onDelete();
               Navigator.pop(context);
             },
             icon: const Icon(Icons.check, color: Colors.green),

@@ -35,7 +35,7 @@ class _ListWidgetState extends State<ListWidget> {
       children: 
           listItems.mapIndexed(
           (index, item) => ItemWidget(item,
-              deleteThisItem: () =>
+              onDelete: () =>
                   setState(() => listItems.removeAt(index)))).toList());
 
   void _addNewItem() {
