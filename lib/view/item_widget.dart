@@ -20,35 +20,26 @@ class _ItemWidgetState extends State<ItemWidget> {
   Widget build(BuildContext context) {
     final itemTextStyle = Theme.of(context).textTheme.titleLarge;
     return ListTile(
-      leading: IconButton(
-        icon: Icon(Icons.delete),
-        onPressed: _showConfirmDeleteDialog,
-      ),
+      onLongPress: _showConfirmDeleteModalSheet,
       title: Text(widget.item.value, style: itemTextStyle),
       onTap: _showEditDialog,
     );
   }
 
-  void _showConfirmDeleteDialog() {
-    showDialog(
+  void _showConfirmDeleteModalSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete this item?", textAlign: TextAlign.center),
-        actionsAlignment: MainAxisAlignment.spaceBetween,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Icon(Icons.close),
-          ),
-          TextButton(
-            onPressed: () {
-              widget.onDelete();
-              Navigator.pop(context);
-            },
-            child: const Icon(Icons.check, color: Colors.red),
-          ),
-        ],
-      ),
+      builder: (context) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      widget.onDelete();
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.delete)),
+              ],
+            ),
     );
   }
 
