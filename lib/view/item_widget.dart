@@ -36,18 +36,16 @@ class _ItemWidgetState extends State<ItemWidget> {
         title: const Text("Delete this item?", textAlign: TextAlign.center),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.close, color: Colors.red),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Icon(Icons.close),
           ),
-          IconButton(
+          TextButton(
             onPressed: () {
               widget.onDelete();
               Navigator.pop(context);
             },
-            icon: const Icon(Icons.check, color: Colors.green),
+            child: const Icon(Icons.check, color: Colors.red),
           ),
         ],
       ),
