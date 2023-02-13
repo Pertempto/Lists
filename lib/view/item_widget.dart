@@ -30,16 +30,15 @@ class _ItemWidgetState extends State<ItemWidget> {
     showModalBottomSheet(
       context: context,
       builder: (context) => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                    onPressed: () {
-                      widget.onDelete();
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.delete)),
-              ],
-            ),
+        children: [
+          TextButton(
+              onPressed: () {
+                widget.onDelete();
+                Navigator.pop(context);
+              },
+              child: const Icon(Icons.delete)),
+        ],
+      ),
     );
   }
 
