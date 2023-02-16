@@ -14,7 +14,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-          iconTheme: IconThemeData.fallback().copyWith(size: 40),
           useMaterial3: true,
           colorScheme:
               ColorScheme.fromSeed(seedColor: const Color(0xff7f8266))),
