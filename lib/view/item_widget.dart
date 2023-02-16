@@ -29,15 +29,23 @@ class _ItemWidgetState extends State<ItemWidget> {
   void _showConfirmDeleteModalSheet() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Row(
-        children: [
-          TextButton(
-              onPressed: () {
-                widget.onDelete();
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.delete)),
-        ],
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton.icon(
+                onPressed: () {
+                  widget.onDelete();
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.delete),
+                label: const Text("Delete"),
+                style: const ButtonStyle(
+                    foregroundColor:
+                        MaterialStatePropertyAll<Color>(Colors.red))),
+          ],
+        ),
       ),
     );
   }
