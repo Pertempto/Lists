@@ -6,7 +6,8 @@ import 'package:lists/model/item.dart';
 ///     in a list (see Item)
 class ItemWidget extends StatefulWidget {
   final Item item;
-  const ItemWidget(this.item, {super.key});
+  final void Function() onDelete;
+  const ItemWidget(this.item, {required this.onDelete, super.key});
 
   @override
   State<ItemWidget> createState() => _ItemWidgetState();
@@ -19,8 +20,33 @@ class _ItemWidgetState extends State<ItemWidget> {
   Widget build(BuildContext context) {
     final itemTextStyle = Theme.of(context).textTheme.titleLarge;
     return ListTile(
+      onLongPress: _showConfirmDeleteModalSheet,
       title: Text(widget.item.value, style: itemTextStyle),
       onTap: _showEditDialog,
+    );
+  }
+
+  void _showConfirmDeleteModalSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton.icon(
+                onPressed: () {
+                  widget.onDelete();
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.delete),
+                label: const Text("Delete"),
+                style: const ButtonStyle(
+                    foregroundColor:
+                        MaterialStatePropertyAll<Color>(Colors.red))),
+          ],
+        ),
+      ),
     );
   }
 

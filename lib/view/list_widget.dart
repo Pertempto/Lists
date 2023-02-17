@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/view/item_widget.dart';
@@ -30,8 +31,12 @@ class _ListWidgetState extends State<ListWidget> {
     );
   }
 
-  ListView _buildListView() =>
-      ListView(children: listItems.map((item) => ItemWidget(item)).toList());
+  ListView _buildListView() => ListView(
+      children: 
+          listItems.mapIndexed(
+          (index, item) => ItemWidget(item,
+              onDelete: () =>
+                  setState(() => listItems.removeAt(index)))).toList());
 
   void _addNewItem() {
     setState(() => listItems.add(Item()));
