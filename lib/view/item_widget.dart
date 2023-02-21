@@ -7,7 +7,14 @@ import 'package:lists/model/item.dart';
 class ItemWidget extends StatefulWidget {
   final Item item;
   final void Function() onDelete;
-  const ItemWidget(this.item, {required this.onDelete, super.key});
+  final void Function() onNewValue;
+
+  const ItemWidget(
+    this.item, {
+    required this.onDelete,
+    required this.onNewValue,
+    super.key,
+  });
 
   @override
   State<ItemWidget> createState() => _ItemWidgetState();
@@ -75,6 +82,8 @@ class _ItemWidgetState extends State<ItemWidget> {
     Navigator.pop(context);
   }
 
-  void updateItemValue(String newValue) =>
-      setState(() => widget.item.value = newValue);
+  void updateItemValue(String newValue) => setState(() {
+        widget.item.value = newValue;
+        widget.onNewValue();
+      });
 }
