@@ -6,8 +6,7 @@ import 'package:lists/model/item.dart';
 import 'package:lists/view/item_widget.dart';
 
 /// ListWidget:
-///   - a widget representing a page containing a single list in the
-///     app, such as a to-do list, a shopping list, etc.
+///   - a widget representing a ListModel
 class ListWidget extends StatefulWidget {
   final ListModel listModel;
   const ListWidget(this.listModel, {super.key});
@@ -17,7 +16,6 @@ class ListWidget extends StatefulWidget {
 }
 
 class _ListWidgetState extends State<ListWidget> {
-  // convenience getter to remove redundant code
   ListModel get listModel => widget.listModel;
   List<Item> get listItems => widget.listModel.items;
 
@@ -42,16 +40,14 @@ class _ListWidgetState extends State<ListWidget> {
                 item,
                 onDelete: () => setState(() {
                   listItems.removeAt(index);
-                  ListsDatabaseManager.update(listModel);
+                  ListsDatabaseManager.updateListModel(listModel);
                 }),
-                onNewValue: () {
-                  ListsDatabaseManager.update(listModel);
-                },
+                onEdited: () => ListsDatabaseManager.updateListModel(listModel),
               ))
           .toList());
 
   void _addNewItem() => setState(() {
         listItems.add(Item());
-        ListsDatabaseManager.update(listModel);
+        ListsDatabaseManager.updateListModel(listModel);
       });
 }
