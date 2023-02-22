@@ -5,7 +5,6 @@ part 'item.g.dart';
 ///   - objects of this class store a single item
 ///     in a list (needs to be wrapped in an ItemWidget
 ///     to be displayed)
-///   - this class is stored in a ListModel
 @embedded
 class Item {
   String value;
