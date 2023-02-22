@@ -15,7 +15,7 @@ class ListsDatabaseManager {
   }
 
   static Future<ListModel> createListModel(String name) async {
-    final newListModel = ListModel.fromName(name);
+    final newListModel = ListModel.fromTitle(name);
     await isar.writeTxn(() async => await isar.listModels.put(newListModel));
     return newListModel;
   }

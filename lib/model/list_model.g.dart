@@ -57,7 +57,7 @@ int _listModelEstimateSize(
       bytesCount += ItemSchema.estimateSize(value, offsets, allOffsets);
     }
   }
-  bytesCount += 3 + object.name.length * 3;
+  bytesCount += 3 + object.title.length * 3;
   return bytesCount;
 }
 
@@ -73,7 +73,7 @@ void _listModelSerialize(
     ItemSchema.serialize,
     object.items,
   );
-  writer.writeString(offsets[1], object.name);
+  writer.writeString(offsets[1], object.title);
 }
 
 ListModel _listModelDeserialize(
@@ -91,7 +91,7 @@ ListModel _listModelDeserialize(
         Item(),
       ) ??
       [];
-  object.name = reader.readString(offsets[1]);
+  object.title = reader.readString(offsets[1]);
   return object;
 }
 

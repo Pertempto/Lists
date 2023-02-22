@@ -9,7 +9,7 @@ part 'list_model.g.dart';
 @Collection()
 class ListModel {
   Id id = Isar.autoIncrement;
-  late String name;
+  late String title;
 
   late List<Item> items;
 
@@ -18,5 +18,5 @@ class ListModel {
 
   void ensureMutable() => items = items.toList(growable: true);
 
-  ListModel.fromName(this.name) : items = [];
+  ListModel.fromTitle(this.title) : items = [];
 }
