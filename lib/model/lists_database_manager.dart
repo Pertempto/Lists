@@ -5,7 +5,7 @@ import 'package:lists/model/list_model.dart';
 /// DatabaseManager:
 ///   - a class that creates, reads, updates, and
 ///     destroys lists (see ListModel).
-class ListsDatabaseManager {
+class DatabaseManager {
   static late final Isar isar;
 
   static Future<void> init() async {

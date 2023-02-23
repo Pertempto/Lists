@@ -4,12 +4,12 @@ import 'package:lists/model/lists_database_manager.dart';
 import 'package:lists/view/list_widget.dart';
 
 void main() async {
-  await ListsDatabaseManager.init();
+  await DatabaseManager.init();
 
-  final listModels = await ListsDatabaseManager.getAllListModels();
+  final listModels = await DatabaseManager.getAllListModels();
 
   final listModel = listModels.isEmpty
-      ? await ListsDatabaseManager.createListModel("New list model")
+      ? await DatabaseManager.createListModel("New list model")
       : listModels.elementAt(0);
 
   runApp(MyApp(listModel));

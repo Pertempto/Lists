@@ -40,14 +40,14 @@ class _ListWidgetState extends State<ListWidget> {
                 item,
                 onDelete: () => setState(() {
                   listItems.removeAt(index);
-                  ListsDatabaseManager.updateListModel(listModel);
+                  DatabaseManager.updateListModel(listModel);
                 }),
-                onEdited: () => ListsDatabaseManager.updateListModel(listModel),
+                onEdited: () => DatabaseManager.updateListModel(listModel),
               ))
           .toList());
 
   void _addNewItem() => setState(() {
         listItems.add(Item());
-        ListsDatabaseManager.updateListModel(listModel);
+        DatabaseManager.updateListModel(listModel);
       });
 }
