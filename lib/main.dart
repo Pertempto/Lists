@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:lists/model/lists_database_manager.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/list_widget.dart';
 
 void main() async {
