@@ -13,10 +13,17 @@ class ListModel {
 
   late List<Item> items;
 
+
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
 
   void ensureMutable() => items = items.toList(growable: true);
 
   ListModel.fromTitle(this.title) : items = [];
+  
+  @override
+  int get hashCode => id;
+
+  @override
+  bool operator ==(Object other) => (other is ListModel) && (other.hashCode == hashCode);
 }

@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:lists/model/lists_database_manager.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/model/item.dart';
@@ -9,7 +9,9 @@ import 'package:lists/view/item_widget.dart';
 ///   - a widget representing a ListModel
 class ListWidget extends StatefulWidget {
   final ListModel listModel;
-  const ListWidget(this.listModel, {super.key});
+  ListWidget(this.listModel, {super.key}) {
+    listModel.ensureMutable();
+  }
 
   @override
   State<ListWidget> createState() => _ListWidgetState();
@@ -23,7 +25,7 @@ class _ListWidgetState extends State<ListWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lists'),
+        title: Text(listModel.title),
       ),
       body: _buildListView(),
       floatingActionButton: FloatingActionButton(
