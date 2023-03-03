@@ -5,9 +5,10 @@ part 'item.g.dart';
 ///   - objects of this class store a single item
 ///     in a list (needs to be wrapped in an ItemWidget
 ///     to be displayed)
-@embedded
+@Collection()
 class Item {
-  String value;
+  Id id = Isar.autoIncrement;
+  late String value;
 
   Item([this.value = 'New Item']);
 }

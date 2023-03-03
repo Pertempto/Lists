@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,6 @@ class ListWidget extends StatefulWidget {
 
 class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
-  List<Item> get listItems => widget.listModel.items;
 
   @override
   Widget build(BuildContext context) {
@@ -35,19 +35,26 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildListView() => ListView(
-      children: listItems
-          .mapIndexed((index, item) => ItemWidget(
+      children: listModel
+          .itemsView()
+          .map((item) => ItemWidget(
                 item,
                 onDelete: () => setState(() {
-                  listItems.removeAt(index);
-                  DatabaseManager.updateListModel(listModel);
+                  listModel.remove(item);
+                  DatabaseManager.updateListModelItems(listModel);
                 }),
-                onEdited: () => DatabaseManager.updateListModel(listModel),
+                onEdited: () {
+                  listModel.updateItemValue(item);
+                  DatabaseManager.updateListModelItems(listModel);
+                  }
+                  ,
               ))
           .toList());
 
-  void _addNewItem() => setState(() {
-        listItems.add(Item());
-        DatabaseManager.updateListModel(listModel);
-      });
+  void _addNewItem() async {
+    listModel.add(await DatabaseManager.createItem());
+    setState(() =>
+      DatabaseManager.updateListModelItems(listModel);
+    );
+  }
 }
