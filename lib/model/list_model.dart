@@ -22,7 +22,8 @@ class ListModel {
 
   void init() => items.loadSync();
 
-  Future<void> add(Item newItem) async {
+  Future<void> addOrUpdate(Item newItem) async {
+    await DatabaseManager.putItem(newItem);
     if (items.add(newItem)) {
       await DatabaseManager.updateListModelItems(this);
     }
@@ -37,10 +38,4 @@ class ListModel {
 
   /// For use by the DatabaseManager only. Use `DatabaseManager.updateListModelItems(listModel)` instead
   Future<void> updateItems() async => await items.save();
-
-  Future<void> updateItem(Item item) async {
-    if (items.contains(item)) {
-      await DatabaseManager.putItem(item);
-    }
-  }
 }

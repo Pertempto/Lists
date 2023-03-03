@@ -1,5 +1,4 @@
-import 'package:collection/collection.dart';
-import 'package:lists/model/database_manager.dart';
+import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/item_widget.dart';
@@ -36,13 +35,15 @@ class _ListWidgetState extends State<ListWidget> {
       children: listModel
           .itemsView()
           .map((item) => ItemWidget(item,
-              onDelete: () =>
-                  listModel.remove(item).then((_) => setState(() {})),
-              onEdited: () => listModel.updateItem(item)))
+              onDelete: () async {
+                await listModel.remove(item);
+                setState(() {});
+              },
+              onEdited: () async => await listModel.addOrUpdate(item)))
           .toList());
 
   void _addNewItem() async {
-    listModel.add(await DatabaseManager.createItem());
+    await listModel.addOrUpdate(Item());
     setState(() {});
   }
 }

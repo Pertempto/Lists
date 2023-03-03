@@ -9,7 +9,8 @@ void main() async {
   final listModels = await DatabaseManager.getAllListModels();
 
   final listModel = listModels.isEmpty
-      ? await DatabaseManager.createListModel("New list model")
+      ? await DatabaseManager.putListModel(
+          ListModel.fromTitle("New list model"))
       : listModels.elementAt(0);
 
   runApp(MyApp(listModel));

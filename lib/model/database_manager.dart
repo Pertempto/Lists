@@ -16,23 +16,11 @@ class DatabaseManager {
     }
   }
 
-  static Future<ListModel> createListModel(String name) async {
-    final newListModel = ListModel.fromTitle(name);
-    await isar.writeTxn(() async => await isar.listModels.put(newListModel));
-    return newListModel..init();
+  static Future<ListModel> putListModel(ListModel listModel) async {
+    // final newListModel = ListModel.fromTitle(name);
+    await isar.writeTxn(() async => await isar.listModels.put(listModel));
+    return listModel..init();
   }
-
-  static Future<Item> createItem([String value = 'New Item']) async {
-    final newItem = Item(value);
-    await putItem(newItem);
-    return newItem;
-  }
-
-  static Future<void> putItem(Item item) async =>
-      await isar.writeTxn(() async => await isar.items.put(item));
-
-  static Future<void> deleteItem(Item item) async =>
-      await isar.writeTxn(() async => await isar.items.delete(item.id));
 
   static Future<List<ListModel>> getAllListModels() async =>
       (await isar.listModels.where().findAll())
@@ -40,4 +28,12 @@ class DatabaseManager {
 
   static Future<void> updateListModelItems(ListModel which) async =>
       await isar.writeTxn(() async => await which.updateItems());
+
+  static Future<Item> putItem(Item item) async {
+    await isar.writeTxn(() async => await isar.items.put(item));
+    return item;
+  }
+
+  static Future<void> deleteItem(Item item) async =>
+      await isar.writeTxn(() async => await isar.items.delete(item.id));
 }
