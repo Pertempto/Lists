@@ -21,6 +21,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    listModel.ensureMutable();
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
