@@ -35,7 +35,4 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
-
-  /// For use by the DatabaseManager only. Use `DatabaseManager.updateListModelItems(listModel)` instead
-  Future<void> updateItems() async => await items.save();
 }

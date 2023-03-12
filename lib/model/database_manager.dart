@@ -17,7 +17,6 @@ class DatabaseManager {
   }
 
   static Future<ListModel> putListModel(ListModel listModel) async {
-    // final newListModel = ListModel.fromTitle(name);
     await isar.writeTxn(() async => await isar.listModels.put(listModel));
     return listModel..init();
   }
@@ -27,7 +26,7 @@ class DatabaseManager {
         ..forEach((listModel) => listModel.init());
 
   static Future<void> updateListModelItems(ListModel which) async =>
-      await isar.writeTxn(() async => await which.updateItems());
+      await isar.writeTxn(() async => await which.items.save());
 
   static Future<Item> putItem(Item item) async {
     await isar.writeTxn(() async => await isar.items.put(item));
