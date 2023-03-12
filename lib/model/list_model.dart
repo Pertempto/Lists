@@ -22,10 +22,18 @@ class ListModel {
 
   void init() => items.loadSync();
 
-  Future<void> addOrUpdate(Item newItem) async {
+  Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);
     if (items.add(newItem)) {
       await DatabaseManager.updateListModelItems(this);
+    }
+  }
+
+  Future<void> update(Item item) async {
+    if (items.contains(item)) {
+      await DatabaseManager.putItem(item);
+    } else {
+      throw ItemUpdateError(item: item, listModel: this);
     }
   }
 
@@ -35,4 +43,20 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
+}
+
+class ItemUpdateError extends ListModelError {
+  const ItemUpdateError({
+    required Item item,
+    required ListModel listModel,
+  }) : super(
+            "tried to update item '$item' in '$listModel', but operation failed. Database may be corrupted.");
+}
+
+class ListModelError implements Exception {
+  final String message;
+  const ListModelError(this.message);
+
+  @override
+  String toString() => "ListModelError: $message";
 }

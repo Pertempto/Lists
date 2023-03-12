@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
@@ -34,16 +36,21 @@ class _ListWidgetState extends State<ListWidget> {
   ListView _buildListView() => ListView(
       children: listModel
           .itemsView()
-          .map((item) => ItemWidget(item,
-              onDelete: () async {
+          .map((item) => ItemWidget(item, onDelete: () async {
                 await listModel.remove(item);
                 setState(() {});
-              },
-              onEdited: () async => await listModel.addOrUpdate(item)))
+              }, onEdited: () async {
+                try {
+                  await listModel.update(item);
+                } on ItemUpdateError catch (e) {
+                  // TODO: handle item update error.
+                  debugPrint(e.toString());
+                }
+              }))
           .toList());
 
   void _addNewItem() async {
-    await listModel.addOrUpdate(Item());
+    await listModel.add(Item());
     setState(() {});
   }
 }
