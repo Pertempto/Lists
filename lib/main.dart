@@ -6,12 +6,6 @@ import 'package:lists/view/home_page.dart';
 void main() async {
   await DatabaseManager.init();
 
-  // final listModels = await DatabaseManager.loadListModels();
-
-  // final listModel = listModels.isEmpty
-  //     ? await ListsDatabaseManager.createListModel("New list model")
-  //     : listModels.elementAt(0);
-
   runApp(MyApp());
 }
 
@@ -26,10 +20,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff7f8266)),
-        // listTileTheme: ListTileThemeData(
-        //   contentPadding: EdgeInsets.all(8),
-        //   shape: RoundedRectangleBorder(
-        //       borderRadius: BorderRadius.circular(8.0)),
       ),
       home: HomePage(),
     );
