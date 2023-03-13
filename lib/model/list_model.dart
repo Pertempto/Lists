@@ -48,7 +48,7 @@ class ListModel {
   int get hashCode => id;
   @override
   bool operator ==(Object other) =>
-      (other is ListModel) && (other.hashCode == hashCode);
+      (other is ListModel) && (other.hashCode == hashCode); // so, objects with the same id are considered equal, no matter how the other fields compare.
 }
 
 class ItemUpdateError extends ListModelError {

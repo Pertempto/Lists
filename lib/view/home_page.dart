@@ -4,11 +4,7 @@ import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/list_widget.dart';
 
 class HomePage extends StatefulWidget {
-  // final List<ListModel> listModels;
-  const HomePage({
-    super.key,
-    // required this.listModels,
-  });
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,9 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Lists"),
-      ),
+      appBar: AppBar(title: const Text("Lists")),
       body: _buildBody(context),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNewListDialog,
@@ -38,21 +32,15 @@ class _HomePageState extends State<HomePage> {
           .map((listModel) => ListTile(
                 leading: const Icon(Icons.list),
                 isThreeLine: true,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) {
-                    listModel.ensureMutable();
-                    return ListWidget(listModel);
-                  }),
-                ),
+                onTap: () async {
+                  await Navigator.push(context,
+                      MaterialPageRoute(builder: (_) => ListWidget(listModel)));
+                  setState(() {});
+                },
                 onLongPress: () => _showOptionsModalSheet(listModel),
-                title: Text(
-                  listModel.title,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                subtitle: Text(
-                  'Items: ${listModel.items.length}',
-                ),
+                title: Text(listModel.title,
+                    style: Theme.of(context).textTheme.titleLarge),
+                subtitle: Text('Items: ${listModel.items.length}'),
               ))
           .toList(),
     );
@@ -70,15 +58,11 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           ElevatedButton(
-            onPressed: () => _submitNewList(context: context),
-            child: const Text('Submit'),
-          ),
+              onPressed: () => _submitNewList(context: context),
+              child: const Text('Submit')),
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Cancel', style: TextStyle(color: Colors.red)),
           )
         ],
       ),
@@ -86,8 +70,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _submitNewList({required BuildContext context}) async {
-    final newListModel =
-        await DatabaseManager.createListModel(_editingController.text);
+    final newListModel = await DatabaseManager.putListModel(
+        ListModel.fromTitle(_editingController.text));
     if (context.mounted) {
       Navigator.pop(context);
       await Navigator.push(
@@ -115,7 +99,6 @@ class _HomePageState extends State<HomePage> {
                 style: const ButtonStyle(
                     foregroundColor:
                         MaterialStatePropertyAll<Color>(Colors.red))),
-
           ],
         ),
       ),
