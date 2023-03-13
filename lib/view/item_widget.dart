@@ -7,14 +7,17 @@ import 'package:lists/model/item.dart';
 class ItemWidget extends StatefulWidget {
   final Item item;
   final void Function() onDelete;
-  const ItemWidget(this.item, {required this.onDelete, super.key});
+  final void Function() onEdited;
+
+  const ItemWidget(this.item,
+      {required this.onDelete, required this.onEdited, super.key});
 
   @override
   State<ItemWidget> createState() => _ItemWidgetState();
 }
 
 class _ItemWidgetState extends State<ItemWidget> {
-  final TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _editingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +59,7 @@ class _ItemWidgetState extends State<ItemWidget> {
       builder: (context) => AlertDialog(
         title: const Text("Enter Item", textAlign: TextAlign.center),
         content: TextFormField(
-          controller: _textEditingController,
+          controller: _editingController,
           autofocus: true,
           onFieldSubmitted: (_) => _submitNewItemValue(context: context),
         ),
@@ -71,10 +74,12 @@ class _ItemWidgetState extends State<ItemWidget> {
   }
 
   void _submitNewItemValue({required BuildContext context}) {
-    updateItemValue(_textEditingController.text);
+    updateItemValue(_editingController.text);
     Navigator.pop(context);
   }
 
-  void updateItemValue(String newValue) =>
-      setState(() => widget.item.value = newValue);
+  void updateItemValue(String newValue) => setState(() {
+        widget.item.value = newValue;
+        widget.onEdited();
+      });
 }

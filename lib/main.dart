@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:lists/model/list_model.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/list_widget.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  await DatabaseManager.init();
+
+  final listModels = await DatabaseManager.getAllListModels();
+
+  final listModel = listModels.isEmpty
+      ? await DatabaseManager.putListModel(
+          ListModel.fromTitle("New list model"))
+      : listModels.elementAt(0);
+
+  runApp(MyApp(listModel));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ListModel listModel;
+  const MyApp(this.listModel, {super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,7 +28,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme:
               ColorScheme.fromSeed(seedColor: const Color(0xff7f8266))),
-      home: const ListWidget(),
+      home: ListWidget(listModel),
     );
   }
 }

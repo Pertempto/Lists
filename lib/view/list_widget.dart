@@ -1,20 +1,22 @@
-import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'dart:developer';
+
 import 'package:lists/model/item.dart';
+import 'package:lists/model/list_model.dart';
+import 'package:flutter/material.dart';
 import 'package:lists/view/item_widget.dart';
 
 /// ListWidget:
-///   - a widget representing a page containing a single list in the
-///     app, such as a to-do list, a shopping list, etc.
+///   - a widget representing a ListModel
 class ListWidget extends StatefulWidget {
-  const ListWidget({super.key});
+  final ListModel listModel;
+  const ListWidget(this.listModel, {super.key});
 
   @override
   State<ListWidget> createState() => _ListWidgetState();
 }
 
 class _ListWidgetState extends State<ListWidget> {
-  final listItems = <Item>[];
+  ListModel get listModel => widget.listModel;
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +34,23 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildListView() => ListView(
-      children: 
-          listItems.mapIndexed(
-          (index, item) => ItemWidget(item,
-              onDelete: () =>
-                  setState(() => listItems.removeAt(index)))).toList());
+      children: listModel
+          .itemsView()
+          .map((item) => ItemWidget(item, onDelete: () async {
+                await listModel.remove(item);
+                setState(() {});
+              }, onEdited: () async {
+                try {
+                  await listModel.update(item);
+                } on ItemUpdateError catch (e) {
+                  // TODO: handle item update error.
+                  debugPrint(e.toString());
+                }
+              }))
+          .toList());
 
-  void _addNewItem() {
-    setState(() => listItems.add(Item()));
+  void _addNewItem() async {
+    await listModel.add(Item());
+    setState(() {});
   }
 }
