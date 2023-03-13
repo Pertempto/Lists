@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/list_model.dart';
@@ -58,6 +57,8 @@ class DatabaseManager {
 
 class _Cache extends Iterable<ListModel> {
   final Set<ListModel> _cache;
+
+  @override
   Iterator<ListModel> get iterator => _cache.iterator;
 
   _Cache.fromList(List<ListModel> listModels)

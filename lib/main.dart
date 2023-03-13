@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/home_page.dart';
 
 void main() async {
   await DatabaseManager.init();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // final List<ListModel> listModels;
   const MyApp({super.key});
 
   @override
@@ -21,7 +19,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff7f8266)),
       ),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }

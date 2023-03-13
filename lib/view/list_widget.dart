@@ -7,7 +7,7 @@ import 'package:lists/view/item_widget.dart';
 ///   - a widget representing a ListModel
 class ListWidget extends StatefulWidget {
   final ListModel listModel;
-  ListWidget(this.listModel, {super.key});
+  const ListWidget(this.listModel, {super.key});
 
   @override
   State<ListWidget> createState() => _ListWidgetState();
