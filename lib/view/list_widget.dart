@@ -19,10 +19,8 @@ class _ListWidgetState extends State<ListWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(listModel.title),
-      ),
-      body: _buildListView(),
+      appBar: AppBar(title: Text(listModel.title)),
+      body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _addNewItem,
         tooltip: 'Add a new item',
@@ -31,7 +29,7 @@ class _ListWidgetState extends State<ListWidget> {
     );
   }
 
-  ListView _buildListView() => ListView(
+  ListView _buildBody() => ListView(
       children: listModel
           .itemsView()
           .map((item) => ItemWidget(item, onDelete: () async {

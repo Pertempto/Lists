@@ -16,12 +16,17 @@ class DatabaseManager {
     if (Isar.instanceNames.isEmpty) {
       isar =
           await Isar.open([ListModelSchema, ItemSchema], inspector: kDebugMode);
-      await _loadListModels();
+      await loadListModels();
     }
   }
 
-  static Future<void> _loadListModels() async =>
-      _cache = _Cache.fromList((await isar.listModels.where().findAll()));
+  static Future<void> loadListModels() async {
+    final loadedListModels = await isar.listModels.where().findAll();
+    for (final listModel in loadedListModels) {
+      listModel.init();
+    }
+    _cache = _Cache.fromList(loadedListModels);
+  }
 
   static Future<ListModel> putListModel(ListModel listModel) async {
     await isar.writeTxn(() async => await isar.listModels.put(listModel));
@@ -29,9 +34,10 @@ class DatabaseManager {
     if (_cache.isCached(listModel)) {
       _cache.updateListModel(listModel);
     } else {
+      listModel.init();
       _cache.addListModel(listModel);
     }
-    return listModel..init();
+    return listModel;
   }
 
   static Future<void> deleteListModel(ListModel listModel) async {
@@ -61,8 +67,7 @@ class _Cache extends Iterable<ListModel> {
   @override
   Iterator<ListModel> get iterator => _cache.iterator;
 
-  _Cache.fromList(List<ListModel> listModels)
-      : _cache = Set.of(listModels..forEach((listModel) => listModel.init()));
+  _Cache.fromList(List<ListModel> listModels) : _cache = listModels.toSet();
 
   void addListModel(ListModel listModel) {
     assert(!isCached(listModel));
@@ -82,7 +87,7 @@ class _Cache extends Iterable<ListModel> {
   }
 
   void deleteListModel(ListModel listModel) {
-    assert(isCached(listModel)); // assertion for debugging; no-op in release.
+    assert(isCached(listModel));
     _cache.remove(listModel);
   }
 

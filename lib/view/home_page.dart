@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
+import 'package:lists/view/edit_dialog.dart';
 import 'package:lists/view/list_widget.dart';
+import 'package:lists/view/list_preview_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,13 +13,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _editingController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Lists")),
-      body: _buildBody(context),
+      body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNewListDialog,
         tooltip: 'Create a new list',
@@ -26,21 +26,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  ListView _buildBody(BuildContext context) {
+  ListView _buildBody() {
     return ListView(
       children: DatabaseManager.listModels
-          .map((listModel) => ListTile(
-                leading: const Icon(Icons.list),
-                isThreeLine: true,
-                onTap: () async {
-                  await Navigator.push(context,
-                      MaterialPageRoute(builder: (_) => ListWidget(listModel)));
+          .map((listModel) => ListPreviewWidget(
+                listModel,
+                onDelete: () async {
+                  await DatabaseManager.deleteListModel(listModel);
                   setState(() {});
                 },
-                onLongPress: () => _showOptionsModalSheet(listModel),
-                title: Text(listModel.title,
-                    style: Theme.of(context).textTheme.titleLarge),
-                subtitle: Text('Items: ${listModel.items.length}'),
               ))
           .toList(),
     );
@@ -49,59 +43,18 @@ class _HomePageState extends State<HomePage> {
   void _showAddNewListDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Enter New List Title", textAlign: TextAlign.center),
-        content: TextFormField(
-          controller: _editingController,
-          autofocus: true,
-          onFieldSubmitted: (_) => _submitNewList(context: context),
-        ),
-        actions: [
-          ElevatedButton(
-              onPressed: () => _submitNewList(context: context),
-              child: const Text('Submit')),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.red)),
-          )
-        ],
-      ),
+      builder: (context) => SubmitValueDialog(
+          title: "Enter New List Title", onSubmit: _submitNewList),
     );
   }
 
-  void _submitNewList({required BuildContext context}) async {
-    final newListModel = await DatabaseManager.putListModel(
-        ListModel.fromTitle(_editingController.text));
+  void _submitNewList(String newListName) async {
+    final newListModel =
+        await DatabaseManager.putListModel(ListModel.fromTitle(newListName));
     if (context.mounted) {
-      Navigator.pop(context);
       await Navigator.push(
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
     }
     setState(() {});
-  }
-
-  void _showOptionsModalSheet(ListModel listModel) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton.icon(
-                onPressed: () {
-                  DatabaseManager.deleteListModel(listModel);
-                  setState(() {});
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.delete),
-                label: const Text("Delete"),
-                style: const ButtonStyle(
-                    foregroundColor:
-                        MaterialStatePropertyAll<Color>(Colors.red))),
-          ],
-        ),
-      ),
-    );
   }
 }
