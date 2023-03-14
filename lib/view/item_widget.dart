@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/view/edit_dialog.dart';
+import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 
 /// ItemWidget:
 ///   - a widget representing the view of a single item
@@ -17,38 +19,23 @@ class ItemWidget extends StatefulWidget {
 }
 
 class _ItemWidgetState extends State<ItemWidget> {
-  final TextEditingController _editingController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     final itemTextStyle = Theme.of(context).textTheme.titleLarge;
     return ListTile(
-      onLongPress: _showConfirmDeleteModalSheet,
+      onLongPress: _showOptionsModalSheet,
       title: Text(widget.item.value, style: itemTextStyle),
       onTap: _showEditDialog,
     );
   }
 
-  void _showConfirmDeleteModalSheet() {
+  void _showOptionsModalSheet() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton.icon(
-                onPressed: () {
-                  widget.onDelete();
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.delete),
-                label: const Text("Delete"),
-                style: const ButtonStyle(
-                    foregroundColor:
-                        MaterialStatePropertyAll<Color>(Colors.red))),
-          ],
-        ),
+      builder: (context) => EditingActionsModalBottomSheet(
+        actionButtons: [
+          EditingActionButton.makeDeleteButton(onDelete: widget.onDelete)
+        ],
       ),
     );
   }
@@ -56,26 +43,11 @@ class _ItemWidgetState extends State<ItemWidget> {
   void _showEditDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Enter Item", textAlign: TextAlign.center),
-        content: TextFormField(
-          controller: _editingController,
-          autofocus: true,
-          onFieldSubmitted: (_) => _submitNewItemValue(context: context),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => _submitNewItemValue(context: context),
-            child: const Text('Submit'),
-          )
-        ],
-      ),
+      builder: (context) => SubmitValueDialog(
+          title: "Enter Item",
+          onSubmit: updateItemValue,
+          initialText: widget.item.value),
     );
-  }
-
-  void _submitNewItemValue({required BuildContext context}) {
-    updateItemValue(_editingController.text);
-    Navigator.pop(context);
   }
 
   void updateItemValue(String newValue) => setState(() {
