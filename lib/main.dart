@@ -1,25 +1,43 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/home_page.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await DatabaseManager.init();
 
-  runApp(const MyApp());
+  final savedThemeMode = await AdaptiveTheme.getThemeMode();
+  runApp(MyApp(savedThemeMode: savedThemeMode));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AdaptiveThemeMode? savedThemeMode;
+  const MyApp({super.key, this.savedThemeMode});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
+    const seedColor = Color(0xff7f8266);
+
+    return AdaptiveTheme(
+      light: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff7f8266)),
+        colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.light, seedColor: seedColor),
       ),
-      home: const HomePage(),
+      dark: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.dark, seedColor: seedColor),
+      ),
+      initial: savedThemeMode ?? AdaptiveThemeMode.light,
+      builder: (light, dark) => MaterialApp(
+        title: 'Flutter Demo',
+        theme: light,
+        darkTheme: dark,
+        home: const HomePage(),
+      ),
     );
   }
 }

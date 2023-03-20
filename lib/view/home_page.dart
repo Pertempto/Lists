@@ -4,6 +4,8 @@ import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/edit_dialog.dart';
 import 'package:lists/view/list_widget.dart';
 import 'package:lists/view/list_preview_widget.dart';
+import 'package:lists/view/settings.dart';
+import 'package:modal_side_sheet/modal_side_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +18,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Lists")),
+      appBar: AppBar(
+        leading: _buildSettingsButton(),
+        title: const Text("Lists"),
+      ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNewListDialog,
@@ -26,27 +31,28 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  ListView _buildBody() {
-    return ListView(
-      children: DatabaseManager.listModels
-          .map((listModel) => ListPreviewWidget(
-                listModel,
-                onDelete: () async {
-                  await DatabaseManager.deleteListModel(listModel);
-                  setState(() {});
-                },
-              ))
-          .toList(),
-    );
-  }
+  IconButton _buildSettingsButton() => IconButton(
+      icon: const Icon(Icons.settings),
+      onPressed: () =>
+          showModalSideSheet(context: context, body: const Settings()));
 
-  void _showAddNewListDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => SubmitValueDialog(
-          title: "Enter New List Title", onSubmit: _submitNewList),
-    );
-  }
+  ListView _buildBody() => ListView(
+        children: DatabaseManager.listModels
+            .map((listModel) => ListPreviewWidget(
+                  listModel,
+                  onDelete: () async {
+                    await DatabaseManager.deleteListModel(listModel);
+                    setState(() {});
+                  },
+                ))
+            .toList(),
+      );
+
+  void _showAddNewListDialog() => showDialog(
+        context: context,
+        builder: (context) => SubmitValueDialog(
+            title: "Enter New List Title", onSubmit: _submitNewList),
+      );
 
   void _submitNewList(String newListName) async {
     final newListModel =
