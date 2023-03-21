@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         leading: _buildSettingsButton(),
-        title: const Text("Lists"),
+        title: const Text('Lists'),
       ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
   IconButton _buildSettingsButton() => IconButton(
       icon: const Icon(Icons.settings),
       onPressed: () =>
-          showModalSideSheet(context: context, body: const Settings()));
+          showModalSideSheet(context: context, body: const SettingsPage()));
 
   ListView _buildBody() => ListView(
         children: DatabaseManager.listModels
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   void _showAddNewListDialog() => showDialog(
         context: context,
         builder: (context) => SubmitValueDialog(
-            title: "Enter New List Title", onSubmit: _submitNewList),
+            title: 'Enter New List Title', onSubmit: _submitNewList),
       );
 
   void _submitNewList(String newListName) async {

@@ -20,23 +20,13 @@ class _ThemePickerState extends State<ThemePicker> {
         },
         dropdownMenuEntries: const [
           DropdownMenuEntry(
-            label: "Light",
+            label: 'Light',
             value: AdaptiveThemeMode.light,
           ),
           DropdownMenuEntry(
-            label: "Dark",
+            label: 'Dark',
             value: AdaptiveThemeMode.dark,
           )
         ]);
-    // return Switch(
-    //     value: AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark,
-    //     onChanged: (isDarkMode) {
-    //       if (isDarkMode) {
-    //         AdaptiveTheme.of(context).setDark();
-    //       } else {
-    //         AdaptiveTheme.of(context).setLight();
-    //       }
-    //       setState(() {});
-    //     });
   }
 }

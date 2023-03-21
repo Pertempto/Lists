@@ -44,7 +44,7 @@ class _ItemWidgetState extends State<ItemWidget> {
     showDialog(
       context: context,
       builder: (context) => SubmitValueDialog(
-          title: "Enter Item",
+          title: 'Enter Item',
           onSubmit: updateItemValue,
           initialText: widget.item.value),
     );

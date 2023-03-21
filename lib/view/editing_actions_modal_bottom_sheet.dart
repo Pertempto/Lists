@@ -36,7 +36,7 @@ class EditingActionButton extends StatelessWidget {
       EditingActionButton(
           onPressed: onDelete,
           icon: Icons.delete,
-          label: "Delete",
+          label: 'Delete',
           color: Colors.red);
 
   @override
