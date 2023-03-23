@@ -26,9 +26,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  ListView _buildBody() {
-    return ListView(
-      children: DatabaseManager.listModels
+  Widget _buildBody() => FutureBuilder<List<ListModel>>(
+      future: DatabaseManager.loadListModels(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return _buildListPreviewsWidget(snapshot.data!);
+        } else if (snapshot.hasError) {
+          _onListModelsLoadingErro(snapshot.error!);
+        }
+        return Container();
+      });
+
+  ListView _buildListPreviewsWidget(List<ListModel> data) => ListView(
+      children: data
           .map((listModel) => ListPreviewWidget(
                 listModel,
                 onDelete: () async {
@@ -36,9 +46,7 @@ class _HomePageState extends State<HomePage> {
                   setState(() {});
                 },
               ))
-          .toList(),
-    );
-  }
+          .toList());
 
   void _showAddNewListDialog() {
     showDialog(
@@ -56,5 +64,10 @@ class _HomePageState extends State<HomePage> {
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
     }
     setState(() {});
+  }
+
+  void _onListModelsLoadingErro(Object error) {
+    //TODO: handle error
+    debugPrint(error.toString());
   }
 }
