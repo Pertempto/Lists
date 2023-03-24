@@ -31,8 +31,9 @@ class _HomePageState extends State<HomePage> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return _buildListPreviewsWidget(snapshot.data!);
-        } else if (snapshot.hasError) {
-          _onListModelsLoadingErro(snapshot.error!);
+        }
+        if (snapshot.hasError) {
+          _onListModelsLoadingError(snapshot.error!);
         }
         return Container();
       });
@@ -66,7 +67,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  void _onListModelsLoadingErro(Object error) {
+  void _onListModelsLoadingError(Object error) {
     //TODO: handle error
     debugPrint(error.toString());
   }
