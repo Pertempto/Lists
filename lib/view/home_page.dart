@@ -36,17 +36,28 @@ class _HomePageState extends State<HomePage> {
       onPressed: () =>
           showModalSideSheet(context: context, body: const SettingsPage()));
 
-  ListView _buildBody() => ListView(
-        children: DatabaseManager.listModels
-            .map((listModel) => ListPreviewWidget(
-                  listModel,
-                  onDelete: () async {
-                    await DatabaseManager.deleteListModel(listModel);
-                    setState(() {});
-                  },
-                ))
-            .toList(),
-      );
+  Widget _buildBody() => FutureBuilder<List<ListModel>>(
+      future: DatabaseManager.loadListModels(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return _buildListPreviewsWidget(snapshot.data!);
+        }
+        if (snapshot.hasError) {
+          _onListModelsLoadingError(snapshot.error!);
+        }
+        return Container();
+      });
+
+  ListView _buildListPreviewsWidget(List<ListModel> data) => ListView(
+      children: data
+          .map((listModel) => ListPreviewWidget(
+                listModel,
+                onDelete: () async {
+                  await DatabaseManager.deleteListModel(listModel);
+                  setState(() {});
+                },
+              ))
+          .toList());
 
   void _showAddNewListDialog() => showDialog(
         context: context,
@@ -62,5 +73,10 @@ class _HomePageState extends State<HomePage> {
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
     }
     setState(() {});
+  }
+
+  void _onListModelsLoadingError(Object error) {
+    //TODO: handle error
+    debugPrint(error.toString());
   }
 }
