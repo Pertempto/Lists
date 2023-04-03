@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// EditingActionsModalBottomSheet:
+///   - A widget which displays the passed `EditingActionButton`'s 
+///     in a modal bottom sheet.
+///   - Typically, should be used with `showModalBottomSheet`
 class EditingActionsModalBottomSheet extends StatelessWidget {
   final List<EditingActionButton> actionButtons;
   const EditingActionsModalBottomSheet(
@@ -17,6 +21,8 @@ class EditingActionsModalBottomSheet extends StatelessWidget {
   }
 }
 
+/// EditingActionButton:
+///   - A button representing an "editing action" (deleting, renaming, etc.)
 class EditingActionButton extends StatelessWidget {
   final void Function() onPressed;
   final IconData icon;

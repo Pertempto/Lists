@@ -1,6 +1,8 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 
+/// ThemePicker:
+///   - a widget which allows the user to change the theme (light/dark mode)
 class ThemePicker extends StatefulWidget {
   const ThemePicker({super.key});
 

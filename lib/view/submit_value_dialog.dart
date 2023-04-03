@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// SubmitValueDialog:
+///   - a dialog that allows the user to submit a text value
+///     (e.g., an `Item`) via a `TextFormField`
 class SubmitValueDialog extends StatefulWidget {
   final String title;
   final void Function(String) onSubmit;
   final String? initialText;
+
   const SubmitValueDialog(
       {super.key,
       required this.title,

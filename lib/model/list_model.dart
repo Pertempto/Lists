@@ -43,16 +43,6 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
-
-  @ignore // mark the hashcode with ignore so that isar does not think the hashcode is a member variable that needs to be serialized and stored in the database
-  @override
-  int get hashCode => id;
-
-  @override
-  bool operator ==(Object other) =>
-      (other is ListModel) &&
-      (other.hashCode ==
-          hashCode); // so, objects with the same id are considered equal, no matter how the other fields compare.
 }
 
 class ListModelError implements Exception {
@@ -65,5 +55,5 @@ class ItemUpdateError extends ListModelError {
     required Item item,
     required ListModel listModel,
   }) : super(
-            'tried to update item '$item' in '$listModel', but operation failed. Database may be corrupted.');
+            'tried to update item "$item" in "$listModel", but operation failed. Database may be corrupted.');
 }

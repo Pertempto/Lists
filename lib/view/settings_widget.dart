@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:lists/view/theme_picker.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+/// SettingsWidget:
+///   - This widget allows the user to change the settings
+///     of the app.
+///   - Use in `showSideModalSheet`.
+class SettingsWidget extends StatefulWidget {
+  const SettingsWidget({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<SettingsWidget> createState() => _SettingsWidgetState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsWidgetState extends State<SettingsWidget> {
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -21,6 +25,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
+/// SettingsBox:
+///   - A widget which allows the user to edit a single setting
 class SettingsBox extends StatelessWidget {
   final String label;
   final Widget settingController;
