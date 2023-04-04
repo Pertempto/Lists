@@ -9,6 +9,12 @@ part 'item.g.dart';
 class Item {
   Id id = Isar.autoIncrement;
   late String value;
+  @enumerated
+  late ItemType itemType;
 
-  Item([this.value = 'New Item']);
+  bool isChecked = false;
+
+  Item([this.value = 'New Item', this.itemType = ItemType.text]);
 }
+
+enum ItemType { text, checkbox }

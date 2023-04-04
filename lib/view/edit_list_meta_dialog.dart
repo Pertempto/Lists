@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:lists/model/list_model.dart';
 
-/// SubmitValueDialog:
-///   - a dialog that allows the user to submit a text value
-///     (e.g., an `Item`) via a `TextFormField`
-class SubmitValueDialog extends StatefulWidget {
+/// EditListDialog:
+///   - a dialog that allows the user to edit the metadata of the list
+class EditListMetaDialog extends StatefulWidget {
   final String title;
-  final void Function(String) onSubmit;
-  final String? initialText;
+  final void Function(ListModel) onSubmit;
+  final ListModel listModel;
 
-  const SubmitValueDialog(
+  const EditListMetaDialog(
       {super.key,
       required this.title,
       required this.onSubmit,
-      this.initialText});
+      required this.listModel});
 
   @override
-  State<SubmitValueDialog> createState() => _SubmitValueDialogState();
+  State<EditListMetaDialog> createState() => _EditListMetaDialogState();
 }
 
-class _SubmitValueDialogState extends State<SubmitValueDialog> {
+class _EditListMetaDialogState extends State<EditListMetaDialog> {
   late final TextEditingController _editingController;
 
   @override
   void initState() {
-    _editingController = TextEditingController(text: widget.initialText);
+    _editingController = TextEditingController(text: widget.listModel.title);
     super.initState();
   }
 
@@ -47,6 +47,7 @@ class _SubmitValueDialogState extends State<SubmitValueDialog> {
 
   void _submitNewItemValue() {
     Navigator.pop(context);
-    widget.onSubmit(_editingController.text);
+    widget.listModel.title = _editingController.text;
+    widget.onSubmit(widget.listModel);
   }
 }

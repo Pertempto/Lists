@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
-import 'package:lists/view/submit_value_dialog.dart';
+import 'package:lists/view/edit_list_meta_dialog.dart';
 import 'package:lists/view/list_widget.dart';
 import 'package:lists/view/list_preview_widget.dart';
 import 'package:lists/view/settings_widget.dart';
@@ -65,13 +65,14 @@ class _HomePageState extends State<HomePage> {
 
   void _showAddNewListDialog() => showDialog(
         context: context,
-        builder: (context) => SubmitValueDialog(
-            title: 'Enter New List Title', onSubmit: _submitNewList),
+        builder: (context) => EditListMetaDialog(
+            title: 'Enter New List Title',
+            onSubmit: _submitNewList,
+            listModel: ListModel()),
       );
 
-  void _submitNewList(String newListName) async {
-    final newListModel =
-        await DatabaseManager.putListModel(ListModel.fromTitle(newListName));
+  void _submitNewList(ListModel listModel) async {
+    final newListModel = await DatabaseManager.putListModel(listModel);
     if (context.mounted) {
       await Navigator.push(
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
