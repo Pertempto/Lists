@@ -76,7 +76,7 @@ Item _itemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Item(
-    reader.readStringOrNull(offsets[2]) ?? 'New Item',
+    reader.readStringOrNull(offsets[2]) ?? '',
     _ItemitemTypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
         ItemType.text,
   );
@@ -98,7 +98,7 @@ P _itemDeserializeProp<P>(
       return (_ItemitemTypeValueEnumMap[reader.readByteOrNull(offset)] ??
           ItemType.text) as P;
     case 2:
-      return (reader.readStringOrNull(offset) ?? 'New Item') as P;
+      return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }

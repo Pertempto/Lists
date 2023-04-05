@@ -1,6 +1,7 @@
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
+import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/error_dialog.dart';
 import 'package:lists/view/item_widget.dart';
 
@@ -47,7 +48,15 @@ class _ListWidgetState extends State<ListWidget> {
           .toList());
 
   void _addNewItem() async {
-    await listModel.add(Item());
-    setState(() {});
+    final newItem = Item();
+    await listModel.add(newItem);
+
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => EditItemDialog(
+            title: 'New Item', onSubmit: (_) => setState(() {}), item: newItem),
+      );
+    }
   }
 }

@@ -14,7 +14,7 @@ class Item {
 
   bool isChecked = false;
 
-  Item([this.value = 'New Item', this.itemType = ItemType.text]);
+  Item([this.value = '', this.itemType = ItemType.text]);
 }
 
 enum ItemType { text, checkbox }
