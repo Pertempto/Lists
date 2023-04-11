@@ -2,7 +2,7 @@ import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
-import 'package:lists/view/error_dialog.dart';
+import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 
 /// ListWidget:
@@ -75,37 +75,5 @@ class _ListWidgetState extends State<ListWidget> {
             title: 'New Item', onSubmit: (_) => setState(() {}), item: newItem),
       );
     }
-  }
-}
-
-class SearchBar extends StatefulWidget {
-  final void Function(String)? onChanged;
-
-  SearchBar({super.key, this.onChanged});
-
-  @override
-  State<SearchBar> createState() => _SearchBarState();
-}
-
-class _SearchBarState extends State<SearchBar> {
-  final TextEditingController editingController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        width: 130,
-        child: TextField(
-          controller: editingController,
-          onChanged: widget.onChanged,
-          decoration: InputDecoration(
-              icon: const Icon(Icons.search),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  editingController.clear();
-                  if (widget.onChanged != null) widget.onChanged!('');
-                },
-              )),
-        ));
   }
 }
