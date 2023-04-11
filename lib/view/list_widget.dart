@@ -18,10 +18,28 @@ class ListWidget extends StatefulWidget {
 class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
 
+  late Iterable<Item> itemsToBeDisplayed;
+
+  @override
+  void initState() {
+    super.initState();
+    itemsToBeDisplayed = listModel.itemsView();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(listModel.title)),
+      appBar: AppBar(
+        title: Text(listModel.title),
+        actions: [
+          SearchBar(
+            onChanged: (searchStr) async {
+              itemsToBeDisplayed = await listModel.searchItems(searchStr);
+              setState(() {});
+            },
+          ),
+        ],
+      ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _addNewItem,
@@ -32,8 +50,7 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildBody() => ListView(
-      children: listModel
-          .itemsView()
+      children: itemsToBeDisplayed
           .map((item) => ItemWidget(item, onDelete: () async {
                 await listModel.remove(item);
                 setState(() {});
@@ -58,5 +75,37 @@ class _ListWidgetState extends State<ListWidget> {
             title: 'New Item', onSubmit: (_) => setState(() {}), item: newItem),
       );
     }
+  }
+}
+
+class SearchBar extends StatefulWidget {
+  final void Function(String)? onChanged;
+
+  SearchBar({super.key, this.onChanged});
+
+  @override
+  State<SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<SearchBar> {
+  final TextEditingController editingController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        width: 130,
+        child: TextField(
+          controller: editingController,
+          onChanged: widget.onChanged,
+          decoration: InputDecoration(
+              icon: const Icon(Icons.search),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  editingController.clear();
+                  if (widget.onChanged != null) widget.onChanged!('');
+                },
+              )),
+        ));
   }
 }
