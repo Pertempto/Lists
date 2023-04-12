@@ -26,7 +26,7 @@ class ListModel {
     final words = _parseSearchStr(searchStr);
     return items
         .filter()
-        .anyOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
+        .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
         .findAll();
   }
 
@@ -36,7 +36,7 @@ class ListModel {
   // All-in-all, this function breaks a sentence apart into words (though
   // it doesn't filter out punctuation).
   // example:
-  // "The great, blue sky." --> ["The", "great,", "blue", "sky."]
+  // "The  great,    blue sky." --> ["The", "great,", "blue", "sky."]
 
   Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);

@@ -17,19 +17,12 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: 130,
+        width: 150,
         child: TextField(
           controller: editingController,
           onChanged: widget.onChanged,
-          decoration: InputDecoration(
-              icon: const Icon(Icons.search),
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  editingController.clear();
-                  if (widget.onChanged != null) widget.onChanged!('');
-                },
-              )),
+          decoration: const InputDecoration(
+              hintText: "Search in list", suffixIcon: Icon(Icons.search)),
         ));
   }
 }
