@@ -57,8 +57,8 @@ class EditingActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton.icon(
         onPressed: () {
-          onPressed();
           Navigator.pop(context);
+          onPressed();
         },
         icon: Icon(icon),
         label: Text(label),

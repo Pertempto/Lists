@@ -3,6 +3,7 @@ import 'package:lists/model/list_model.dart';
 import 'package:lists/view/edit_list_meta_dialog.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/list_widget.dart';
+import 'package:lists/model/database_manager.dart';
 
 /// ListPreviewWidget:
 ///   - a widget representing a tile which contains the metadata
@@ -47,7 +48,10 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
                   context: context,
                   builder: (context) => EditListMetaDialog(
                       title: 'Edit List',
-                      onSubmit: (_) {},
+                      onSubmit: (listModel) async {
+                        await DatabaseManager.putListModel(listModel);
+                        setState(() {});
+                      },
                       listModel: widget.listModel))),
         ],
       ),

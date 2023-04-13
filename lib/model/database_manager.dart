@@ -31,8 +31,11 @@ class DatabaseManager {
 
   static Future<void> deleteListModel(ListModel listModel) async {
     late final bool wasDeleted;
-    await isar.writeTxn(
-        () async => wasDeleted = await isar.listModels.delete(listModel.id));
+    await isar.writeTxn(() async {
+      await isar.items
+          .deleteAll(listModel.items.map((item) => item.id).toList());
+      wasDeleted = await isar.listModels.delete(listModel.id);
+    });
 
     assert(wasDeleted);
   }
