@@ -19,6 +19,7 @@ class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
 
   late Iterable<Item> itemsToBeDisplayed;
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _ListWidgetState extends State<ListWidget> {
         actions: [
           SearchBar(
             onChanged: (searchQuery) async {
+              this.searchQuery = searchQuery;
               itemsToBeDisplayed = await listModel.searchItems(searchQuery);
               setState(() {});
             },
@@ -51,17 +53,22 @@ class _ListWidgetState extends State<ListWidget> {
 
   ListView _buildBody() => ListView(
       children: itemsToBeDisplayed
-          .map((item) => ItemWidget(item, onDelete: () async {
-                await listModel.remove(item);
-                setState(() {});
-              }, onEdited: () async {
-                try {
-                  await listModel.update(item);
-                } on ItemUpdateError catch (e) {
-                  // TODO: handle item update error.
-                  debugPrint(e.toString());
-                }
-              }))
+          .map((item) => ItemWidget(
+                item,
+                onDelete: () async {
+                  await listModel.remove(item);
+                  itemsToBeDisplayed = await listModel.searchItems(searchQuery);
+                  setState(() {});
+                },
+                onEdited: () async {
+                  try {
+                    await listModel.update(item);
+                  } on ItemUpdateError catch (e) {
+                    // TODO: handle item update error.
+                    debugPrint(e.toString());
+                  }
+                },
+              ))
           .toList());
 
   void _addNewItem() async {
