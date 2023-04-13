@@ -49,13 +49,17 @@ class _ListWidgetState extends State<ListWidget> {
 
   void _addNewItem() async {
     final newItem = Item();
-    await listModel.add(newItem);
 
     if (context.mounted) {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            title: 'New Item', onSubmit: (_) => setState(() {}), item: newItem),
+            title: 'New Item',
+            onSubmit: (newItem) async {
+              await listModel.add(newItem);
+              setState(() {});
+            },
+            item: newItem),
       );
     }
   }
