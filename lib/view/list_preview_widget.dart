@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
+import 'package:lists/view/edit_list_meta_dialog.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/list_widget.dart';
 
 /// ListPreviewWidget:
-///   - a widget representing a tile which contains the metadata 
-///     about a ListModel. When selected, pushes a ListWidget 
-///     representing this ListModel.     
+///   - a widget representing a tile which contains the metadata
+///     about a ListModel. When selected, pushes a ListWidget
+///     representing this ListModel.
 class ListPreviewWidget extends StatefulWidget {
   final ListModel listModel;
   final void Function() onDelete;
@@ -40,8 +41,14 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
       context: context,
       builder: (context) => EditingActionsModalBottomSheet(
         actionButtons: [
-          EditingActionButton.makeDeleteButton(
-              onDelete: widget.onDelete)
+          EditingActionButton.makeDeleteButton(onDelete: widget.onDelete),
+          EditingActionButton.makeEditButton(
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => EditListMetaDialog(
+                      title: 'Edit List',
+                      onSubmit: (_) {},
+                      listModel: widget.listModel))),
         ],
       ),
     );

@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
   void _showAddNewListDialog() => showDialog(
         context: context,
         builder: (context) => EditListMetaDialog(
-            title: 'Enter New List Title',
+            title: 'New List',
             onSubmit: _submitNewList,
             listModel: ListModel()),
       );

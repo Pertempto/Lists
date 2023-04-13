@@ -33,8 +33,8 @@ class _ListWidgetState extends State<ListWidget> {
         title: Text(listModel.title),
         actions: [
           SearchBar(
-            onChanged: (searchStr) async {
-              itemsToBeDisplayed = await listModel.searchItems(searchStr);
+            onChanged: (searchQuery) async {
+              itemsToBeDisplayed = await listModel.searchItems(searchQuery);
               setState(() {});
             },
           ),
