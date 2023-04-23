@@ -81,6 +81,7 @@ class _ListWidgetState extends State<ListWidget> {
             title: 'New Item',
             onSubmit: (newItem) async {
               await listModel.add(newItem);
+              itemsToBeDisplayed = await listModel.searchItems(searchQuery);
               setState(() {});
             },
             item: newItem),
