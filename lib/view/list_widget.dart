@@ -19,6 +19,7 @@ class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
 
   late Iterable<Item> itemsToBeDisplayed;
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _ListWidgetState extends State<ListWidget> {
         actions: [
           SearchBar(
             onChanged: (searchStr) async {
+              searchQuery = searchStr;
               itemsToBeDisplayed = await listModel.searchItems(searchStr);
               setState(() {});
             },
@@ -74,6 +76,7 @@ class _ListWidgetState extends State<ListWidget> {
             title: 'New Item',
             onSubmit: (newItem) async {
               await listModel.add(newItem);
+              itemsToBeDisplayed = await listModel.searchItems(searchQuery);
               setState(() {});
             },
             item: newItem),
