@@ -33,7 +33,7 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
       onLongPress: _showOptionsModalSheet,
       title: Text(widget.listModel.title,
           style: Theme.of(context).textTheme.titleLarge),
-      subtitle: Text('Items: ${widget.listModel.items.length}'),
+      subtitle: Text('Items: ${widget.listModel.itemCount}'),
     );
   }
 

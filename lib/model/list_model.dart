@@ -1,6 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/default_item_group.dart';
+import 'package:lists/model/item_group.dart';
+import 'package:lists/model/user_created_item_group.dart';
 
 part 'list_model.g.dart';
 
@@ -12,22 +16,45 @@ class ListModel {
   Id id = Isar.autoIncrement;
   String title = '';
 
-  final items = IsarLinks<Item>();
+  @ignore
+  final DefaultItemGroup defaultItemGroup = DefaultItemGroup();
+  final userCreatedItemGroups = IsarLinks<UserCreatedItemGroup>();
 
-  Iterable<Item> itemsView() => items;
+  // note: for isar
+  IsarLinks<Item> get defaultItemGroupItems => defaultItemGroup.items;
+
+  Iterable<Item> itemsView() =>
+      groupsView().expand((itemGroup) => itemGroup.itemsView());
+
+  Iterable<ItemGroup> groupsView() => <Iterable<ItemGroup>>[
+        [defaultItemGroup],
+        userCreatedItemGroups
+      ].flattened;
+
+  @ignore
+  int get itemCount => userCreatedItemGroups.fold(defaultItemGroup.itemCount,
+      (runningItemCount, itemGroup) => runningItemCount + itemGroup.itemCount);
 
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
   ListModel.fromTitle(this.title);
 
-  void init() => items.loadSync();
+  void init() {
+    userCreatedItemGroups.loadSync();
+    for (final itemGroup in groupsView()) {
+      itemGroup.init();
+    }
+  }
 
-  Future<Iterable<Item>> searchItems(String searchQuery) {
+  Future<Iterable<Item>> searchItems(String searchQuery) async {
     final words = _parseSearchStr(searchQuery);
-    return items
-        .filter()
-        .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
-        .findAll();
+    final searchResults = <Iterable<Item>>[];
+
+    for (final itemGroup in groupsView()) {
+      searchResults.add(await itemGroup.searchItems(words));
+    }
+
+    return searchResults.flattened;
   }
 
   Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r"([^\s]+)")
@@ -41,13 +68,13 @@ class ListModel {
 
   Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);
-    if (items.add(newItem)) {
-      await DatabaseManager.updateListModelItems(this);
+    if (defaultItemGroup.add(newItem)) {
+      await DatabaseManager.updateGroupItems(defaultItemGroup);
     }
   }
 
   Future<void> update(Item item) async {
-    if (items.contains(item)) {
+    if (defaultItemGroup.contains(item)) {
       await DatabaseManager.putItem(item);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
@@ -55,9 +82,9 @@ class ListModel {
   }
 
   Future<void> remove(Item item) async {
-    if (items.remove(item)) {
+    if (defaultItemGroup.remove(item)) {
       await DatabaseManager.deleteItem(item);
-      await DatabaseManager.updateListModelItems(this);
+      await DatabaseManager.updateGroupItems(defaultItemGroup);
     }
   }
 }

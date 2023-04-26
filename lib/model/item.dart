@@ -8,10 +8,10 @@ part 'item.g.dart';
 @Collection()
 class Item {
   Id id = Isar.autoIncrement;
+
   late String value;
   @enumerated
   late ItemType itemType;
-
   bool isChecked = false;
 
   Item([this.value = '', this.itemType = ItemType.text]);

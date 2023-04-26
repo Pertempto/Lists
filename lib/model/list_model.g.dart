@@ -30,9 +30,15 @@ const ListModelSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {
-    r'items': LinkSchema(
-      id: 8006812209972363162,
-      name: r'items',
+    r'userCreatedItemGroups': LinkSchema(
+      id: 7842742788986650323,
+      name: r'userCreatedItemGroups',
+      target: r'UserCreatedItemGroup',
+      single: false,
+    ),
+    r'defaultItemGroupItems': LinkSchema(
+      id: -388390053698887794,
+      name: r'defaultItemGroupItems',
       target: r'Item',
       single: false,
     )
@@ -94,12 +100,18 @@ Id _listModelGetId(ListModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _listModelGetLinks(ListModel object) {
-  return [object.items];
+  return [object.userCreatedItemGroups, object.defaultItemGroupItems];
 }
 
 void _listModelAttach(IsarCollection<dynamic> col, Id id, ListModel object) {
   object.id = id;
-  object.items.attach(col, col.isar.collection<Item>(), r'items', id);
+  object.userCreatedItemGroups.attach(
+      col,
+      col.isar.collection<UserCreatedItemGroup>(),
+      r'userCreatedItemGroups',
+      id);
+  object.defaultItemGroupItems
+      .attach(col, col.isar.collection<Item>(), r'defaultItemGroupItems', id);
 }
 
 extension ListModelQueryWhereSort
@@ -370,52 +382,59 @@ extension ListModelQueryObject
 
 extension ListModelQueryLinks
     on QueryBuilder<ListModel, ListModel, QFilterCondition> {
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> items(
-      FilterQuery<Item> q) {
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      userCreatedItemGroups(FilterQuery<UserCreatedItemGroup> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'items');
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> itemsLengthEqualTo(
-      int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'items', length, true, length, true);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> itemsIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'items', 0, true, 0, true);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> itemsIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'items', 0, false, 999999, true);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> itemsLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'items', 0, true, length, include);
+      return query.link(q, r'userCreatedItemGroups');
     });
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      itemsLengthGreaterThan(
+      userCreatedItemGroupsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'userCreatedItemGroups', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      userCreatedItemGroupsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'userCreatedItemGroups', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      userCreatedItemGroupsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'userCreatedItemGroups', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      userCreatedItemGroupsLengthLessThan(
     int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'items', length, include, 999999, true);
+      return query.linkLength(
+          r'userCreatedItemGroups', 0, true, length, include);
     });
   }
 
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> itemsLengthBetween(
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      userCreatedItemGroupsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'userCreatedItemGroups', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      userCreatedItemGroupsLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -423,7 +442,71 @@ extension ListModelQueryLinks
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(
-          r'items', lower, includeLower, upper, includeUpper);
+          r'userCreatedItemGroups', lower, includeLower, upper, includeUpper);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      defaultItemGroupItems(FilterQuery<Item> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'defaultItemGroupItems');
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      defaultItemGroupItemsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'defaultItemGroupItems', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      defaultItemGroupItemsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'defaultItemGroupItems', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      defaultItemGroupItemsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'defaultItemGroupItems', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      defaultItemGroupItemsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'defaultItemGroupItems', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      defaultItemGroupItemsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'defaultItemGroupItems', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      defaultItemGroupItemsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'defaultItemGroupItems', lower, includeLower, upper, includeUpper);
     });
   }
 }
