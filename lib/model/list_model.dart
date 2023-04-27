@@ -45,18 +45,15 @@ class ListModel {
   }
 }
 
+class ListModelError implements Exception {
+  final String message;
+  const ListModelError(this.message);
+}
+
 class ItemUpdateError extends ListModelError {
   const ItemUpdateError({
     required Item item,
     required ListModel listModel,
   }) : super(
             "tried to update item '$item' in '$listModel', but operation failed. Database may be corrupted.");
-}
-
-class ListModelError implements Exception {
-  final String message;
-  const ListModelError(this.message);
-
-  @override
-  String toString() => "ListModelError: $message";
 }
