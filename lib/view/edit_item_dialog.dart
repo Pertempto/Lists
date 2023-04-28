@@ -52,7 +52,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
     );
   }
 
-  Row _buildItemTypeSwitcher() => Row(
+  Widget _buildItemTypeSwitcher() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text("Checkbox?"),

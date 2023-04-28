@@ -22,6 +22,10 @@ class _ThemePickerState extends State<ThemePicker> {
         },
         dropdownMenuEntries: const [
           DropdownMenuEntry(
+            label: 'System',
+            value: AdaptiveThemeMode.system,
+          ),
+          DropdownMenuEntry(
             label: 'Light',
             value: AdaptiveThemeMode.light,
           ),
