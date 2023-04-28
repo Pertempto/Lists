@@ -55,5 +55,5 @@ class ItemUpdateError extends ListModelError {
     required Item item,
     required ListModel listModel,
   }) : super(
-            "tried to update item '$item' in '$listModel', but operation failed. Database may be corrupted.");
+            'tried to update item "$item" in "$listModel", but operation failed. Database may be corrupted.');
 }

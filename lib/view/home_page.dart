@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
-import 'package:lists/view/edit_dialog.dart';
+import 'package:lists/view/submit_value_dialog.dart';
 import 'package:lists/view/list_widget.dart';
 import 'package:lists/view/list_preview_widget.dart';
+import 'package:lists/view/settings_widget.dart';
+import 'package:modal_side_sheet/modal_side_sheet.dart';
 
+/// HomePage:
+///   - A widget representing the home page in the app.
+///     This is where the user selects the list they
+///     want to view/edit.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -16,7 +22,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Lists")),
+      appBar:
+          AppBar(title: const Text('Lists'), actions: [_buildSettingsButton()]),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNewListDialog,
@@ -25,6 +32,11 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  IconButton _buildSettingsButton() => IconButton(
+      icon: const Icon(Icons.settings),
+      onPressed: () =>
+          showModalSideSheet(context: context, body: const SettingsWidget()));
 
   Widget _buildBody() => FutureBuilder<List<ListModel>>(
       future: DatabaseManager.loadListModels(),
@@ -49,13 +61,11 @@ class _HomePageState extends State<HomePage> {
               ))
           .toList());
 
-  void _showAddNewListDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => SubmitValueDialog(
-          title: "Enter New List Title", onSubmit: _submitNewList),
-    );
-  }
+  void _showAddNewListDialog() => showDialog(
+        context: context,
+        builder: (context) => SubmitValueDialog(
+            title: 'Enter New List Title', onSubmit: _submitNewList),
+      );
 
   void _submitNewList(String newListName) async {
     final newListModel =

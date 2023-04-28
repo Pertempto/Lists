@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/view/edit_dialog.dart';
+import 'package:lists/view/submit_value_dialog.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 
 /// ItemWidget:
@@ -44,7 +44,7 @@ class _ItemWidgetState extends State<ItemWidget> {
     showDialog(
       context: context,
       builder: (context) => SubmitValueDialog(
-          title: "Enter Item",
+          title: 'Enter Item',
           onSubmit: updateItemValue,
           initialText: widget.item.value),
     );
