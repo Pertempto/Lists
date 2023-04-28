@@ -22,10 +22,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: _buildSettingsButton(),
-        title: const Text('Lists'),
-      ),
+      appBar:
+          AppBar(title: const Text('Lists'), actions: [_buildSettingsButton()]),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNewListDialog,
