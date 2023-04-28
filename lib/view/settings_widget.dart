@@ -4,7 +4,7 @@ import 'package:lists/view/theme_picker.dart';
 /// SettingsWidget:
 ///   - This widget allows the user to change the settings
 ///     of the app.
-///   - Use in `showSideModalSheet`.
+///   - Use in `showSideModalSheet`. TODO: make into settings page
 class SettingsWidget extends StatefulWidget {
   const SettingsWidget({super.key});
 
