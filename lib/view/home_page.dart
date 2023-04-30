@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
-import 'package:lists/view/edit_list_dialog.dart';
+import 'package:lists/view/list_settings_dialog.dart';
 import 'package:lists/view/list_widget.dart';
 import 'package:lists/view/list_preview_widget.dart';
 import 'package:lists/view/settings_widget.dart';
@@ -63,8 +63,7 @@ class _HomePageState extends State<HomePage> {
 
   void _showAddNewListDialog() => showDialog(
         context: context,
-        builder: (context) => EditListDialog(
-            title: 'Enter New List Title',
+        builder: (context) => ListSettingsDialog(
             onSubmit: _submitNewList,
             listModel: ListModel()),
       );
