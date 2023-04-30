@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 
-/// EditListDialog:
+/// ListSettingsDialog:
 ///   - a dialog that allows the user to edit the metadata of the list
 class ListSettingsDialog extends StatefulWidget {
   final void Function(ListModel) onSubmit;
