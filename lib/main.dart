@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
             brightness: Brightness.dark, seedColor: seedColor),
       ),
-      initial: savedThemeMode ?? AdaptiveThemeMode.light,
+      initial: savedThemeMode ?? AdaptiveThemeMode.system,
       builder: (light, dark) => MaterialApp(
         title: 'Flutter Demo',
         theme: light,

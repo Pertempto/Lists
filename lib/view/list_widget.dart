@@ -73,7 +73,6 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            title: 'New Item',
             onSubmit: (newItem) async {
               await listModel.add(newItem);
               itemsToBeDisplayed = await listModel.searchItems(searchQuery);

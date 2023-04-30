@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 
-/// EditListDialog:
+/// ListSettingsDialog:
 ///   - a dialog that allows the user to edit the metadata of the list
-class EditListMetaDialog extends StatefulWidget {
-  final String title;
+class ListSettingsDialog extends StatefulWidget {
   final void Function(ListModel) onSubmit;
   final ListModel listModel;
 
-  const EditListMetaDialog(
+  const ListSettingsDialog(
       {super.key,
-      required this.title,
       required this.onSubmit,
       required this.listModel});
 
   @override
-  State<EditListMetaDialog> createState() => _EditListMetaDialogState();
+  State<ListSettingsDialog> createState() => _ListSettingsDialogState();
 }
 
-class _EditListMetaDialogState extends State<EditListMetaDialog> {
+class _ListSettingsDialogState extends State<ListSettingsDialog> {
   late final TextEditingController _editingController;
 
   @override
@@ -30,7 +28,7 @@ class _EditListMetaDialogState extends State<EditListMetaDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.title, textAlign: TextAlign.center),
+      title: const Text('Enter New List Title', textAlign: TextAlign.center),
       content: TextFormField(
         controller: _editingController,
         autofocus: true,
