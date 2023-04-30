@@ -36,7 +36,7 @@ class _ListWidgetState extends State<ListWidget> {
           SearchBar(
             onChanged: (searchQuery) async {
               this.searchQuery = searchQuery;
-              refreshItems();
+              await refreshItems();
             },
           ),
         ],
@@ -77,14 +77,14 @@ class _ListWidgetState extends State<ListWidget> {
         builder: (context) => EditItemDialog(
             onSubmit: (newItem) async {
               await listModel.add(newItem);
-              refreshItems();
+              await refreshItems();
             },
             item: newItem),
       );
     }
   }
 
-  void refreshItems() async {
+  Future<void> refreshItems() async {
     itemsToBeDisplayed = await listModel.searchItems(searchQuery);
     setState(() {});
   }
