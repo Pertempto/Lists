@@ -36,7 +36,7 @@ class ListModel {
   // All-in-all, this function breaks a sentence apart into words (though
   // it doesn't filter out punctuation).
   // example:
-  // "The  great,    blue sky." --> ["The", "great,", "blue", "sky."]
+  // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
 
   Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);

@@ -57,7 +57,7 @@ class _ListWidgetState extends State<ListWidget> {
       children: itemsToBeDisplayed
           .map((item) => ItemWidget(item, onDelete: () async {
                 await listModel.remove(item);
-                setState(() {});
+                await refreshItems();
               }, onEdited: () async {
                 try {
                   await listModel.update(item);
