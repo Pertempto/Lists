@@ -34,19 +34,21 @@ class _ListWidgetState extends State<ListWidget> {
         title: Text(listModel.title),
         actions: [
           SearchBar(
-            onChanged: (searchStr) async {
-              searchQuery = searchStr;
-              itemsToBeDisplayed = await listModel.searchItems(searchStr);
-              setState(() {});
+            onChanged: (searchQuery) async {
+              this.searchQuery = searchQuery;
+              refreshItems();
             },
           ),
         ],
       ),
       body: _buildBody(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNewItem,
-        tooltip: 'Add a new item',
-        child: const Icon(Icons.add),
+      floatingActionButton: Visibility(
+        visible: searchQuery.isEmpty,
+        child: FloatingActionButton(
+          onPressed: _addNewItem,
+          tooltip: 'Add a new item',
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -75,11 +77,15 @@ class _ListWidgetState extends State<ListWidget> {
         builder: (context) => EditItemDialog(
             onSubmit: (newItem) async {
               await listModel.add(newItem);
-              itemsToBeDisplayed = await listModel.searchItems(searchQuery);
-              setState(() {});
+              refreshItems();
             },
             item: newItem),
       );
     }
+  }
+
+  void refreshItems() async {
+    itemsToBeDisplayed = await listModel.searchItems(searchQuery);
+    setState(() {});
   }
 }
