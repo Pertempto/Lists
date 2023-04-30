@@ -65,8 +65,7 @@ class _ItemWidgetState extends State<ItemWidget> {
   void _showEditDialog() {
     showDialog(
       context: context,
-      builder: (context) => EditItemDialog(
-          title: 'Enter Item', onSubmit: (_) => updateThis(), item: widget.item),
+      builder: (context) => EditItemDialog(onSubmit: (_) => updateThis(), item: widget.item),
     );
   }
 

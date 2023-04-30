@@ -3,22 +3,20 @@ import 'package:lists/model/list_model.dart';
 
 /// EditListDialog:
 ///   - a dialog that allows the user to edit the metadata of the list
-class EditListDialog extends StatefulWidget {
-  final String title;
+class ListSettingsDialog extends StatefulWidget {
   final void Function(ListModel) onSubmit;
   final ListModel listModel;
 
-  const EditListDialog(
+  const ListSettingsDialog(
       {super.key,
-      required this.title,
       required this.onSubmit,
       required this.listModel});
 
   @override
-  State<EditListDialog> createState() => _EditListDialogState();
+  State<ListSettingsDialog> createState() => _ListSettingsDialogState();
 }
 
-class _EditListDialogState extends State<EditListDialog> {
+class _ListSettingsDialogState extends State<ListSettingsDialog> {
   late final TextEditingController _editingController;
 
   @override
@@ -30,7 +28,7 @@ class _EditListDialogState extends State<EditListDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.title, textAlign: TextAlign.center),
+      title: const Text('Enter New List Title', textAlign: TextAlign.center),
       content: TextFormField(
         controller: _editingController,
         autofocus: true,
