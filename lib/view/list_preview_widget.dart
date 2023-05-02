@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:lists/view/edit_list_meta_dialog.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/list_widget.dart';
+import 'package:lists/view/list_settings_dialog.dart';
 import 'package:lists/model/database_manager.dart';
 
 /// ListPreviewWidget:
@@ -46,8 +46,7 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
           EditingActionButton.makeEditButton(
               onPressed: () => showDialog(
                   context: context,
-                  builder: (context) => EditListMetaDialog(
-                      title: 'Edit List',
+                  builder: (context) => ListSettingsDialog(
                       onSubmit: (listModel) async {
                         await DatabaseManager.putListModel(listModel);
                         setState(() {});

@@ -36,39 +36,36 @@ class _ListWidgetState extends State<ListWidget> {
           SearchBar(
             onChanged: (searchQuery) async {
               this.searchQuery = searchQuery;
-              itemsToBeDisplayed = await listModel.searchItems(searchQuery);
-              setState(() {});
+              await refreshItems();
             },
           ),
         ],
       ),
       body: _buildBody(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNewItem,
-        tooltip: 'Add a new item',
-        child: const Icon(Icons.add),
+      floatingActionButton: Visibility(
+        visible: searchQuery.isEmpty,
+        child: FloatingActionButton(
+          onPressed: _addNewItem,
+          tooltip: 'Add a new item',
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
 
   ListView _buildBody() => ListView(
       children: itemsToBeDisplayed
-          .map((item) => ItemWidget(
-                item,
-                onDelete: () async {
-                  await listModel.remove(item);
-                  itemsToBeDisplayed = await listModel.searchItems(searchQuery);
-                  setState(() {});
-                },
-                onEdited: () async {
-                  try {
-                    await listModel.update(item);
-                  } on ItemUpdateError catch (e) {
-                    // TODO: handle item update error.
-                    debugPrint(e.toString());
-                  }
-                },
-              ))
+          .map((item) => ItemWidget(item, onDelete: () async {
+                await listModel.remove(item);
+                await refreshItems();
+              }, onEdited: () async {
+                try {
+                  await listModel.update(item);
+                } on ItemUpdateError catch (e) {
+                  // TODO: handle item update error.
+                  debugPrint(e.toString());
+                }
+              }))
           .toList());
 
   void _addNewItem() async {
@@ -78,14 +75,17 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            title: 'New Item',
             onSubmit: (newItem) async {
               await listModel.add(newItem);
-              itemsToBeDisplayed = await listModel.searchItems(searchQuery);
-              setState(() {});
+              await refreshItems();
             },
             item: newItem),
       );
     }
+  }
+
+  Future<void> refreshItems() async {
+    itemsToBeDisplayed = await listModel.searchItems(searchQuery);
+    setState(() {});
   }
 }

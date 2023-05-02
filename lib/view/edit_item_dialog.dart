@@ -4,15 +4,10 @@ import 'package:lists/model/item.dart';
 /// EditItemDialog:
 ///   - a dialog that allows the user to edit an `Item`
 class EditItemDialog extends StatefulWidget {
-  final String title;
   final void Function(Item) onSubmit;
   final Item item;
 
-  const EditItemDialog(
-      {super.key,
-      required this.title,
-      required this.onSubmit,
-      required this.item});
+  const EditItemDialog({super.key, required this.onSubmit, required this.item});
 
   @override
   State<EditItemDialog> createState() => _EditItemDialogState();
@@ -20,6 +15,7 @@ class EditItemDialog extends StatefulWidget {
 
 class _EditItemDialogState extends State<EditItemDialog> {
   late final TextEditingController _editingController;
+  late ItemType selectedItemType = widget.item.itemType;
 
   @override
   void initState() {
@@ -30,7 +26,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.title, textAlign: TextAlign.center),
+      title: const Text('Enter Item', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -57,8 +53,8 @@ class _EditItemDialogState extends State<EditItemDialog> {
         children: [
           const Text("Checkbox?"),
           Switch(
-              value: widget.item.itemType == ItemType.checkbox,
-              onChanged: (isCheckbox) => setState(() => widget.item.itemType =
+              value: selectedItemType == ItemType.checkbox,
+              onChanged: (isCheckbox) => setState(() => selectedItemType =
                   isCheckbox ? ItemType.checkbox : ItemType.text))
         ],
       );
@@ -66,6 +62,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
   void _submitNewItemValue() {
     Navigator.pop(context);
     widget.item.value = _editingController.text;
+    widget.item.itemType = selectedItemType;
 
     widget.onSubmit(widget.item);
   }
