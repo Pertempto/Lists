@@ -40,7 +40,15 @@ const ItemSchema = CollectionSchema(
   deserializeProp: _itemDeserializeProp,
   idName: r'id',
   indexes: {},
-  links: {},
+  links: {
+    r'group': LinkSchema(
+      id: -3898584517192245807,
+      name: r'group',
+      target: r'ItemGroup',
+      single: true,
+      linkName: r'items',
+    )
+  },
   embeddedSchemas: {},
   getId: _itemGetId,
   getLinks: _itemGetLinks,
@@ -118,11 +126,12 @@ Id _itemGetId(Item object) {
 }
 
 List<IsarLinkBase<dynamic>> _itemGetLinks(Item object) {
-  return [];
+  return [object.group];
 }
 
 void _itemAttach(IsarCollection<dynamic> col, Id id, Item object) {
   object.id = id;
+  object.group.attach(col, col.isar.collection<ItemGroup>(), r'group', id);
 }
 
 extension ItemQueryWhereSort on QueryBuilder<Item, Item, QWhere> {
@@ -446,7 +455,20 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 
 extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
 
-extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {}
+extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {
+  QueryBuilder<Item, Item, QAfterFilterCondition> group(
+      FilterQuery<ItemGroup> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'group');
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> groupIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'group', 0, true, 0, true);
+    });
+  }
+}
 
 extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
   QueryBuilder<Item, Item, QAfterSortBy> sortByIsChecked() {

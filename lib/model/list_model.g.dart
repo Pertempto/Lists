@@ -17,8 +17,13 @@ const ListModelSchema = CollectionSchema(
   name: r'ListModel',
   id: 5416347897186416744,
   properties: {
-    r'title': PropertySchema(
+    r'hasDefaultItemGroup': PropertySchema(
       id: 0,
+      name: r'hasDefaultItemGroup',
+      type: IsarType.bool,
+    ),
+    r'title': PropertySchema(
+      id: 1,
       name: r'title',
       type: IsarType.string,
     )
@@ -30,16 +35,16 @@ const ListModelSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {
-    r'userCreatedItemGroups': LinkSchema(
-      id: 7842742788986650323,
-      name: r'userCreatedItemGroups',
-      target: r'UserCreatedItemGroup',
-      single: false,
+    r'defaultItemGroupLink': LinkSchema(
+      id: -4902889469726989801,
+      name: r'defaultItemGroupLink',
+      target: r'ItemGroup',
+      single: true,
     ),
-    r'defaultItemGroupItems': LinkSchema(
-      id: -388390053698887794,
-      name: r'defaultItemGroupItems',
-      target: r'Item',
+    r'itemGroups': LinkSchema(
+      id: 5222933689247287929,
+      name: r'itemGroups',
+      target: r'ItemGroup',
       single: false,
     )
   },
@@ -66,7 +71,8 @@ void _listModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.title);
+  writer.writeBool(offsets[0], object.hasDefaultItemGroup);
+  writer.writeString(offsets[1], object.title);
 }
 
 ListModel _listModelDeserialize(
@@ -77,7 +83,7 @@ ListModel _listModelDeserialize(
 ) {
   final object = ListModel();
   object.id = id;
-  object.title = reader.readString(offsets[0]);
+  object.title = reader.readString(offsets[1]);
   return object;
 }
 
@@ -89,6 +95,8 @@ P _listModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
+      return (reader.readBool(offset)) as P;
+    case 1:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -100,18 +108,15 @@ Id _listModelGetId(ListModel object) {
 }
 
 List<IsarLinkBase<dynamic>> _listModelGetLinks(ListModel object) {
-  return [object.userCreatedItemGroups, object.defaultItemGroupItems];
+  return [object.defaultItemGroupLink, object.itemGroups];
 }
 
 void _listModelAttach(IsarCollection<dynamic> col, Id id, ListModel object) {
   object.id = id;
-  object.userCreatedItemGroups.attach(
-      col,
-      col.isar.collection<UserCreatedItemGroup>(),
-      r'userCreatedItemGroups',
-      id);
-  object.defaultItemGroupItems
-      .attach(col, col.isar.collection<Item>(), r'defaultItemGroupItems', id);
+  object.defaultItemGroupLink.attach(
+      col, col.isar.collection<ItemGroup>(), r'defaultItemGroupLink', id);
+  object.itemGroups
+      .attach(col, col.isar.collection<ItemGroup>(), r'itemGroups', id);
 }
 
 extension ListModelQueryWhereSort
@@ -193,6 +198,16 @@ extension ListModelQueryWhere
 
 extension ListModelQueryFilter
     on QueryBuilder<ListModel, ListModel, QFilterCondition> {
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      hasDefaultItemGroupEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'hasDefaultItemGroup',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -383,58 +398,69 @@ extension ListModelQueryObject
 extension ListModelQueryLinks
     on QueryBuilder<ListModel, ListModel, QFilterCondition> {
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      userCreatedItemGroups(FilterQuery<UserCreatedItemGroup> q) {
+      defaultItemGroupLink(FilterQuery<ItemGroup> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'userCreatedItemGroups');
+      return query.link(q, r'defaultItemGroupLink');
     });
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      userCreatedItemGroupsLengthEqualTo(int length) {
+      defaultItemGroupLinkIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'userCreatedItemGroups', length, true, length, true);
+      return query.linkLength(r'defaultItemGroupLink', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> itemGroups(
+      FilterQuery<ItemGroup> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'itemGroups');
     });
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      userCreatedItemGroupsIsEmpty() {
+      itemGroupsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'userCreatedItemGroups', 0, true, 0, true);
+      return query.linkLength(r'itemGroups', length, true, length, true);
     });
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      userCreatedItemGroupsIsNotEmpty() {
+      itemGroupsIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'userCreatedItemGroups', 0, false, 999999, true);
+      return query.linkLength(r'itemGroups', 0, true, 0, true);
     });
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      userCreatedItemGroupsLengthLessThan(
+      itemGroupsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'itemGroups', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      itemGroupsLengthLessThan(
     int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'userCreatedItemGroups', 0, true, length, include);
+      return query.linkLength(r'itemGroups', 0, true, length, include);
     });
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      userCreatedItemGroupsLengthGreaterThan(
+      itemGroupsLengthGreaterThan(
     int length, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'userCreatedItemGroups', length, include, 999999, true);
+      return query.linkLength(r'itemGroups', length, include, 999999, true);
     });
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      userCreatedItemGroupsLengthBetween(
+      itemGroupsLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -442,76 +468,25 @@ extension ListModelQueryLinks
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(
-          r'userCreatedItemGroups', lower, includeLower, upper, includeUpper);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupItems(FilterQuery<Item> q) {
-    return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'defaultItemGroupItems');
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupItemsLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'defaultItemGroupItems', length, true, length, true);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupItemsIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'defaultItemGroupItems', 0, true, 0, true);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupItemsIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'defaultItemGroupItems', 0, false, 999999, true);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupItemsLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'defaultItemGroupItems', 0, true, length, include);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupItemsLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'defaultItemGroupItems', length, include, 999999, true);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupItemsLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'defaultItemGroupItems', lower, includeLower, upper, includeUpper);
+          r'itemGroups', lower, includeLower, upper, includeUpper);
     });
   }
 }
 
 extension ListModelQuerySortBy on QueryBuilder<ListModel, ListModel, QSortBy> {
+  QueryBuilder<ListModel, ListModel, QAfterSortBy> sortByHasDefaultItemGroup() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasDefaultItemGroup', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterSortBy>
+      sortByHasDefaultItemGroupDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasDefaultItemGroup', Sort.desc);
+    });
+  }
+
   QueryBuilder<ListModel, ListModel, QAfterSortBy> sortByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -527,6 +502,19 @@ extension ListModelQuerySortBy on QueryBuilder<ListModel, ListModel, QSortBy> {
 
 extension ListModelQuerySortThenBy
     on QueryBuilder<ListModel, ListModel, QSortThenBy> {
+  QueryBuilder<ListModel, ListModel, QAfterSortBy> thenByHasDefaultItemGroup() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasDefaultItemGroup', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterSortBy>
+      thenByHasDefaultItemGroupDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasDefaultItemGroup', Sort.desc);
+    });
+  }
+
   QueryBuilder<ListModel, ListModel, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -554,6 +542,13 @@ extension ListModelQuerySortThenBy
 
 extension ListModelQueryWhereDistinct
     on QueryBuilder<ListModel, ListModel, QDistinct> {
+  QueryBuilder<ListModel, ListModel, QDistinct>
+      distinctByHasDefaultItemGroup() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'hasDefaultItemGroup');
+    });
+  }
+
   QueryBuilder<ListModel, ListModel, QDistinct> distinctByTitle(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -567,6 +562,13 @@ extension ListModelQueryProperty
   QueryBuilder<ListModel, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<ListModel, bool, QQueryOperations>
+      hasDefaultItemGroupProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'hasDefaultItemGroup');
     });
   }
 

@@ -1,24 +1,41 @@
 import 'package:isar/isar.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/item_group_base.dart';
+import 'package:lists/model/item_group_search_results.dart';
 
-abstract class ItemGroup {
-  bool get hasTitle;
-  String? get title;
+part 'item_group.g.dart';
 
-  Iterable<Item> itemsView();
+@Collection()
+class ItemGroup extends ItemGroupBase {
+  Id id = Isar.autoIncrement;
+  @override
+  String? title;
+  final items = IsarLinks<Item>();
 
-  int get itemCount;
+  ItemGroup({this.title});
 
-  void init();
+  @override
+  int get itemCount => items.length;
 
-  IsarLinks<Item> get items;
+  @override
+  Iterable<Item> itemsView() => items;
 
-  Future<Iterable<Item>> searchItems(Iterable<String> searchWords) async =>
-      await items
-          .filter()
-          .allOf(searchWords,
-              (q, word) => q.valueContains(word, caseSensitive: false))
-          .findAll();
+  void init() {
+    items.loadSync();
+    for (final item in items) {
+      item.init();
+    }
+  }
+
+  Future<ItemGroupSearchResults> searchItems(
+          Iterable<String> searchWords) async =>
+      ItemGroupSearchResults(
+          group: this,
+          results: await items
+              .filter()
+              .allOf(searchWords,
+                  (q, word) => q.valueContains(word, caseSensitive: false))
+              .findAll());
 
   bool add(Item newItem) => items.add(newItem);
   bool contains(Item item) => items.contains(item);

@@ -64,12 +64,12 @@ class _HomePageState extends State<HomePage> {
   void _showAddNewListDialog() => showDialog(
         context: context,
         builder: (context) => ListSettingsDialog(
-            onSubmit: _submitNewList,
-            listModel: ListModel()),
+            onSubmit: _submitNewList, listModel: ListModel()),
       );
 
   void _submitNewList(ListModel listModel) async {
     final newListModel = await DatabaseManager.putListModel(listModel);
+    await newListModel.createDefaultItemGroup();
     if (context.mounted) {
       await Navigator.push(
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
@@ -79,6 +79,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onListModelsLoadingError(Object error) {
     //TODO: handle error
-    debugPrint(error.toString());
+    debugPrint("MESH MESH MESH $error");
+    debugPrint("MESH MESH MESH ${error is Error ? error.stackTrace : null}");
   }
 }

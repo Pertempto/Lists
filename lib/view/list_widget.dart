@@ -1,4 +1,6 @@
+import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/item_group_base.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
@@ -18,13 +20,13 @@ class ListWidget extends StatefulWidget {
 class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
 
-  late Iterable<Item> itemsToBeDisplayed;
+  late Iterable<ItemGroupBase> groupsToBeDisplayed;
   String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    itemsToBeDisplayed = listModel.itemsView();
+    groupsToBeDisplayed = listModel.groupsView();
   }
 
   @override
@@ -54,18 +56,24 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildBody() => ListView(
-      children: itemsToBeDisplayed
-          .map((item) => ItemWidget(item, onDelete: () async {
-                await listModel.remove(item);
-                await refreshItems();
-              }, onEdited: () async {
-                try {
-                  await listModel.update(item);
-                } on ItemUpdateError catch (e) {
-                  // TODO: handle item update error.
-                  debugPrint(e.toString());
-                }
-              }))
+      children: groupsToBeDisplayed
+          .map((group) => <Widget>[
+                Text(group.title ?? 'Cheese',
+                    style: Theme.of(context).textTheme.headlineLarge)
+              ].followedBy(group
+                  .itemsView()
+                  .map((item) => ItemWidget(item, onDelete: () async {
+                        await listModel.remove(item);
+                        await refreshItems();
+                      }, onEdited: () async {
+                        try {
+                          await listModel.update(item);
+                        } on ItemUpdateError catch (e) {
+                          // TODO: handle item update error.
+                          debugPrint(e.toString());
+                        }
+                      }))))
+          .flattened
           .toList());
 
   void _addNewItem() async {
@@ -85,7 +93,7 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   Future<void> refreshItems() async {
-    itemsToBeDisplayed = await listModel.searchItems(searchQuery);
+    groupsToBeDisplayed = await listModel.searchItems(searchQuery);
     setState(() {});
   }
 }

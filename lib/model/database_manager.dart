@@ -3,7 +3,6 @@ import 'package:isar/isar.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
-import 'package:lists/model/user_created_item_group.dart';
 
 /// DatabaseManager:
 ///   - a class that creates, reads, updates, and
@@ -13,8 +12,7 @@ class DatabaseManager {
 
   static Future<void> init() async {
     if (Isar.instanceNames.isEmpty) {
-      isar = await Isar.open(
-          [ListModelSchema, ItemSchema, UserCreatedItemGroupSchema],
+      isar = await Isar.open([ListModelSchema, ItemSchema, ItemGroupSchema],
           inspector: kDebugMode);
     }
   }
@@ -35,8 +33,7 @@ class DatabaseManager {
   static Future<void> deleteListModel(ListModel listModel) async {
     late final bool wasDeleted;
 
-    deleteItemGroup(listModel.defaultItemGroup);
-    for (final itemGroup in listModel.userCreatedItemGroups) {
+    for (final itemGroup in listModel.groupsView()) {
       deleteItemGroup(itemGroup);
     }
     await isar.writeTxn(
@@ -45,10 +42,15 @@ class DatabaseManager {
     assert(wasDeleted);
   }
 
-  static Future<ItemGroup> putUserCreatedItemGroup(
-      UserCreatedItemGroup itemGroup) async {
-    await isar
-        .writeTxn(() async => await isar.userCreatedItemGroups.put(itemGroup));
+  static Future<void> updateListModelGroups(ListModel listModel) async {
+    await isar.writeTxn(() async {
+      await listModel.defaultItemGroupLink.save();
+      await listModel.itemGroups.save();
+    });
+  }
+
+  static Future<ItemGroup> putItemGroup(ItemGroup itemGroup) async {
+    await isar.writeTxn(() async => await isar.itemGroups.put(itemGroup));
     return itemGroup;
   }
 
@@ -57,9 +59,7 @@ class DatabaseManager {
       await isar.items
           .deleteAll(itemGroup.items.map((item) => item.id).toList());
 
-      if (itemGroup is UserCreatedItemGroup) {
-        await isar.userCreatedItemGroups.delete(itemGroup.id);
-      }
+      await isar.itemGroups.delete(itemGroup.id);
     });
   }
 
@@ -67,10 +67,8 @@ class DatabaseManager {
       {required ItemGroup from, required ItemGroup to}) async {
     to.items.addAll(from.items);
     from.items.clear();
-    await isar.writeTxn(() async {
-      await to.items.save();
-      await from.items.save();
-    });
+    updateGroupItems(from);
+    updateGroupItems(to);
   }
 
   static Future<void> updateGroupItems(ItemGroup which) async =>
