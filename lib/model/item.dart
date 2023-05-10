@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/item_group.dart';
 part 'item.g.dart';
@@ -16,11 +17,29 @@ class Item {
   bool isChecked = false;
 
   @Backlink(to: "items")
-  final group = IsarLink<ItemGroup>();
+  final groupLink = IsarLink<ItemGroup>();
+
+  @ignore
+  ItemGroup get group => groupLink.value!;
+
+  @ignore
+  bool get hasGroup => groupLink.value != null;
 
   Item([this.value = '', this.itemType = ItemType.text]);
 
-  void init() => group.loadSync();
+  void init() {}
+
+  @override
+  String toString() => 'Item(\'$value\')';
+
+  @visibleForTesting
+  bool isExactlyEqualTo(Item other) {
+    return 
+        other.id == id &&
+        other.itemType == itemType &&
+        other.value == value &&
+        other.isChecked == isChecked;
+  }
 }
 
 enum ItemType { text, checkbox }

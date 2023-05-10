@@ -27,6 +27,7 @@ class DatabaseManager {
 
   static Future<ListModel> putListModel(ListModel listModel) async {
     await isar.writeTxn(() async => await isar.listModels.put(listModel));
+    await listModel.ensureHasDefaultItemGroup();
     return listModel;
   }
 
@@ -67,12 +68,13 @@ class DatabaseManager {
       {required ItemGroup from, required ItemGroup to}) async {
     to.items.addAll(from.items);
     from.items.clear();
-    updateGroupItems(from);
-    updateGroupItems(to);
+    await updateGroupItems(from);
+    await updateGroupItems(to);
   }
 
-  static Future<void> updateGroupItems(ItemGroup which) async =>
-      await isar.writeTxn(() async => await which.items.save());
+  static Future<void> updateGroupItems(ItemGroup which) async {
+    await isar.writeTxn(() async => await which.items.save());
+  }
 
   static Future<Item> putItem(Item item) async {
     await isar.writeTxn(() async => await isar.items.put(item));
@@ -81,4 +83,38 @@ class DatabaseManager {
 
   static Future<void> deleteItem(Item item) async =>
       await isar.writeTxn(() async => await isar.items.delete(item.id));
+
+  @visibleForTesting
+  static Future<void> doTest(Future<void> Function() test) async {
+    await initForTesting();
+    await test();
+    await cleanupAfterTesting();
+  }
+
+  @visibleForTesting
+  static Future<void> initForTesting() async {
+    await Isar.initializeIsarCore(download: true);
+    await init();
+    await DatabaseManager.clear();
+  }
+
+  @visibleForTesting
+  static Future<void> cleanupAfterTesting() async {
+    await DatabaseManager.clear();
+  }
+
+  @visibleForTesting
+  static Future<void> clear() async {
+    await isar.writeTxn(() async {
+      await isar.items.clear();
+      await isar.itemGroups.clear();
+      await isar.listModels.clear();
+    });
+  }
+
+  @visibleForTesting
+  static Future<ListModel> getListModel(Id id) async {
+    return await loadListModels().then((listModels) =>
+        listModels.where((listModel) => listModel.id == id).single);
+  }
 }

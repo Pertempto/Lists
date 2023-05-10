@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group_base.dart';
@@ -12,8 +14,11 @@ class ItemGroup extends ItemGroupBase {
   String? title;
   final items = IsarLinks<Item>();
 
-  ItemGroup({this.title});
+  ItemGroup({this.title}) {
+    print('new ItemGroup(\'$title\')');
+  }
 
+  @ignore
   @override
   int get itemCount => items.length;
 
@@ -40,4 +45,19 @@ class ItemGroup extends ItemGroupBase {
   bool add(Item newItem) => items.add(newItem);
   bool contains(Item item) => items.contains(item);
   bool remove(Item item) => items.remove(item);
+
+  @override
+  String toString() =>
+      'ItemGroup(id: $id, title: $title, items: $items, itemCount: $itemCount, itemsView: ${itemsView()})';
+
+  @visibleForTesting
+  bool isExactlyEqualTo(ItemGroup other) {
+    return other.id == id &&
+        other.itemCount == itemCount &&
+        other.title == title &&
+        IterableZip([itemsView(), other.itemsView()]).fold(
+            true,
+            (runningCondition, items) =>
+                runningCondition && items[0].isExactlyEqualTo(items[1]));
+  }
 }

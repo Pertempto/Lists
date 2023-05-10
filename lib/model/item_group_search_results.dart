@@ -16,11 +16,14 @@ class ItemGroupSearchResults extends ItemGroupBase {
 
   @override
   int get itemCount => _results.length;
-  
+
   @override
   Iterable<Item> itemsView() => _results;
 
   ItemGroup get group => _group;
   Iterator<Item> get iterator => _results.iterator;
-  
+
+  @override
+  String toString() =>
+      'ItemGroupSearchResults(itemCount: $itemCount, itemsView: ${itemsView()}, group: $group)';
 }

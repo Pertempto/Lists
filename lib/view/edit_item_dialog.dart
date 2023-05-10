@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/item_group.dart';
 
 /// EditItemDialog:
 ///   - a dialog that allows the user to edit an `Item`
 class EditItemDialog extends StatefulWidget {
   final void Function(Item) onSubmit;
   final Item item;
+  final Iterable<ItemGroup> itemGroups;
 
-  const EditItemDialog({super.key, required this.onSubmit, required this.item});
+  const EditItemDialog(
+      {super.key,
+      required this.onSubmit,
+      required this.item,
+      required this.itemGroups});
 
   @override
   State<EditItemDialog> createState() => _EditItemDialogState();
@@ -36,7 +42,9 @@ class _EditItemDialogState extends State<EditItemDialog> {
             onFieldSubmitted: (_) => _submitNewItemValue(),
           ),
           const SizedBox(height: 15),
-          _buildItemTypeSwitcher()
+          _buildItemTypeSwitcher(),
+          const SizedBox(height: 15),
+          _buildGroupPicker(),
         ],
       ),
       actions: [
@@ -56,6 +64,19 @@ class _EditItemDialogState extends State<EditItemDialog> {
               value: selectedItemType == ItemType.checkbox,
               onChanged: (isCheckbox) => setState(() => selectedItemType =
                   isCheckbox ? ItemType.checkbox : ItemType.text))
+        ],
+      );
+
+  Widget _buildGroupPicker() => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("Group"),
+          DropdownMenu<ItemGroup>(
+              leadingIcon: const Icon(Icons.category),
+              dropdownMenuEntries: widget.itemGroups
+                  .map((itemGroup) => DropdownMenuEntry(
+                      value: itemGroup, label: itemGroup.title ?? 'Cheese'))
+                  .toList()),
         ],
       );
 

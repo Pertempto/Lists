@@ -41,9 +41,9 @@ const ItemSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {
-    r'group': LinkSchema(
+    r'groupLink': LinkSchema(
       id: -3898584517192245807,
-      name: r'group',
+      name: r'groupLink',
       target: r'ItemGroup',
       single: true,
       linkName: r'items',
@@ -126,12 +126,13 @@ Id _itemGetId(Item object) {
 }
 
 List<IsarLinkBase<dynamic>> _itemGetLinks(Item object) {
-  return [object.group];
+  return [object.groupLink];
 }
 
 void _itemAttach(IsarCollection<dynamic> col, Id id, Item object) {
   object.id = id;
-  object.group.attach(col, col.isar.collection<ItemGroup>(), r'group', id);
+  object.groupLink
+      .attach(col, col.isar.collection<ItemGroup>(), r'groupLink', id);
 }
 
 extension ItemQueryWhereSort on QueryBuilder<Item, Item, QWhere> {
@@ -456,16 +457,16 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
 
 extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {
-  QueryBuilder<Item, Item, QAfterFilterCondition> group(
+  QueryBuilder<Item, Item, QAfterFilterCondition> groupLink(
       FilterQuery<ItemGroup> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'group');
+      return query.link(q, r'groupLink');
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> groupIsNull() {
+  QueryBuilder<Item, Item, QAfterFilterCondition> groupLinkIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'group', 0, true, 0, true);
+      return query.linkLength(r'groupLink', 0, true, 0, true);
     });
   }
 }

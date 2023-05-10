@@ -69,7 +69,6 @@ class _HomePageState extends State<HomePage> {
 
   void _submitNewList(ListModel listModel) async {
     final newListModel = await DatabaseManager.putListModel(listModel);
-    await newListModel.createDefaultItemGroup();
     if (context.mounted) {
       await Navigator.push(
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
@@ -83,3 +82,6 @@ class _HomePageState extends State<HomePage> {
     debugPrint("MESH MESH MESH ${error is Error ? error.stackTrace : null}");
   }
 }
+
+
+// TODO: find out about these ghost item groups and get the thing working! It isn't deleting items in program, but does in database.

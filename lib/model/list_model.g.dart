@@ -17,13 +17,8 @@ const ListModelSchema = CollectionSchema(
   name: r'ListModel',
   id: 5416347897186416744,
   properties: {
-    r'hasDefaultItemGroup': PropertySchema(
-      id: 0,
-      name: r'hasDefaultItemGroup',
-      type: IsarType.bool,
-    ),
     r'title': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'title',
       type: IsarType.string,
     )
@@ -71,8 +66,7 @@ void _listModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.hasDefaultItemGroup);
-  writer.writeString(offsets[1], object.title);
+  writer.writeString(offsets[0], object.title);
 }
 
 ListModel _listModelDeserialize(
@@ -83,7 +77,7 @@ ListModel _listModelDeserialize(
 ) {
   final object = ListModel();
   object.id = id;
-  object.title = reader.readString(offsets[1]);
+  object.title = reader.readString(offsets[0]);
   return object;
 }
 
@@ -95,8 +89,6 @@ P _listModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBool(offset)) as P;
-    case 1:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -198,16 +190,6 @@ extension ListModelQueryWhere
 
 extension ListModelQueryFilter
     on QueryBuilder<ListModel, ListModel, QFilterCondition> {
-  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      hasDefaultItemGroupEqualTo(bool value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'hasDefaultItemGroup',
-        value: value,
-      ));
-    });
-  }
-
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -474,19 +456,6 @@ extension ListModelQueryLinks
 }
 
 extension ListModelQuerySortBy on QueryBuilder<ListModel, ListModel, QSortBy> {
-  QueryBuilder<ListModel, ListModel, QAfterSortBy> sortByHasDefaultItemGroup() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'hasDefaultItemGroup', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterSortBy>
-      sortByHasDefaultItemGroupDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'hasDefaultItemGroup', Sort.desc);
-    });
-  }
-
   QueryBuilder<ListModel, ListModel, QAfterSortBy> sortByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -502,19 +471,6 @@ extension ListModelQuerySortBy on QueryBuilder<ListModel, ListModel, QSortBy> {
 
 extension ListModelQuerySortThenBy
     on QueryBuilder<ListModel, ListModel, QSortThenBy> {
-  QueryBuilder<ListModel, ListModel, QAfterSortBy> thenByHasDefaultItemGroup() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'hasDefaultItemGroup', Sort.asc);
-    });
-  }
-
-  QueryBuilder<ListModel, ListModel, QAfterSortBy>
-      thenByHasDefaultItemGroupDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'hasDefaultItemGroup', Sort.desc);
-    });
-  }
-
   QueryBuilder<ListModel, ListModel, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -542,13 +498,6 @@ extension ListModelQuerySortThenBy
 
 extension ListModelQueryWhereDistinct
     on QueryBuilder<ListModel, ListModel, QDistinct> {
-  QueryBuilder<ListModel, ListModel, QDistinct>
-      distinctByHasDefaultItemGroup() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'hasDefaultItemGroup');
-    });
-  }
-
   QueryBuilder<ListModel, ListModel, QDistinct> distinctByTitle(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -562,13 +511,6 @@ extension ListModelQueryProperty
   QueryBuilder<ListModel, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
-    });
-  }
-
-  QueryBuilder<ListModel, bool, QQueryOperations>
-      hasDefaultItemGroupProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'hasDefaultItemGroup');
     });
   }
 

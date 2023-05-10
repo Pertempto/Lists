@@ -19,29 +19,35 @@ class ListModel {
   final itemGroups = IsarLinks<ItemGroup>();
 
   @ignore
-  ItemGroup get _defaultItemGroup => defaultItemGroupLink.value!;
-  set _defaultItemGroup(ItemGroup newValue) =>
-      defaultItemGroupLink.value = newValue;
+  ItemGroup get defaultItemGroup => defaultItemGroupLink.value!;
+  set defaultItemGroup(ItemGroup itemGroup) =>
+      defaultItemGroupLink.value = itemGroup;
 
   bool get hasDefaultItemGroup => defaultItemGroupLink.value != null;
 
-  Future<void> createDefaultItemGroup() async {
+  Future<void> ensureHasDefaultItemGroup() async {
     if (!hasDefaultItemGroup) {
-      _defaultItemGroup = await DatabaseManager.putItemGroup(ItemGroup());
+      await DatabaseManager.putItemGroup(defaultItemGroup = ItemGroup());
       DatabaseManager.updateListModelGroups(this);
     }
+  }
+
+  Future<void> addGroup(ItemGroup itemGroup) async {
+    await DatabaseManager.putItemGroup(itemGroup);
+    itemGroups.add(itemGroup);
+    DatabaseManager.updateListModelGroups(this);
   }
 
   Iterable<Item> itemsView() =>
       groupsView().expand((itemGroup) => itemGroup.itemsView());
 
-  Iterable<ItemGroup> groupsView() => <Iterable<ItemGroup>>[
-        [_defaultItemGroup],
+  Iterable<ItemGroup> groupsView() => [
+        [defaultItemGroup],
         itemGroups
       ].flattened;
 
   @ignore
-  int get itemCount => itemGroups.fold(_defaultItemGroup.itemCount,
+  int get itemCount => groupsView().fold(0,
       (runningItemCount, itemGroup) => runningItemCount + itemGroup.itemCount);
 
   // a zero-arg constructor is required for classes that are isar collections
@@ -68,7 +74,7 @@ class ListModel {
     return searchResults;
   }
 
-  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r"([^\s]+)")
+  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r'([^\s]+)')
       .allMatches(searchQuery)
       .map((match) => match.group(0)!);
   // note: the above regex pattern "([^\s]+)" matches a string without spaces.
@@ -79,23 +85,37 @@ class ListModel {
 
   Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);
-    if (_defaultItemGroup.add(newItem)) {
-      await DatabaseManager.updateGroupItems(_defaultItemGroup);
+    if (defaultItemGroup.add(newItem)) {
+      await DatabaseManager.updateGroupItems(defaultItemGroup);
+      await newItem.groupLink.load();
     }
   }
 
   Future<void> update(Item item) async {
-    if (_defaultItemGroup.contains(item)) {
+    if (item.group.contains(item)) {
       await DatabaseManager.putItem(item);
+      // await item.group.items.load();
+      if (item.group.id == defaultItemGroup.id) {
+        await defaultItemGroup.items.load();
+      } else {
+        await itemGroups.lookup(item.group)!.items.load();
+        // TODO: fix remove. CLEAN SERIOUSLY!!!!!!!!
+      }
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
   }
 
   Future<void> remove(Item item) async {
-    if (_defaultItemGroup.remove(item)) {
+    if (item.group.remove(item)) {
       await DatabaseManager.deleteItem(item);
-      await DatabaseManager.updateGroupItems(_defaultItemGroup);
+      await DatabaseManager.updateGroupItems(item.group);
+      if (item.group.id == defaultItemGroup.id) {
+        await defaultItemGroup.items.load();
+      } else {
+        await itemGroups.lookup(item.group)!.items.load();
+        // TODO: fix remove. CLEAN SERIOUSLY!!!!!!!!
+      }
     }
   }
 }

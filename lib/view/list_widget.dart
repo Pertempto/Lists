@@ -31,6 +31,7 @@ class _ListWidgetState extends State<ListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print(groupsToBeDisplayed);
     return Scaffold(
       appBar: AppBar(
         title: Text(listModel.title),
@@ -67,10 +68,12 @@ class _ListWidgetState extends State<ListWidget> {
                         await refreshItems();
                       }, onEdited: () async {
                         try {
+                          print('onEdited: $item');
+                          print('onEdited: ${item.group}');
                           await listModel.update(item);
                         } on ItemUpdateError catch (e) {
                           // TODO: handle item update error.
-                          debugPrint(e.toString());
+                          debugPrint('ERROR: ${e.toString()}');
                         }
                       }))))
           .flattened
@@ -83,6 +86,7 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
+            itemGroups: [],
             onSubmit: (newItem) async {
               await listModel.add(newItem);
               await refreshItems();
