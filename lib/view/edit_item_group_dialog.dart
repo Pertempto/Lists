@@ -13,7 +13,8 @@ class EditItemGroupDialog extends StatefulWidget {
 }
 
 class _EditItemGroupDialogState extends State<EditItemGroupDialog> {
-  final TextEditingController _editingController = TextEditingController();
+  late final TextEditingController _editingController =
+      TextEditingController(text: widget.itemGroup.title);
 
   @override
   Widget build(BuildContext context) {
