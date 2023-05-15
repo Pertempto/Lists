@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
+import 'package:lists/model/list_model.dart';
+import 'package:lists/view/edit_item_group_dialog.dart';
 
 /// EditItemDialog:
 ///   - a dialog that allows the user to edit an `Item`
 class EditItemDialog extends StatefulWidget {
   final void Function(Item) onSubmit;
   final Item item;
-  final Iterable<ItemGroup> itemGroups;
+  final ListModel containingListModel;
 
   const EditItemDialog(
       {super.key,
       required this.onSubmit,
       required this.item,
-      required this.itemGroups});
+      required this.containingListModel});
 
   @override
   State<EditItemDialog> createState() => _EditItemDialogState();
@@ -22,6 +25,11 @@ class EditItemDialog extends StatefulWidget {
 class _EditItemDialogState extends State<EditItemDialog> {
   late final TextEditingController _editingController;
   late ItemType selectedItemType = widget.item.itemType;
+  late ItemGroup selectedGroup = widget.item.hasGroup
+      ? widget.containingListModel
+          .groupsView()
+          .firstWhere((itemGroup) => itemGroup.id == widget.item.group.id)
+      : widget.containingListModel.defaultItemGroup;
 
   @override
   void initState() {
@@ -31,6 +39,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
 
   @override
   Widget build(BuildContext context) {
+    print(selectedGroup);
     return AlertDialog(
       title: const Text('Enter Item', textAlign: TextAlign.center),
       content: Column(
@@ -45,6 +54,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
           _buildItemTypeSwitcher(),
           const SizedBox(height: 15),
           _buildGroupPicker(),
+          const SizedBox(height: 15),
         ],
       ),
       actions: [
@@ -73,10 +83,12 @@ class _EditItemDialogState extends State<EditItemDialog> {
           const Text("Group"),
           DropdownMenu<ItemGroup>(
               leadingIcon: const Icon(Icons.category),
-              dropdownMenuEntries: widget.itemGroups
+              initialSelection: selectedGroup,
+              dropdownMenuEntries: widget.containingListModel
+                  .groupsView()
                   .map((itemGroup) => DropdownMenuEntry(
-                      value: itemGroup, label: itemGroup.title ?? 'Cheese'))
-                  .toList()),
+                      value: itemGroup, label: itemGroup.title ?? '(None)'))
+                  .toList())
         ],
       );
 

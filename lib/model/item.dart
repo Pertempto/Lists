@@ -28,18 +28,6 @@ class Item {
   Item([this.value = '', this.itemType = ItemType.text]);
 
   void init() {}
-
-  @override
-  String toString() => 'Item(\'$value\')';
-
-  @visibleForTesting
-  bool isExactlyEqualTo(Item other) {
-    return 
-        other.id == id &&
-        other.itemType == itemType &&
-        other.value == value &&
-        other.isChecked == isChecked;
-  }
 }
 
 enum ItemType { text, checkbox }

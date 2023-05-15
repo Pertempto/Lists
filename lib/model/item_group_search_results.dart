@@ -1,16 +1,19 @@
+import 'package:isar/isar.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
 import 'package:lists/model/item_group_base.dart';
 
 class ItemGroupSearchResults extends ItemGroupBase {
-  final ItemGroup _group;
+  final ItemGroupBase _group;
   final Iterable<Item> _results;
 
   @override
   String? get title => group.title;
+  @override
+  set title(String? newTitle) => group.title = newTitle;
 
   const ItemGroupSearchResults(
-      {required ItemGroup group, required Iterable<Item> results})
+      {required ItemGroupBase group, required Iterable<Item> results})
       : _group = group,
         _results = results;
 
@@ -20,10 +23,8 @@ class ItemGroupSearchResults extends ItemGroupBase {
   @override
   Iterable<Item> itemsView() => _results;
 
-  ItemGroup get group => _group;
-  Iterator<Item> get iterator => _results.iterator;
+  ItemGroupBase get group => _group;
 
   @override
-  String toString() =>
-      'ItemGroupSearchResults(itemCount: $itemCount, itemsView: ${itemsView()}, group: $group)';
+  Future<ItemGroup> asDatabaseItemGroup() => _group.asDatabaseItemGroup();
 }

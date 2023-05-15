@@ -78,10 +78,6 @@ class _HomePageState extends State<HomePage> {
 
   void _onListModelsLoadingError(Object error) {
     //TODO: handle error
-    debugPrint("MESH MESH MESH $error");
-    debugPrint("MESH MESH MESH ${error is Error ? error.stackTrace : null}");
+    debugPrint("ERROR: $error");
   }
 }
-
-
-// TODO: find out about these ghost item groups and get the thing working! It isn't deleting items in program, but does in database.

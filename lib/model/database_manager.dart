@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
+import 'package:lists/model/item_group_base.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
@@ -83,38 +84,4 @@ class DatabaseManager {
 
   static Future<void> deleteItem(Item item) async =>
       await isar.writeTxn(() async => await isar.items.delete(item.id));
-
-  @visibleForTesting
-  static Future<void> doTest(Future<void> Function() test) async {
-    await initForTesting();
-    await test();
-    await cleanupAfterTesting();
-  }
-
-  @visibleForTesting
-  static Future<void> initForTesting() async {
-    await Isar.initializeIsarCore(download: true);
-    await init();
-    await DatabaseManager.clear();
-  }
-
-  @visibleForTesting
-  static Future<void> cleanupAfterTesting() async {
-    await DatabaseManager.clear();
-  }
-
-  @visibleForTesting
-  static Future<void> clear() async {
-    await isar.writeTxn(() async {
-      await isar.items.clear();
-      await isar.itemGroups.clear();
-      await isar.listModels.clear();
-    });
-  }
-
-  @visibleForTesting
-  static Future<ListModel> getListModel(Id id) async {
-    return await loadListModels().then((listModels) =>
-        listModels.where((listModel) => listModel.id == id).single);
-  }
 }

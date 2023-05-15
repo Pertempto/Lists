@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
+import 'package:lists/model/item_group_base.dart';
 import 'package:lists/model/item_group_search_results.dart';
 
 part 'list_model.g.dart';
@@ -25,22 +26,6 @@ class ListModel {
 
   bool get hasDefaultItemGroup => defaultItemGroupLink.value != null;
 
-  Future<void> ensureHasDefaultItemGroup() async {
-    if (!hasDefaultItemGroup) {
-      await DatabaseManager.putItemGroup(defaultItemGroup = ItemGroup());
-      DatabaseManager.updateListModelGroups(this);
-    }
-  }
-
-  Future<void> addGroup(ItemGroup itemGroup) async {
-    await DatabaseManager.putItemGroup(itemGroup);
-    itemGroups.add(itemGroup);
-    DatabaseManager.updateListModelGroups(this);
-  }
-
-  Iterable<Item> itemsView() =>
-      groupsView().expand((itemGroup) => itemGroup.itemsView());
-
   Iterable<ItemGroup> groupsView() => [
         [defaultItemGroup],
         itemGroups
@@ -62,19 +47,50 @@ class ListModel {
     }
   }
 
-  Future<Iterable<ItemGroupSearchResults>> searchItems(
-      String searchQuery) async {
-    final words = _parseSearchStr(searchQuery);
-    final searchResults = <ItemGroupSearchResults>[];
-
-    for (final itemGroup in groupsView()) {
-      searchResults.add(await itemGroup.searchItems(words));
+  Future<void> ensureHasDefaultItemGroup() async {
+    if (!hasDefaultItemGroup) {
+      await DatabaseManager.putItemGroup(defaultItemGroup = ItemGroup());
+      await DatabaseManager.updateListModelGroups(this);
     }
-
-    return searchResults;
   }
 
-  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r'([^\s]+)')
+  Future<void> addGroup(ItemGroup itemGroup) async {
+    await DatabaseManager.putItemGroup(itemGroup);
+    itemGroups.add(itemGroup);
+    await DatabaseManager.updateListModelGroups(this);
+  }
+
+  Future<void> updateGroup(ItemGroup itemGroup) async {
+    assert(itemGroups.contains(itemGroup));
+    await DatabaseManager.putItemGroup(itemGroup);
+    await reloadGroup(itemGroup);
+  }
+
+  Future<void> add(Item newItem) async => await defaultItemGroup.add(newItem);
+
+  Future<void> update(Item item) async {
+    if (await item.group.contains(item)) {
+      await DatabaseManager.putItem(item);
+      await reloadGroup(item.group);
+    } else {
+      throw ItemUpdateError(item: item, listModel: this);
+    }
+  }
+
+  Future<void> remove(Item item) async {
+    await item.group.remove(item);
+    await reloadGroup(item.group);
+  }
+
+  Future<void> reloadGroup(ItemGroup itemGroup) async {
+    if (itemGroup.id == defaultItemGroup.id) {
+      await defaultItemGroup.items.load();
+    } else {
+      await itemGroups.lookup(itemGroup)!.items.load();
+    }
+  }
+
+  Iterable<String> _parseSearchQuery(String searchQuery) => RegExp(r'([^\s]+)')
       .allMatches(searchQuery)
       .map((match) => match.group(0)!);
   // note: the above regex pattern "([^\s]+)" matches a string without spaces.
@@ -83,40 +99,15 @@ class ListModel {
   // example:
   // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
 
-  Future<void> add(Item newItem) async {
-    await DatabaseManager.putItem(newItem);
-    if (defaultItemGroup.add(newItem)) {
-      await DatabaseManager.updateGroupItems(defaultItemGroup);
-      await newItem.groupLink.load();
-    }
-  }
+  Future<Iterable<ItemGroupSearchResults>> searchItems(
+      String searchQuery) async {
+    final searchStr = _parseSearchQuery(searchQuery);
+    final searchResults = <ItemGroupSearchResults>[];
 
-  Future<void> update(Item item) async {
-    if (item.group.contains(item)) {
-      await DatabaseManager.putItem(item);
-      // await item.group.items.load();
-      if (item.group.id == defaultItemGroup.id) {
-        await defaultItemGroup.items.load();
-      } else {
-        await itemGroups.lookup(item.group)!.items.load();
-        // TODO: fix remove. CLEAN SERIOUSLY!!!!!!!!
-      }
-    } else {
-      throw ItemUpdateError(item: item, listModel: this);
+    for (final itemGroup in groupsView()) {
+      searchResults.add(await itemGroup.search(searchStr));
     }
-  }
-
-  Future<void> remove(Item item) async {
-    if (item.group.remove(item)) {
-      await DatabaseManager.deleteItem(item);
-      await DatabaseManager.updateGroupItems(item.group);
-      if (item.group.id == defaultItemGroup.id) {
-        await defaultItemGroup.items.load();
-      } else {
-        await itemGroups.lookup(item.group)!.items.load();
-        // TODO: fix remove. CLEAN SERIOUSLY!!!!!!!!
-      }
-    }
+    return searchResults;
   }
 }
 
@@ -126,9 +117,9 @@ class ListModelError implements Exception {
 }
 
 class ItemUpdateError extends ListModelError {
-  const ItemUpdateError({
+  ItemUpdateError({
     required Item item,
     required ListModel listModel,
   }) : super(
-            'tried to update item "$item" in "$listModel", but operation failed. Database may be corrupted.');
+            'tried to update item "$item" in group "${item.group}" in list "$listModel", but operation failed. Database may be corrupted.');
 }

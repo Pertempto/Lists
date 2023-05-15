@@ -1,9 +1,12 @@
 import 'package:collection/collection.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/item_group.dart';
 import 'package:lists/model/item_group_base.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
+import 'package:lists/view/edit_item_group_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 
@@ -20,14 +23,8 @@ class ListWidget extends StatefulWidget {
 class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
 
-  late Iterable<ItemGroupBase> groupsToBeDisplayed;
+  late Iterable<ItemGroupBase> groupsToBeDisplayed = listModel.groupsView();
   String searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-    groupsToBeDisplayed = listModel.groupsView();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +38,23 @@ class _ListWidgetState extends State<ListWidget> {
               this.searchQuery = searchQuery;
               await refreshItems();
             },
+          ),
+          IconButton(
+            icon: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [const Icon(Icons.add), const Icon(Icons.category)]),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => EditItemGroupDialog(
+                itemGroup: ItemGroup(),
+                onSubmit: (itemGroup) async {
+                  await listModel
+                      .addGroup(await itemGroup.asDatabaseItemGroup());
+                  await refreshItems();
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -59,23 +73,35 @@ class _ListWidgetState extends State<ListWidget> {
   ListView _buildBody() => ListView(
       children: groupsToBeDisplayed
           .map((group) => <Widget>[
-                Text(group.title ?? 'Cheese',
-                    style: Theme.of(context).textTheme.headlineLarge)
-              ].followedBy(group
-                  .itemsView()
-                  .map((item) => ItemWidget(item, onDelete: () async {
-                        await listModel.remove(item);
-                        await refreshItems();
-                      }, onEdited: () async {
-                        try {
-                          print('onEdited: $item');
-                          print('onEdited: ${item.group}');
-                          await listModel.update(item);
-                        } on ItemUpdateError catch (e) {
-                          // TODO: handle item update error.
-                          debugPrint('ERROR: ${e.toString()}');
-                        }
-                      }))))
+                InkWell(
+                  onTap: () async {
+                    await showDialog(
+                        context: context,
+                        builder: (context) => EditItemGroupDialog(
+                            itemGroup: group,
+                            onSubmit: (itemGroup) async {
+                              await listModel.updateGroup(
+                                  await itemGroup.asDatabaseItemGroup());
+                              setState(() {});
+                            }));
+                  },
+                  child: Text(group.title ?? 'Cheese',
+                      style: Theme.of(context).textTheme.headlineLarge),
+                )
+              ].followedBy(group.itemsView().map((item) => ItemWidget(item,
+                      listModel: widget.listModel, onDelete: () async {
+                    await listModel.remove(item);
+                    await refreshItems();
+                  }, onEdited: () async {
+                    try {
+                      print('onEdited: $item');
+                      print('onEdited: ${item.group}');
+                      await listModel.update(item);
+                    } on ItemUpdateError catch (e) {
+                      // TODO: handle item update error.
+                      debugPrint('ERROR: ${e.toString()}');
+                    }
+                  }))))
           .flattened
           .toList());
 
@@ -86,7 +112,7 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            itemGroups: [],
+            containingListModel: listModel,
             onSubmit: (newItem) async {
               await listModel.add(newItem);
               await refreshItems();
