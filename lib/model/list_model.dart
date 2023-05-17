@@ -66,12 +66,13 @@ class ListModel {
     await reloadGroup(itemGroup);
   }
 
-  Future<void> add(Item newItem) async => await defaultItemGroup.add(newItem);
+  Future<void> add(Item newItem) async =>
+      await (newItem.hasGroup ? lookupGroup(newItem.group) : defaultItemGroup)
+          .add(newItem);
 
   Future<void> update(Item item) async {
     if (await item.group.contains(item)) {
       await DatabaseManager.putItem(item);
-      await reloadGroup(item.group);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
@@ -83,10 +84,14 @@ class ListModel {
   }
 
   Future<void> reloadGroup(ItemGroup itemGroup) async {
+    await lookupGroup(itemGroup).items.load();
+  }
+
+  ItemGroup lookupGroup(ItemGroup itemGroup) {
     if (itemGroup.id == defaultItemGroup.id) {
-      await defaultItemGroup.items.load();
+      return defaultItemGroup;
     } else {
-      await itemGroups.lookup(itemGroup)!.items.load();
+      return itemGroups.lookup(itemGroup)!;
     }
   }
 

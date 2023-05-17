@@ -65,12 +65,16 @@ class DatabaseManager {
     });
   }
 
-  static Future<void> moveItems(
+  static Future<void> moveAllItems(
       {required ItemGroup from, required ItemGroup to}) async {
     to.items.addAll(from.items);
     from.items.clear();
     await updateGroupItems(from);
     await updateGroupItems(to);
+
+    for (final item in to.items) {
+      item.groupLink.loadSync();
+    }
   }
 
   static Future<void> updateGroupItems(ItemGroup which) async {
@@ -84,4 +88,13 @@ class DatabaseManager {
 
   static Future<void> deleteItem(Item item) async =>
       await isar.writeTxn(() async => await isar.items.delete(item.id));
+
+  @visibleForTesting
+  static Future<void> doTest(Future<void> Function() test) async {
+    await Isar.initializeIsarCore(download: true);
+    await init();
+    await isar.writeTxn(() => isar.clear());
+    await test();
+    await isar.writeTxn(() => isar.clear());
+  }
 }

@@ -1,4 +1,3 @@
-import 'package:isar/isar.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
 

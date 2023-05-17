@@ -39,7 +39,6 @@ class _EditItemDialogState extends State<EditItemDialog> {
 
   @override
   Widget build(BuildContext context) {
-    print(selectedGroup);
     return AlertDialog(
       title: const Text('Enter Item', textAlign: TextAlign.center),
       content: Column(
@@ -54,7 +53,6 @@ class _EditItemDialogState extends State<EditItemDialog> {
           _buildItemTypeSwitcher(),
           const SizedBox(height: 15),
           _buildGroupPicker(),
-          const SizedBox(height: 15),
         ],
       ),
       actions: [
@@ -84,6 +82,8 @@ class _EditItemDialogState extends State<EditItemDialog> {
           DropdownMenu<ItemGroup>(
               leadingIcon: const Icon(Icons.category),
               initialSelection: selectedGroup,
+              onSelected: (newGroup) =>
+                  selectedGroup = newGroup ?? selectedGroup,
               dropdownMenuEntries: widget.containingListModel
                   .groupsView()
                   .map((itemGroup) => DropdownMenuEntry(
@@ -92,10 +92,12 @@ class _EditItemDialogState extends State<EditItemDialog> {
         ],
       );
 
-  void _submitNewItemValue() {
+  void _submitNewItemValue() async {
     Navigator.pop(context);
     widget.item.value = _editingController.text;
     widget.item.itemType = selectedItemType;
+    await widget.item.move(
+        to: selectedGroup, containingListModel: widget.containingListModel);
 
     widget.onSubmit(widget.item);
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item_group.dart';
+import 'package:lists/model/list_model.dart';
 part 'item.g.dart';
 
 /// Item:
@@ -21,6 +23,21 @@ class Item {
 
   @ignore
   ItemGroup get group => groupLink.value!;
+  Future<void> move(
+      {required ItemGroup to, required ListModel containingListModel}) async {
+    if (!hasGroup) groupLink.value = to;
+    if (group.id == to.id) return;
+
+    to.items.add(this);
+    group.items.remove(this);
+    await DatabaseManager.updateGroupItems(group);
+    await DatabaseManager.updateGroupItems(to);
+
+    await containingListModel.reloadGroup(group);
+    await containingListModel.reloadGroup(to);
+
+    await groupLink.load();
+  }
 
   @ignore
   bool get hasGroup => groupLink.value != null;

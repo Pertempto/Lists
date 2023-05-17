@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
 import 'package:lists/model/item_group_base.dart';
@@ -28,7 +27,6 @@ class _ListWidgetState extends State<ListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print(groupsToBeDisplayed);
     return Scaffold(
       appBar: AppBar(
         title: Text(listModel.title),
@@ -36,7 +34,7 @@ class _ListWidgetState extends State<ListWidget> {
           SearchBar(
             onChanged: (searchQuery) async {
               this.searchQuery = searchQuery;
-              await refreshItems();
+              await reFetchItems();
             },
           ),
           IconButton(
@@ -51,7 +49,7 @@ class _ListWidgetState extends State<ListWidget> {
                 onSubmit: (itemGroup) async {
                   await listModel
                       .addGroup(await itemGroup.asDatabaseItemGroup());
-                  await refreshItems();
+                  await reFetchItems();
                 },
               ),
             ),
@@ -91,15 +89,14 @@ class _ListWidgetState extends State<ListWidget> {
               ].followedBy(group.itemsView().map((item) => ItemWidget(item,
                       listModel: widget.listModel, onDelete: () async {
                     await listModel.remove(item);
-                    await refreshItems();
+                    await reFetchItems();
                   }, onEdited: () async {
                     try {
-                      print('onEdited: $item');
-                      print('onEdited: ${item.group}');
                       await listModel.update(item);
+                      await reFetchItems();
                     } on ItemUpdateError catch (e) {
                       // TODO: handle item update error.
-                      debugPrint('ERROR: ${e.toString()}');
+                      debugPrint('ERROR: $e');
                     }
                   }))))
           .flattened
@@ -115,14 +112,14 @@ class _ListWidgetState extends State<ListWidget> {
             containingListModel: listModel,
             onSubmit: (newItem) async {
               await listModel.add(newItem);
-              await refreshItems();
+              await reFetchItems();
             },
             item: newItem),
       );
     }
   }
 
-  Future<void> refreshItems() async {
+  Future<void> reFetchItems() async {
     groupsToBeDisplayed = await listModel.searchItems(searchQuery);
     setState(() {});
   }
