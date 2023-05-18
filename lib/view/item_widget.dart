@@ -6,15 +6,15 @@ import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 
 /// ItemWidget:
 ///   - a widget representing the view of a single item
-///     in a list (see Item)
+///     in a list (see `Item`)
 class ItemWidget extends StatefulWidget {
   final Item item;
-  final ListModel listModel;
+  final ListModel containingListModel;
   final void Function() onDelete;
   final void Function() onEdited;
 
   const ItemWidget(this.item,
-      {required this.listModel,
+      {required this.containingListModel,
       required this.onDelete,
       required this.onEdited,
       super.key});
@@ -33,10 +33,8 @@ class _ItemWidgetState extends State<ItemWidget> {
     TextDecoration? textDecoration;
 
     if (widget.item.itemType == ItemType.checkbox) {
-      checkbox = Checkbox(
-        value: widget.item.isChecked,
-        onChanged: _onNewCheckedState,
-      );
+      checkbox =
+          Checkbox(value: widget.item.isChecked, onChanged: _onNewCheckedState);
       textDecoration =
           widget.item.isChecked ? TextDecoration.lineThrough : null;
     }
@@ -66,15 +64,12 @@ class _ItemWidgetState extends State<ItemWidget> {
     );
   }
 
-  void _showEditDialog() {
-    showDialog(
-        context: context,
-        builder: (context) => EditItemDialog(
-              onSubmit: (_) => updateThis(),
-              item: widget.item,
-              containingListModel: widget.listModel
-            ));
-  }
+  void _showEditDialog() => showDialog(
+      context: context,
+      builder: (context) => EditItemDialog(
+          onSubmit: (_) => updateThis(),
+          item: widget.item,
+          containingListModel: widget.containingListModel));
 
   void updateThis() {
     widget.onEdited();

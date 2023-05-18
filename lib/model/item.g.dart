@@ -42,9 +42,9 @@ const ItemSchema = CollectionSchema(
   indexes: {},
   links: {
     r'groupLink': LinkSchema(
-      id: -3898584517192245807,
+      id: -5775534708990048529,
       name: r'groupLink',
-      target: r'ItemGroup',
+      target: r'ListModelItemGroup',
       single: true,
       linkName: r'items',
     )
@@ -132,7 +132,7 @@ List<IsarLinkBase<dynamic>> _itemGetLinks(Item object) {
 void _itemAttach(IsarCollection<dynamic> col, Id id, Item object) {
   object.id = id;
   object.groupLink
-      .attach(col, col.isar.collection<ItemGroup>(), r'groupLink', id);
+      .attach(col, col.isar.collection<ListModelItemGroup>(), r'groupLink', id);
 }
 
 extension ItemQueryWhereSort on QueryBuilder<Item, Item, QWhere> {
@@ -458,7 +458,7 @@ extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
 
 extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {
   QueryBuilder<Item, Item, QAfterFilterCondition> groupLink(
-      FilterQuery<ItemGroup> q) {
+      FilterQuery<ListModelItemGroup> q) {
     return QueryBuilder.apply(this, (query) {
       return query.link(q, r'groupLink');
     });

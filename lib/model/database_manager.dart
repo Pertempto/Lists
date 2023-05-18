@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
-import 'package:lists/model/item_group_base.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/model/item_group.dart';
+import 'package:lists/model/list_model_item_group.dart';
 
 /// DatabaseManager:
 ///   - a class that creates, reads, updates, and
@@ -13,7 +12,8 @@ class DatabaseManager {
 
   static Future<void> init() async {
     if (Isar.instanceNames.isEmpty) {
-      isar = await Isar.open([ListModelSchema, ItemSchema, ItemGroupSchema],
+      isar = await Isar.open(
+          [ListModelSchema, ItemSchema, ListModelItemGroupSchema],
           inspector: kDebugMode);
     }
   }
@@ -32,54 +32,39 @@ class DatabaseManager {
     return listModel;
   }
 
+  static Future<void> updateGroupsOfListModel(ListModel listModel) async =>
+      await isar.writeTxn(() async {
+        await listModel.defaultItemGroupLink.save();
+        await listModel.itemGroups.save();
+      });
+
   static Future<void> deleteListModel(ListModel listModel) async {
     late final bool wasDeleted;
 
     for (final itemGroup in listModel.groupsView()) {
-      deleteItemGroup(itemGroup);
+      await deleteItemGroup(itemGroup);
     }
     await isar.writeTxn(
         () async => wasDeleted = await isar.listModels.delete(listModel.id));
-
     assert(wasDeleted);
   }
 
-  static Future<void> updateListModelGroups(ListModel listModel) async {
-    await isar.writeTxn(() async {
-      await listModel.defaultItemGroupLink.save();
-      await listModel.itemGroups.save();
-    });
-  }
-
-  static Future<ItemGroup> putItemGroup(ItemGroup itemGroup) async {
-    await isar.writeTxn(() async => await isar.itemGroups.put(itemGroup));
+  static Future<ListModelItemGroup> putItemGroup(
+      ListModelItemGroup itemGroup) async {
+    await isar
+        .writeTxn(() async => await isar.listModelItemGroups.put(itemGroup));
     return itemGroup;
   }
 
-  static Future<void> deleteItemGroup(ItemGroup itemGroup) async {
-    await isar.writeTxn(() async {
-      await isar.items
-          .deleteAll(itemGroup.items.map((item) => item.id).toList());
+  static Future<void> deleteItemGroup(ListModelItemGroup itemGroup) async =>
+      await isar.writeTxn(() async {
+        await isar.items
+            .deleteAll(itemGroup.items.map((item) => item.id).toList());
+        await isar.listModelItemGroups.delete(itemGroup.id);
+      });
 
-      await isar.itemGroups.delete(itemGroup.id);
-    });
-  }
-
-  static Future<void> moveAllItems(
-      {required ItemGroup from, required ItemGroup to}) async {
-    to.items.addAll(from.items);
-    from.items.clear();
-    await updateGroupItems(from);
-    await updateGroupItems(to);
-
-    for (final item in to.items) {
-      item.groupLink.loadSync();
-    }
-  }
-
-  static Future<void> updateGroupItems(ItemGroup which) async {
-    await isar.writeTxn(() async => await which.items.save());
-  }
+  static Future<void> updateGroupItems(ListModelItemGroup which) async =>
+      await isar.writeTxn(() async => await which.items.save());
 
   static Future<Item> putItem(Item item) async {
     await isar.writeTxn(() async => await isar.items.put(item));
@@ -88,13 +73,4 @@ class DatabaseManager {
 
   static Future<void> deleteItem(Item item) async =>
       await isar.writeTxn(() async => await isar.items.delete(item.id));
-
-  @visibleForTesting
-  static Future<void> doTest(Future<void> Function() test) async {
-    await Isar.initializeIsarCore(download: true);
-    await init();
-    await isar.writeTxn(() => isar.clear());
-    await test();
-    await isar.writeTxn(() => isar.clear());
-  }
 }

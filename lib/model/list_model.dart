@@ -2,8 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/model/item_group.dart';
-import 'package:lists/model/item_group_base.dart';
+import 'package:lists/model/list_model_item_group.dart';
 import 'package:lists/model/item_group_search_results.dart';
 
 part 'list_model.g.dart';
@@ -16,17 +15,17 @@ class ListModel {
   Id id = Isar.autoIncrement;
   String title = '';
 
-  final defaultItemGroupLink = IsarLink<ItemGroup>();
-  final itemGroups = IsarLinks<ItemGroup>();
+  final defaultItemGroupLink = IsarLink<ListModelItemGroup>();
+  final itemGroups = IsarLinks<ListModelItemGroup>();
 
   @ignore
-  ItemGroup get defaultItemGroup => defaultItemGroupLink.value!;
-  set defaultItemGroup(ItemGroup itemGroup) =>
+  ListModelItemGroup get defaultItemGroup => defaultItemGroupLink.value!;
+  set defaultItemGroup(ListModelItemGroup itemGroup) =>
       defaultItemGroupLink.value = itemGroup;
 
   bool get hasDefaultItemGroup => defaultItemGroupLink.value != null;
 
-  Iterable<ItemGroup> groupsView() => [
+  Iterable<ListModelItemGroup> groupsView() => [
         [defaultItemGroup],
         itemGroups
       ].flattened;
@@ -49,28 +48,37 @@ class ListModel {
 
   Future<void> ensureHasDefaultItemGroup() async {
     if (!hasDefaultItemGroup) {
-      await DatabaseManager.putItemGroup(defaultItemGroup = ItemGroup());
-      await DatabaseManager.updateListModelGroups(this);
+      await DatabaseManager.putItemGroup(
+          defaultItemGroup = ListModelItemGroup());
+      await DatabaseManager.updateGroupsOfListModel(this);
     }
   }
 
-  Future<void> addGroup(ItemGroup itemGroup) async {
+  Future<void> addGroup(ListModelItemGroup itemGroup) async {
     await DatabaseManager.putItemGroup(itemGroup);
     itemGroups.add(itemGroup);
-    await DatabaseManager.updateListModelGroups(this);
+    await DatabaseManager.updateGroupsOfListModel(this);
   }
 
-  Future<void> updateGroup(ItemGroup itemGroup) async {
+  Future<void> updateGroup(ListModelItemGroup itemGroup) async {
     assert(itemGroups.contains(itemGroup));
     await DatabaseManager.putItemGroup(itemGroup);
     await reloadGroup(itemGroup);
   }
 
-  Future<void> add(Item newItem) async =>
+  Future<void> reloadGroup(ListModelItemGroup itemGroup) async =>
+      await lookupGroup(itemGroup).items.load();
+
+  ListModelItemGroup lookupGroup(ListModelItemGroup itemGroup) =>
+      itemGroup.id == defaultItemGroup.id
+          ? defaultItemGroup
+          : itemGroups.lookup(itemGroup)!;
+
+  Future<void> addItem(Item newItem) async =>
       await (newItem.hasGroup ? lookupGroup(newItem.group) : defaultItemGroup)
           .add(newItem);
 
-  Future<void> update(Item item) async {
+  Future<void> updateItem(Item item) async {
     if (await item.group.contains(item)) {
       await DatabaseManager.putItem(item);
     } else {
@@ -78,22 +86,8 @@ class ListModel {
     }
   }
 
-  Future<void> remove(Item item) async {
-    await item.group.remove(item);
-    await reloadGroup(item.group);
-  }
-
-  Future<void> reloadGroup(ItemGroup itemGroup) async {
-    await lookupGroup(itemGroup).items.load();
-  }
-
-  ItemGroup lookupGroup(ItemGroup itemGroup) {
-    if (itemGroup.id == defaultItemGroup.id) {
-      return defaultItemGroup;
-    } else {
-      return itemGroups.lookup(itemGroup)!;
-    }
-  }
+  Future<void> removeItem(Item item) async =>
+      await lookupGroup(item.group).remove(item);
 
   Iterable<String> _parseSearchQuery(String searchQuery) => RegExp(r'([^\s]+)')
       .allMatches(searchQuery)
@@ -106,11 +100,11 @@ class ListModel {
 
   Future<Iterable<ItemGroupSearchResults>> searchItems(
       String searchQuery) async {
-    final searchStr = _parseSearchQuery(searchQuery);
+    final parsedSearchQuery = _parseSearchQuery(searchQuery);
     final searchResults = <ItemGroupSearchResults>[];
 
     for (final itemGroup in groupsView()) {
-      searchResults.add(await itemGroup.search(searchStr));
+      searchResults.add(await itemGroup.search(parsedSearchQuery));
     }
     return searchResults;
   }

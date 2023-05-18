@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'item_group.dart';
+part of 'list_model_item_group.dart';
 
 // **************************************************************************
 // IsarCollectionGenerator
@@ -9,13 +9,14 @@ part of 'item_group.dart';
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
 
-extension GetItemGroupCollection on Isar {
-  IsarCollection<ItemGroup> get itemGroups => this.collection();
+extension GetListModelItemGroupCollection on Isar {
+  IsarCollection<ListModelItemGroup> get listModelItemGroups =>
+      this.collection();
 }
 
-const ItemGroupSchema = CollectionSchema(
-  name: r'ItemGroup',
-  id: 1402692719960394580,
+const ListModelItemGroupSchema = CollectionSchema(
+  name: r'ListModelItemGroup',
+  id: 3765066155568484043,
   properties: {
     r'itemCount': PropertySchema(
       id: 0,
@@ -28,29 +29,29 @@ const ItemGroupSchema = CollectionSchema(
       type: IsarType.string,
     )
   },
-  estimateSize: _itemGroupEstimateSize,
-  serialize: _itemGroupSerialize,
-  deserialize: _itemGroupDeserialize,
-  deserializeProp: _itemGroupDeserializeProp,
+  estimateSize: _listModelItemGroupEstimateSize,
+  serialize: _listModelItemGroupSerialize,
+  deserialize: _listModelItemGroupDeserialize,
+  deserializeProp: _listModelItemGroupDeserializeProp,
   idName: r'id',
   indexes: {},
   links: {
     r'items': LinkSchema(
-      id: 6864335146474543936,
+      id: 8352113501326674715,
       name: r'items',
       target: r'Item',
       single: false,
     )
   },
   embeddedSchemas: {},
-  getId: _itemGroupGetId,
-  getLinks: _itemGroupGetLinks,
-  attach: _itemGroupAttach,
+  getId: _listModelItemGroupGetId,
+  getLinks: _listModelItemGroupGetLinks,
+  attach: _listModelItemGroupAttach,
   version: '3.0.0',
 );
 
-int _itemGroupEstimateSize(
-  ItemGroup object,
+int _listModelItemGroupEstimateSize(
+  ListModelItemGroup object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -64,8 +65,8 @@ int _itemGroupEstimateSize(
   return bytesCount;
 }
 
-void _itemGroupSerialize(
-  ItemGroup object,
+void _listModelItemGroupSerialize(
+  ListModelItemGroup object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
@@ -74,20 +75,20 @@ void _itemGroupSerialize(
   writer.writeString(offsets[1], object.title);
 }
 
-ItemGroup _itemGroupDeserialize(
+ListModelItemGroup _listModelItemGroupDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = ItemGroup(
+  final object = ListModelItemGroup(
     title: reader.readStringOrNull(offsets[1]),
   );
   object.id = id;
   return object;
 }
 
-P _itemGroupDeserializeProp<P>(
+P _listModelItemGroupDeserializeProp<P>(
   IsarReader reader,
   int propertyId,
   int offset,
@@ -103,31 +104,34 @@ P _itemGroupDeserializeProp<P>(
   }
 }
 
-Id _itemGroupGetId(ItemGroup object) {
+Id _listModelItemGroupGetId(ListModelItemGroup object) {
   return object.id;
 }
 
-List<IsarLinkBase<dynamic>> _itemGroupGetLinks(ItemGroup object) {
+List<IsarLinkBase<dynamic>> _listModelItemGroupGetLinks(
+    ListModelItemGroup object) {
   return [object.items];
 }
 
-void _itemGroupAttach(IsarCollection<dynamic> col, Id id, ItemGroup object) {
+void _listModelItemGroupAttach(
+    IsarCollection<dynamic> col, Id id, ListModelItemGroup object) {
   object.id = id;
   object.items.attach(col, col.isar.collection<Item>(), r'items', id);
 }
 
-extension ItemGroupQueryWhereSort
-    on QueryBuilder<ItemGroup, ItemGroup, QWhere> {
-  QueryBuilder<ItemGroup, ItemGroup, QAfterWhere> anyId() {
+extension ListModelItemGroupQueryWhereSort
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QWhere> {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
     });
   }
 }
 
-extension ItemGroupQueryWhere
-    on QueryBuilder<ItemGroup, ItemGroup, QWhereClause> {
-  QueryBuilder<ItemGroup, ItemGroup, QAfterWhereClause> idEqualTo(Id id) {
+extension ListModelItemGroupQueryWhere
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QWhereClause> {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterWhereClause>
+      idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -136,7 +140,8 @@ extension ItemGroupQueryWhere
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterWhereClause> idNotEqualTo(Id id) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterWhereClause>
+      idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -158,8 +163,8 @@ extension ItemGroupQueryWhere
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterWhereClause> idGreaterThan(Id id,
-      {bool include = false}) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterWhereClause>
+      idGreaterThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.greaterThan(lower: id, includeLower: include),
@@ -167,8 +172,8 @@ extension ItemGroupQueryWhere
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterWhereClause> idLessThan(Id id,
-      {bool include = false}) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterWhereClause>
+      idLessThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.lessThan(upper: id, includeUpper: include),
@@ -176,7 +181,8 @@ extension ItemGroupQueryWhere
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterWhereClause> idBetween(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterWhereClause>
+      idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
@@ -193,10 +199,10 @@ extension ItemGroupQueryWhere
   }
 }
 
-extension ItemGroupQueryFilter
-    on QueryBuilder<ItemGroup, ItemGroup, QFilterCondition> {
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> idEqualTo(
-      Id value) {
+extension ListModelItemGroupQueryFilter
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QFilterCondition> {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -205,7 +211,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> idGreaterThan(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      idGreaterThan(
     Id value, {
     bool include = false,
   }) {
@@ -218,7 +225,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> idLessThan(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      idLessThan(
     Id value, {
     bool include = false,
   }) {
@@ -231,7 +239,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> idBetween(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      idBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
@@ -248,8 +257,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemCountEqualTo(
-      int value) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemCountEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'itemCount',
@@ -258,7 +267,7 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition>
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
       itemCountGreaterThan(
     int value, {
     bool include = false,
@@ -272,7 +281,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemCountLessThan(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemCountLessThan(
     int value, {
     bool include = false,
   }) {
@@ -285,7 +295,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemCountBetween(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemCountBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -302,7 +313,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleIsNull() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
         property: r'title',
@@ -310,7 +322,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleIsNotNull() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'title',
@@ -318,7 +331,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleEqualTo(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleEqualTo(
     String? value, {
     bool caseSensitive = true,
   }) {
@@ -331,7 +345,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleGreaterThan(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -346,7 +361,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleLessThan(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
@@ -361,7 +377,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleBetween(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -380,7 +397,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleStartsWith(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -393,7 +411,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleEndsWith(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
@@ -406,9 +425,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleContains(
-      String value,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
         property: r'title',
@@ -418,9 +436,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
         property: r'title',
@@ -430,7 +447,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleIsEmpty() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'title',
@@ -439,7 +457,8 @@ extension ItemGroupQueryFilter
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> titleIsNotEmpty() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      titleIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'title',
@@ -449,38 +468,41 @@ extension ItemGroupQueryFilter
   }
 }
 
-extension ItemGroupQueryObject
-    on QueryBuilder<ItemGroup, ItemGroup, QFilterCondition> {}
+extension ListModelItemGroupQueryObject
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QFilterCondition> {}
 
-extension ItemGroupQueryLinks
-    on QueryBuilder<ItemGroup, ItemGroup, QFilterCondition> {
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> items(
-      FilterQuery<Item> q) {
+extension ListModelItemGroupQueryLinks
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QFilterCondition> {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      items(FilterQuery<Item> q) {
     return QueryBuilder.apply(this, (query) {
       return query.link(q, r'items');
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemsLengthEqualTo(
-      int length) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'items', length, true, length, true);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemsIsEmpty() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemsIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'items', 0, true, 0, true);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemsIsNotEmpty() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemsIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.linkLength(r'items', 0, false, 999999, true);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemsLengthLessThan(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemsLengthLessThan(
     int length, {
     bool include = false,
   }) {
@@ -489,7 +511,7 @@ extension ItemGroupQueryLinks
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition>
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
       itemsLengthGreaterThan(
     int length, {
     bool include = false,
@@ -499,7 +521,8 @@ extension ItemGroupQueryLinks
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterFilterCondition> itemsLengthBetween(
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterFilterCondition>
+      itemsLengthBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -512,102 +535,114 @@ extension ItemGroupQueryLinks
   }
 }
 
-extension ItemGroupQuerySortBy on QueryBuilder<ItemGroup, ItemGroup, QSortBy> {
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> sortByItemCount() {
+extension ListModelItemGroupQuerySortBy
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QSortBy> {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      sortByItemCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'itemCount', Sort.asc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> sortByItemCountDesc() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      sortByItemCountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'itemCount', Sort.desc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> sortByTitle() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      sortByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> sortByTitleDesc() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      sortByTitleDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.desc);
     });
   }
 }
 
-extension ItemGroupQuerySortThenBy
-    on QueryBuilder<ItemGroup, ItemGroup, QSortThenBy> {
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> thenById() {
+extension ListModelItemGroupQuerySortThenBy
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QSortThenBy> {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> thenByIdDesc() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> thenByItemCount() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      thenByItemCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'itemCount', Sort.asc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> thenByItemCountDesc() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      thenByItemCountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'itemCount', Sort.desc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> thenByTitle() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      thenByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QAfterSortBy> thenByTitleDesc() {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QAfterSortBy>
+      thenByTitleDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.desc);
     });
   }
 }
 
-extension ItemGroupQueryWhereDistinct
-    on QueryBuilder<ItemGroup, ItemGroup, QDistinct> {
-  QueryBuilder<ItemGroup, ItemGroup, QDistinct> distinctByItemCount() {
+extension ListModelItemGroupQueryWhereDistinct
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QDistinct> {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QDistinct>
+      distinctByItemCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'itemCount');
     });
   }
 
-  QueryBuilder<ItemGroup, ItemGroup, QDistinct> distinctByTitle(
-      {bool caseSensitive = true}) {
+  QueryBuilder<ListModelItemGroup, ListModelItemGroup, QDistinct>
+      distinctByTitle({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'title', caseSensitive: caseSensitive);
     });
   }
 }
 
-extension ItemGroupQueryProperty
-    on QueryBuilder<ItemGroup, ItemGroup, QQueryProperty> {
-  QueryBuilder<ItemGroup, int, QQueryOperations> idProperty() {
+extension ListModelItemGroupQueryProperty
+    on QueryBuilder<ListModelItemGroup, ListModelItemGroup, QQueryProperty> {
+  QueryBuilder<ListModelItemGroup, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
     });
   }
 
-  QueryBuilder<ItemGroup, int, QQueryOperations> itemCountProperty() {
+  QueryBuilder<ListModelItemGroup, int, QQueryOperations> itemCountProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'itemCount');
     });
   }
 
-  QueryBuilder<ItemGroup, String?, QQueryOperations> titleProperty() {
+  QueryBuilder<ListModelItemGroup, String?, QQueryOperations> titleProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'title');
     });

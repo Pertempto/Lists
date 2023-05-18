@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/list_model_item_group.dart';
 import 'package:lists/model/item_group.dart';
-import 'package:lists/model/item_group_base.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
@@ -10,7 +10,7 @@ import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 
 /// ListWidget:
-///   - a widget representing a ListModel
+///   - a widget representing a `ListModel`
 class ListWidget extends StatefulWidget {
   final ListModel listModel;
   const ListWidget(this.listModel, {super.key});
@@ -22,7 +22,7 @@ class ListWidget extends StatefulWidget {
 class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
 
-  late Iterable<ItemGroupBase> groupsToBeDisplayed = listModel.groupsView();
+  late Iterable<ItemGroup> groupsToBeDisplayed = listModel.groupsView();
   String searchQuery = '';
 
   @override
@@ -41,14 +41,14 @@ class _ListWidgetState extends State<ListWidget> {
             icon: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [const Icon(Icons.add), const Icon(Icons.category)]),
+                children: const [Icon(Icons.add), Icon(Icons.category)]),
             onPressed: () => showDialog(
               context: context,
               builder: (context) => EditItemGroupDialog(
-                itemGroup: ItemGroup(),
+                itemGroup: ListModelItemGroup(),
                 onSubmit: (itemGroup) async {
                   await listModel
-                      .addGroup(await itemGroup.asDatabaseItemGroup());
+                      .addGroup(await itemGroup.asListModelItemGroup());
                   await reFetchItems();
                 },
               ),
@@ -71,34 +71,37 @@ class _ListWidgetState extends State<ListWidget> {
   ListView _buildBody() => ListView(
       children: groupsToBeDisplayed
           .map((group) => <Widget>[
-                InkWell(
-                  onTap: () async {
-                    await showDialog(
+                if (group.title != null)
+                  InkWell(
+                    onTap: () async => await showDialog(
                         context: context,
                         builder: (context) => EditItemGroupDialog(
                             itemGroup: group,
                             onSubmit: (itemGroup) async {
                               await listModel.updateGroup(
-                                  await itemGroup.asDatabaseItemGroup());
+                                  await itemGroup.asListModelItemGroup());
                               setState(() {});
-                            }));
-                  },
-                  child: Text(group.title ?? 'Cheese',
-                      style: Theme.of(context).textTheme.headlineLarge),
-                )
-              ].followedBy(group.itemsView().map((item) => ItemWidget(item,
-                      listModel: widget.listModel, onDelete: () async {
-                    await listModel.remove(item);
-                    await reFetchItems();
-                  }, onEdited: () async {
-                    try {
-                      await listModel.update(item);
+                            })),
+                    child: Text(group.title!,
+                        style: Theme.of(context).textTheme.headlineLarge),
+                  )
+              ].followedBy(group.itemsView().map((item) => ItemWidget(
+                    item,
+                    containingListModel: widget.listModel,
+                    onDelete: () async {
+                      await listModel.removeItem(item);
                       await reFetchItems();
-                    } on ItemUpdateError catch (e) {
-                      // TODO: handle item update error.
-                      debugPrint('ERROR: $e');
-                    }
-                  }))))
+                    },
+                    onEdited: () async {
+                      try {
+                        await listModel.updateItem(item);
+                        await reFetchItems();
+                      } on ItemUpdateError catch (e) {
+                        // TODO: handle item update error.
+                        debugPrint('ERROR: $e');
+                      }
+                    },
+                  ))))
           .flattened
           .toList());
 
@@ -106,16 +109,15 @@ class _ListWidgetState extends State<ListWidget> {
     final newItem = Item();
 
     if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => EditItemDialog(
-            containingListModel: listModel,
-            onSubmit: (newItem) async {
-              await listModel.add(newItem);
-              await reFetchItems();
-            },
-            item: newItem),
-      );
+      await showDialog(
+          context: context,
+          builder: (context) => EditItemDialog(
+              containingListModel: listModel,
+              onSubmit: (newItem) async {
+                await listModel.addItem(newItem);
+                await reFetchItems();
+              },
+              item: newItem));
     }
   }
 

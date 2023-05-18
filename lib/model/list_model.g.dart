@@ -38,13 +38,13 @@ const ListModelSchema = CollectionSchema(
     r'defaultItemGroupLink': LinkSchema(
       id: -4902889469726989801,
       name: r'defaultItemGroupLink',
-      target: r'ItemGroup',
+      target: r'ListModelItemGroup',
       single: true,
     ),
     r'itemGroups': LinkSchema(
       id: 5222933689247287929,
       name: r'itemGroups',
-      target: r'ItemGroup',
+      target: r'ListModelItemGroup',
       single: false,
     )
   },
@@ -113,10 +113,10 @@ List<IsarLinkBase<dynamic>> _listModelGetLinks(ListModel object) {
 
 void _listModelAttach(IsarCollection<dynamic> col, Id id, ListModel object) {
   object.id = id;
-  object.defaultItemGroupLink.attach(
-      col, col.isar.collection<ItemGroup>(), r'defaultItemGroupLink', id);
-  object.itemGroups
-      .attach(col, col.isar.collection<ItemGroup>(), r'itemGroups', id);
+  object.defaultItemGroupLink.attach(col,
+      col.isar.collection<ListModelItemGroup>(), r'defaultItemGroupLink', id);
+  object.itemGroups.attach(
+      col, col.isar.collection<ListModelItemGroup>(), r'itemGroups', id);
 }
 
 extension ListModelQueryWhereSort
@@ -398,7 +398,7 @@ extension ListModelQueryObject
 extension ListModelQueryLinks
     on QueryBuilder<ListModel, ListModel, QFilterCondition> {
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
-      defaultItemGroupLink(FilterQuery<ItemGroup> q) {
+      defaultItemGroupLink(FilterQuery<ListModelItemGroup> q) {
     return QueryBuilder.apply(this, (query) {
       return query.link(q, r'defaultItemGroupLink');
     });
@@ -412,7 +412,7 @@ extension ListModelQueryLinks
   }
 
   QueryBuilder<ListModel, ListModel, QAfterFilterCondition> itemGroups(
-      FilterQuery<ItemGroup> q) {
+      FilterQuery<ListModelItemGroup> q) {
     return QueryBuilder.apply(this, (query) {
       return query.link(q, r'itemGroups');
     });

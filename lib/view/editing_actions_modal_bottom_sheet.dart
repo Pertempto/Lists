@@ -14,15 +14,14 @@ class EditingActionsModalBottomSheet extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: actionButtons
-      ),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: actionButtons),
     );
   }
 }
 
 /// EditingActionButton:
-///   - A button representing an "editing action" (deleting, renaming, etc.)
+///   - A button representing an "editing action" (deleting, editing, etc.)
 class EditingActionButton extends StatelessWidget {
   final void Function() onPressed;
   final IconData icon;

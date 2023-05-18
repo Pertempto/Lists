@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:lists/model/item_group_base.dart';
+import 'package:lists/model/item_group.dart';
 
+/// EditItemDialog:
+///   - a dialog that allows the user to edit an `ItemGroup`
 class EditItemGroupDialog extends StatefulWidget {
-  final ItemGroupBase itemGroup;
-  final void Function(ItemGroupBase) onSubmit;
+  final ItemGroup itemGroup;
+  final void Function(ItemGroup) onSubmit;
 
   const EditItemGroupDialog(
       {super.key, required this.itemGroup, required this.onSubmit});

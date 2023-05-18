@@ -7,8 +7,8 @@ import 'package:lists/model/database_manager.dart';
 
 /// ListPreviewWidget:
 ///   - a widget representing a tile which contains the metadata
-///     about a ListModel. When selected, pushes a ListWidget
-///     representing this ListModel.
+///     about a `ListModel`. When selected, pushes a `ListWidget`
+///     representing this `ListModel`
 class ListPreviewWidget extends StatefulWidget {
   final ListModel listModel;
   final void Function() onDelete;
@@ -37,23 +37,21 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
     );
   }
 
-  void _showOptionsModalSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => EditingActionsModalBottomSheet(
-        actionButtons: [
-          EditingActionButton.makeDeleteButton(onDelete: widget.onDelete),
-          EditingActionButton.makeEditButton(
-              onPressed: () => showDialog(
-                  context: context,
-                  builder: (context) => ListSettingsDialog(
-                      onSubmit: (listModel) async {
-                        await DatabaseManager.putListModel(listModel);
-                        setState(() {});
-                      },
-                      listModel: widget.listModel))),
-        ],
-      ),
-    );
-  }
+  void _showOptionsModalSheet() => showModalBottomSheet(
+        context: context,
+        builder: (context) => EditingActionsModalBottomSheet(
+          actionButtons: [
+            EditingActionButton.makeDeleteButton(onDelete: widget.onDelete),
+            EditingActionButton.makeEditButton(
+                onPressed: () => showDialog(
+                    context: context,
+                    builder: (context) => ListSettingsDialog(
+                        onSubmit: (listModel) async {
+                          await DatabaseManager.putListModel(listModel);
+                          setState(() {});
+                        },
+                        listModel: widget.listModel))),
+          ],
+        ),
+      );
 }

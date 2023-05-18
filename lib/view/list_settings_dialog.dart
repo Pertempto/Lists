@@ -2,28 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 
 /// ListSettingsDialog:
-///   - a dialog that allows the user to edit the metadata of the list
+///   - a dialog that allows the user to edit the settings of the list
 class ListSettingsDialog extends StatefulWidget {
   final void Function(ListModel) onSubmit;
   final ListModel listModel;
 
   const ListSettingsDialog(
-      {super.key,
-      required this.onSubmit,
-      required this.listModel});
+      {super.key, required this.onSubmit, required this.listModel});
 
   @override
   State<ListSettingsDialog> createState() => _ListSettingsDialogState();
 }
 
 class _ListSettingsDialogState extends State<ListSettingsDialog> {
-  late final TextEditingController _editingController;
-
-  @override
-  void initState() {
-    _editingController = TextEditingController(text: widget.listModel.title);
-    super.initState();
-  }
+  late final TextEditingController _editingController =
+      TextEditingController(text: widget.listModel.title);
 
   @override
   Widget build(BuildContext context) {

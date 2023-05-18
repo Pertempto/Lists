@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/model/item_group.dart';
+import 'package:lists/model/list_model_item_group.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:lists/view/edit_item_group_dialog.dart';
 
 /// EditItemDialog:
 ///   - a dialog that allows the user to edit an `Item`
@@ -23,19 +21,12 @@ class EditItemDialog extends StatefulWidget {
 }
 
 class _EditItemDialogState extends State<EditItemDialog> {
-  late final TextEditingController _editingController;
+  late final TextEditingController _editingController =
+      TextEditingController(text: widget.item.value);
   late ItemType selectedItemType = widget.item.itemType;
-  late ItemGroup selectedGroup = widget.item.hasGroup
-      ? widget.containingListModel
-          .groupsView()
-          .firstWhere((itemGroup) => itemGroup.id == widget.item.group.id)
+  late ListModelItemGroup selectedGroup = widget.item.hasGroup
+      ? widget.containingListModel.lookupGroup(widget.item.group)
       : widget.containingListModel.defaultItemGroup;
-
-  @override
-  void initState() {
-    _editingController = TextEditingController(text: widget.item.value);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +70,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text("Group"),
-          DropdownMenu<ItemGroup>(
+          DropdownMenu<ListModelItemGroup>(
               leadingIcon: const Icon(Icons.category),
               initialSelection: selectedGroup,
               onSelected: (newGroup) =>

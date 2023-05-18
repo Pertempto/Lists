@@ -1,19 +1,20 @@
-import 'package:isar/isar.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/list_model_item_group.dart';
 import 'package:lists/model/item_group.dart';
-import 'package:lists/model/item_group_base.dart';
 
-class ItemGroupSearchResults extends ItemGroupBase {
-  final ItemGroupBase _group;
+/// ItemGroupSearchResults:
+///   - an `ItemGroup` that contains the results of searching in another `ItemGroup`
+class ItemGroupSearchResults extends ItemGroup {
+  final ItemGroup _group;
   final Iterable<Item> _results;
 
   @override
-  String? get title => group.title;
+  String? get title => _group.title;
   @override
-  set title(String? newTitle) => group.title = newTitle;
+  set title(String? newTitle) => _group.title = newTitle;
 
   const ItemGroupSearchResults(
-      {required ItemGroupBase group, required Iterable<Item> results})
+      {required ItemGroup group, required Iterable<Item> results})
       : _group = group,
         _results = results;
 
@@ -23,8 +24,7 @@ class ItemGroupSearchResults extends ItemGroupBase {
   @override
   Iterable<Item> itemsView() => _results;
 
-  ItemGroupBase get group => _group;
-
   @override
-  Future<ItemGroup> asDatabaseItemGroup() => _group.asDatabaseItemGroup();
+  Future<ListModelItemGroup> asListModelItemGroup() =>
+      _group.asListModelItemGroup();
 }

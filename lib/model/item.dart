@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
-import 'package:lists/model/item_group.dart';
+import 'package:lists/model/list_model_item_group.dart';
 import 'package:lists/model/list_model.dart';
+
 part 'item.g.dart';
 
 /// Item:
@@ -19,12 +19,18 @@ class Item {
   bool isChecked = false;
 
   @Backlink(to: "items")
-  final groupLink = IsarLink<ItemGroup>();
+  final groupLink = IsarLink<ListModelItemGroup>();
+
+  Item([this.value = '', this.itemType = ItemType.text]);
 
   @ignore
-  ItemGroup get group => groupLink.value!;
+  bool get hasGroup => groupLink.value != null;
+  @ignore
+  ListModelItemGroup get group => groupLink.value!;
+
   Future<void> move(
-      {required ItemGroup to, required ListModel containingListModel}) async {
+      {required ListModelItemGroup to,
+      required ListModel containingListModel}) async {
     if (!hasGroup) groupLink.value = to;
     if (group.id == to.id) return;
 
@@ -38,13 +44,6 @@ class Item {
 
     await groupLink.load();
   }
-
-  @ignore
-  bool get hasGroup => groupLink.value != null;
-
-  Item([this.value = '', this.itemType = ItemType.text]);
-
-  void init() {}
 }
 
 enum ItemType { text, checkbox }
