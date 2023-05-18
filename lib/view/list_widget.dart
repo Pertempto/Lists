@@ -6,6 +6,7 @@ import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/edit_item_group_dialog.dart';
+import 'package:lists/view/item_group_widget.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 
@@ -72,38 +73,32 @@ class _ListWidgetState extends State<ListWidget> {
       children: groupsToBeDisplayed
           .map((group) => <Widget>[
                 if (group.title != null)
-                  InkWell(
-                    onTap: () async => await showDialog(
-                        context: context,
-                        builder: (context) => EditItemGroupDialog(
-                            itemGroup: group,
-                            onSubmit: (itemGroup) async {
-                              await listModel.updateGroup(
-                                  await itemGroup.asListModelItemGroup());
-                              setState(() {});
-                            })),
-                    child: Text(group.title!,
-                        style: Theme.of(context).textTheme.headlineLarge),
+                  ItemGroupWidget(
+                    itemGroup: group,
+                    onEdited: (itemGroup) async => await listModel
+                        .updateGroup(await itemGroup.asListModelItemGroup()),
                   )
-              ].followedBy(group.itemsView().map((item) => ItemWidget(
-                    item,
-                    containingListModel: widget.listModel,
-                    onDelete: () async {
-                      await listModel.removeItem(item);
-                      await reFetchItems();
-                    },
-                    onEdited: () async {
-                      try {
-                        await listModel.updateItem(item);
-                        await reFetchItems();
-                      } on ItemUpdateError catch (e) {
-                        // TODO: handle item update error.
-                        debugPrint('ERROR: $e');
-                      }
-                    },
-                  ))))
+              ].followedBy(group.itemsView().map(_buildItemWidget)))
           .flattened
           .toList());
+
+  ItemWidget _buildItemWidget(Item item) => ItemWidget(
+        item,
+        containingListModel: widget.listModel,
+        onDelete: () async {
+          await listModel.removeItem(item);
+          await reFetchItems();
+        },
+        onEdited: () async {
+          try {
+            await listModel.updateItem(item);
+            await reFetchItems();
+          } on ItemUpdateError catch (e) {
+            // TODO: handle item update error.
+            debugPrint('ERROR: $e');
+          }
+        },
+      );
 
   void _addNewItem() async {
     final newItem = Item();
