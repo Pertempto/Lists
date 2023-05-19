@@ -3,6 +3,7 @@ import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_group.dart';
 import 'package:lists/model/item_group_search_results.dart';
+import 'package:lists/model/list_model.dart';
 
 part 'list_model_item_group.g.dart';
 
@@ -32,7 +33,7 @@ class ListModelItemGroup extends ItemGroup {
 
   Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);
-    assert(items.add(newItem));
+    link(newItem);
 
     await DatabaseManager.updateGroupItems(this);
     await newItem.groupLink.load();
@@ -41,7 +42,7 @@ class ListModelItemGroup extends ItemGroup {
   Future<bool> contains(Item item) async => items.contains(item);
 
   Future<void> remove(Item item) async {
-    assert(items.remove(item));
+    unlink(item);
     await DatabaseManager.deleteItem(item);
     await DatabaseManager.updateGroupItems(item.group);
   }
@@ -54,4 +55,12 @@ class ListModelItemGroup extends ItemGroup {
               .allOf(searchWords,
                   (q, word) => q.valueContains(word, caseSensitive: false))
               .findAll());
+
+  void link(Item item) {
+    assert(items.add(item));
+  }
+
+  void unlink(Item item) {
+    assert(items.remove(item));
+  }
 }

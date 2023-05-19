@@ -89,6 +89,23 @@ class ListModel {
   Future<void> removeItem(Item item) async =>
       await lookupGroup(item.group).remove(item);
 
+  Future<void> moveItem(Item item, {required ListModelItemGroup to}) async {
+    if (!item.hasGroup) item.group = to;
+
+    final from = item.group;
+    if (from.id == to.id) return;
+    to.link(item);
+    from.unlink(item);
+
+    await DatabaseManager.updateGroupItems(from);
+    await DatabaseManager.updateGroupItems(to);
+
+    await reloadGroup(to);
+    await reloadGroup(from);
+
+    await item.groupLink.load();
+  }
+
   Iterable<String> _parseSearchQuery(String searchQuery) => RegExp(r'([^\s]+)')
       .allMatches(searchQuery)
       .map((match) => match.group(0)!);

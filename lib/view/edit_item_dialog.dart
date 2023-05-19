@@ -87,8 +87,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
     Navigator.pop(context);
     widget.item.value = _editingController.text;
     widget.item.itemType = selectedItemType;
-    await widget.item.move(
-        to: selectedGroup, containingListModel: widget.containingListModel);
+    await widget.containingListModel.moveItem(widget.item, to: selectedGroup);
 
     widget.onSubmit(widget.item);
   }

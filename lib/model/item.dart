@@ -27,23 +27,7 @@ class Item {
   bool get hasGroup => groupLink.value != null;
   @ignore
   ListModelItemGroup get group => groupLink.value!;
-
-  Future<void> move(
-      {required ListModelItemGroup to,
-      required ListModel containingListModel}) async {
-    if (!hasGroup) groupLink.value = to;
-    if (group.id == to.id) return;
-
-    to.items.add(this);
-    group.items.remove(this);
-    await DatabaseManager.updateGroupItems(group);
-    await DatabaseManager.updateGroupItems(to);
-
-    await containingListModel.reloadGroup(group);
-    await containingListModel.reloadGroup(to);
-
-    await groupLink.load();
-  }
+  set group(ListModelItemGroup newGroup) => groupLink.value = newGroup;
 }
 
 enum ItemType { text, checkbox }
