@@ -10,7 +10,7 @@ part 'list_model.g.dart';
 @Collection()
 class ListModel {
   Id id = Isar.autoIncrement;
-  late String title;
+  String title = '';
 
   final items = IsarLinks<Item>();
 

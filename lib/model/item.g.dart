@@ -17,8 +17,19 @@ const ItemSchema = CollectionSchema(
   name: r'Item',
   id: 7900997316587104717,
   properties: {
-    r'value': PropertySchema(
+    r'isChecked': PropertySchema(
       id: 0,
+      name: r'isChecked',
+      type: IsarType.bool,
+    ),
+    r'itemType': PropertySchema(
+      id: 1,
+      name: r'itemType',
+      type: IsarType.byte,
+      enumMap: _ItemitemTypeEnumValueMap,
+    ),
+    r'value': PropertySchema(
+      id: 2,
       name: r'value',
       type: IsarType.string,
     )
@@ -53,7 +64,9 @@ void _itemSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.value);
+  writer.writeBool(offsets[0], object.isChecked);
+  writer.writeByte(offsets[1], object.itemType.index);
+  writer.writeString(offsets[2], object.value);
 }
 
 Item _itemDeserialize(
@@ -63,9 +76,12 @@ Item _itemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Item(
-    reader.readStringOrNull(offsets[0]) ?? 'New Item',
+    reader.readStringOrNull(offsets[2]) ?? 'New Item',
+    _ItemitemTypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
+        ItemType.text,
   );
   object.id = id;
+  object.isChecked = reader.readBool(offsets[0]);
   return object;
 }
 
@@ -77,11 +93,25 @@ P _itemDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
+      return (reader.readBool(offset)) as P;
+    case 1:
+      return (_ItemitemTypeValueEnumMap[reader.readByteOrNull(offset)] ??
+          ItemType.text) as P;
+    case 2:
       return (reader.readStringOrNull(offset) ?? 'New Item') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
+
+const _ItemitemTypeEnumValueMap = {
+  'text': 0,
+  'checkbox': 1,
+};
+const _ItemitemTypeValueEnumMap = {
+  0: ItemType.text,
+  1: ItemType.checkbox,
+};
 
 Id _itemGetId(Item object) {
   return object.id;
@@ -215,6 +245,68 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> isCheckedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isChecked',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> itemTypeEqualTo(
+      ItemType value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'itemType',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> itemTypeGreaterThan(
+    ItemType value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'itemType',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> itemTypeLessThan(
+    ItemType value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'itemType',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> itemTypeBetween(
+    ItemType lower,
+    ItemType upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'itemType',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -357,6 +449,30 @@ extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
 extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {}
 
 extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
+  QueryBuilder<Item, Item, QAfterSortBy> sortByIsChecked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isChecked', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByIsCheckedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isChecked', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByItemType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'itemType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByItemTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'itemType', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> sortByValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'value', Sort.asc);
@@ -383,6 +499,30 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterSortBy> thenByIsChecked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isChecked', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByIsCheckedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isChecked', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByItemType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'itemType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByItemTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'itemType', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> thenByValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'value', Sort.asc);
@@ -397,6 +537,18 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
 }
 
 extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
+  QueryBuilder<Item, Item, QDistinct> distinctByIsChecked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isChecked');
+    });
+  }
+
+  QueryBuilder<Item, Item, QDistinct> distinctByItemType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'itemType');
+    });
+  }
+
   QueryBuilder<Item, Item, QDistinct> distinctByValue(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -409,6 +561,18 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
   QueryBuilder<Item, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Item, bool, QQueryOperations> isCheckedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isChecked');
+    });
+  }
+
+  QueryBuilder<Item, ItemType, QQueryOperations> itemTypeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'itemType');
     });
   }
 
