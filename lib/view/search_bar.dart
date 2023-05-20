@@ -17,7 +17,7 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        width: 150,
+        width: 160,
         child: TextField(
           controller: editingController,
           onChanged: widget.onChanged,
