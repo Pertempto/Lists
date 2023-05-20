@@ -22,6 +22,22 @@ class ListModel {
 
   void init() => items.loadSync();
 
+  Future<Iterable<Item>> searchItems(String searchStr) {
+    final words = _parseSearchStr(searchStr);
+    return items
+        .filter()
+        .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
+        .findAll();
+  }
+
+  Iterable<String> _parseSearchStr(String searchStr) =>
+      RegExp(r"([^\s]+)").allMatches(searchStr).map((match) => match.group(0)!);
+  // note: the above regex pattern "([^\s]+)" matches a string without spaces.
+  // All-in-all, this function breaks a sentence apart into words (though
+  // it doesn't filter out punctuation).
+  // example:
+  // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
+
   Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);
     if (items.add(newItem)) {
