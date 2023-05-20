@@ -32,11 +32,14 @@ class _ListWidgetState extends State<ListWidget> {
       appBar: AppBar(
         title: Text(listModel.title),
         actions: [
-          SearchBar(
-            onChanged: (searchQuery) async {
-              this.searchQuery = searchQuery;
-              await reFetchItems();
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: SearchBar(
+              onChanged: (searchQuery) async {
+                this.searchQuery = searchQuery;
+                await reFetchItems();
+              },
+            ),
           ),
           IconButton(
             icon: Row(
