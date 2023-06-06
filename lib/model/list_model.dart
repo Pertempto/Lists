@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
@@ -14,13 +15,16 @@ class ListModel {
 
   final items = IsarLinks<Item>();
 
+  ItemType getDefaultItemType() => items.lastOrNull?.itemType ?? ItemType.text;
+
   Iterable<Item> itemsView() => items;
 
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
   ListModel.fromTitle(this.title);
 
-  void init() => items.loadSync();
+  void init() => reload();
+  void reload() => items.loadSync();
 
   Future<Iterable<Item>> searchItems(String searchStr) {
     final words = _parseSearchStr(searchStr);

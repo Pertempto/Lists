@@ -24,6 +24,7 @@ class _ListWidgetState extends State<ListWidget> {
   @override
   void initState() {
     super.initState();
+    listModel.reload();
     itemsToBeDisplayed = listModel.itemsView();
   }
 
@@ -72,7 +73,7 @@ class _ListWidgetState extends State<ListWidget> {
           .toList());
 
   void _addNewItem() async {
-    final newItem = Item();
+    final newItem = Item('', listModel.getDefaultItemType());
 
     if (context.mounted) {
       showDialog(
