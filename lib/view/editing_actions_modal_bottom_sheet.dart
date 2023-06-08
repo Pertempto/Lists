@@ -37,7 +37,7 @@ class EditingActionButton extends StatelessWidget {
     this.color,
   });
 
-  factory EditingActionButton.makeDeleteButton(
+  factory EditingActionButton.deleteButton(
           {required void Function() onDelete}) =>
       EditingActionButton(
           onPressed: onDelete,
