@@ -42,8 +42,8 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
       context: context,
       builder: (context) => EditingActionsModalBottomSheet(
         actionButtons: [
-          EditingActionButton.makeDeleteButton(onDelete: widget.onDelete),
-          EditingActionButton.makeEditButton(
+          EditingActionButton.deleteButton(onDelete: widget.onDelete),
+          EditingActionButton.editButton(
               onPressed: () => showDialog(
                   context: context,
                   builder: (context) => ListSettingsDialog(
