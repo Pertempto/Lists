@@ -13,10 +13,7 @@ class EditingActionsModalBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: actionButtons,
-      ),
+      child: Wrap(spacing: 8.0, children: actionButtons),
     );
   }
 }
