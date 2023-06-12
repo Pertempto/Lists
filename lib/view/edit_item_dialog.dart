@@ -35,7 +35,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
             autofocus: true,
             onFieldSubmitted: (_) => _submitNewItemValue(),
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 16),
           _buildItemTypeSwitcher()
         ],
       ),

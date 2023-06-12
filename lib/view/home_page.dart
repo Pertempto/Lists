@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
@@ -19,6 +20,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late Iterable<String> labels;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +45,10 @@ class _HomePageState extends State<HomePage> {
       future: DatabaseManager.loadListModels(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          labels = snapshot.data!
+              .map((listModel) => listModel.labels)
+              .flattened
+              .toSet();
           return _buildListPreviewsWidget(snapshot.data!);
         }
         if (snapshot.hasError) {
@@ -64,8 +71,7 @@ class _HomePageState extends State<HomePage> {
   void _showAddNewListDialog() => showDialog(
         context: context,
         builder: (context) => ListSettingsDialog(
-            onSubmit: _submitNewList,
-            listModel: ListModel()),
+            onSubmit: _submitNewList, labels: labels, listModel: ListModel()),
       );
 
   void _submitNewList(ListModel listModel) async {

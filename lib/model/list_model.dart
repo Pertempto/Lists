@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
@@ -13,12 +14,13 @@ class ListModel {
   String title = '';
 
   final items = IsarLinks<Item>();
+  List<String> labels = [];
 
   Iterable<Item> itemsView() => items;
 
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
-  ListModel.fromTitle(this.title);
+  ListModel.fromTitle(this.title) : labels = [];
 
   void init() => items.loadSync();
 
@@ -59,6 +61,19 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
+
+  void addLabel(String label) {
+    if (!hasLabel(label)) {
+      labels.add(label);
+    }
+  }
+
+  void removeLabel(String label) {
+    assert(hasLabel(label));
+    labels.remove(label);
+  }
+
+  bool hasLabel(String label) => labels.contains(label);
 }
 
 class ListModelError implements Exception {
