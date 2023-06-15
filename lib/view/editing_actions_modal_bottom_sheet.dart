@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// EditingActionsModalBottomSheet:
-///   - A widget which displays the passed `EditingActionButton`'s 
+///   - A widget which displays the passed `EditingActionButton`'s
 ///     in a modal bottom sheet.
 ///   - Typically, should be used with `showModalBottomSheet`
 class EditingActionsModalBottomSheet extends StatelessWidget {
@@ -13,10 +13,7 @@ class EditingActionsModalBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: actionButtons,
-      ),
+      child: Wrap(spacing: 8.0, children: actionButtons),
     );
   }
 }
@@ -37,20 +34,28 @@ class EditingActionButton extends StatelessWidget {
     this.color,
   });
 
-  factory EditingActionButton.makeDeleteButton(
-          {required final void Function() onDelete}) =>
+  factory EditingActionButton.deleteButton(
+          {required void Function() onDelete}) =>
       EditingActionButton(
           onPressed: onDelete,
           icon: Icons.delete,
           label: 'Delete',
           color: Colors.red);
 
+  factory EditingActionButton.editButton(
+          {required void Function() onPressed}) =>
+      EditingActionButton(
+          onPressed: onPressed,
+          icon: Icons.edit,
+          label: 'Edit',
+          color: Colors.lightGreen);
+
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(
         onPressed: () {
-          onPressed();
           Navigator.pop(context);
+          onPressed();
         },
         icon: Icon(icon),
         label: Text(label),
