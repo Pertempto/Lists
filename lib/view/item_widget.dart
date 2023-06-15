@@ -58,7 +58,7 @@ class _ItemWidgetState extends State<ItemWidget> {
       context: context,
       builder: (context) => EditingActionsModalBottomSheet(
         actionButtons: [
-          EditingActionButton.makeDeleteButton(onDelete: widget.onDelete)
+          EditingActionButton.deleteButton(onDelete: widget.onDelete)
         ],
       ),
     );

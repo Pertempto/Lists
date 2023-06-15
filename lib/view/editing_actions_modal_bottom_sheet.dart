@@ -13,9 +13,7 @@ class EditingActionsModalBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: actionButtons),
+      child: Wrap(spacing: 8.0, children: actionButtons),
     );
   }
 }
@@ -36,7 +34,7 @@ class EditingActionButton extends StatelessWidget {
     this.color,
   });
 
-  factory EditingActionButton.makeDeleteButton(
+  factory EditingActionButton.deleteButton(
           {required void Function() onDelete}) =>
       EditingActionButton(
           onPressed: onDelete,
@@ -44,7 +42,7 @@ class EditingActionButton extends StatelessWidget {
           label: 'Delete',
           color: Colors.red);
 
-  factory EditingActionButton.makeEditButton(
+  factory EditingActionButton.editButton(
           {required void Function() onPressed}) =>
       EditingActionButton(
           onPressed: onPressed,
