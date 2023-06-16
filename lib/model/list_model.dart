@@ -15,7 +15,8 @@ class ListModel {
 
   final items = IsarLinks<Item>();
 
-  ItemType getDefaultItemType() => items.lastOrNull?.itemType ?? ItemType.text;
+  @ignore
+  ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
 
   Iterable<Item> itemsView() => items;
 
@@ -53,6 +54,9 @@ class ListModel {
   Future<void> update(Item item) async {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
+      // The following ensures that the copy of `item` that `this` has is up to date.
+      items.remove(item);
+      items.add(item);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
