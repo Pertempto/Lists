@@ -55,8 +55,7 @@ class ListModel {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
       // The following ensures that the copy of `item` that `this` has is up to date.
-      items.remove(item);
-      items.add(item);
+      item.copyOnto(items.lookup(item)!);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }

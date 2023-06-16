@@ -15,6 +15,12 @@ class Item {
   bool isChecked = false;
 
   Item([this.value = '', this.itemType = ItemType.text]);
+
+  void copyOnto(Item item) {
+    item.value = value;
+    item.itemType = itemType;
+    item.isChecked = isChecked;
+  }
 }
 
 enum ItemType { text, checkbox }
