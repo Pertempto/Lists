@@ -33,12 +33,21 @@ class ListModel {
   @ignore
   int get itemCount => groupsView().fold(0,
       (runningItemCount, itemGroup) => runningItemCount + itemGroup.itemCount);
+  ItemType get lastItemType {
+    final lastItemGroup = itemGroups.lastOrNull ?? defaultItemGroup;
+    final lastItems = lastItemGroup.items;
+
+    return lastItems.lastOrNull?.itemType ?? ItemType.text;
+  }
+
+  // Iterable<Item> itemsView() => items;
 
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
   ListModel.fromTitle(this.title);
 
-  void init() {
+  void init() => reload();
+  void reload() {
     defaultItemGroupLink.loadSync();
     itemGroups.loadSync();
     for (final itemGroup in groupsView()) {
@@ -81,10 +90,14 @@ class ListModel {
   Future<void> updateItem(Item item) async {
     if (await item.group.contains(item)) {
       await DatabaseManager.putItem(item);
+      // The following ensures that the copy of `item` that `this` has is up to date.
+      item.copyOnto(lookupItem(item));
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
   }
+
+  Item lookupItem(Item item) => lookupGroup(item.group).items.lookup(item)!;
 
   Future<void> removeItem(Item item) async =>
       await lookupGroup(item.group).remove(item);

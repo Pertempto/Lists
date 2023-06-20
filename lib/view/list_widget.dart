@@ -104,7 +104,8 @@ class _ListWidgetState extends State<ListWidget> {
       );
 
   void _addNewItem() async {
-    final newItem = Item();
+    // Imitate the type of the last item.
+    final newItem = Item('', listModel.lastItemType);
 
     if (context.mounted) {
       await showDialog(
