@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
@@ -14,13 +15,17 @@ class ListModel {
 
   final items = IsarLinks<Item>();
 
+  @ignore
+  ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
+
   Iterable<Item> itemsView() => items;
 
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
   ListModel.fromTitle(this.title);
 
-  void init() => items.loadSync();
+  void init() => reload();
+  void reload() => items.loadSync();
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
     final words = _parseSearchStr(searchQuery);
@@ -49,6 +54,8 @@ class ListModel {
   Future<void> update(Item item) async {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
+      // The following ensures that the copy of `item` that `this` has is up to date.
+      item.copyOnto(items.lookup(item)!);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
