@@ -30,15 +30,13 @@ class ListModel {
         itemGroups
       ].flattened;
 
+  Iterable<Item> itemsView() => groupsView().expand((group) => group.items);
+
   @ignore
   int get itemCount => groupsView().fold(0,
       (runningItemCount, itemGroup) => runningItemCount + itemGroup.itemCount);
-  ItemType get lastItemType {
-    final lastItemGroup = itemGroups.lastOrNull ?? defaultItemGroup;
-    final lastItems = lastItemGroup.items;
-
-    return lastItems.lastOrNull?.itemType ?? ItemType.text;
-  }
+  ItemType get lastItemType =>
+      itemsView().lastOrNull?.itemType ?? ItemType.text;
 
   // Iterable<Item> itemsView() => items;
 
