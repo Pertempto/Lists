@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
@@ -16,6 +16,9 @@ class ListModel {
   final items = IsarLinks<Item>();
   List<String> labels = [];
 
+  @ignore
+  ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
+
   Iterable<Item> itemsView() => items;
 
   // a zero-arg constructor is required for classes that are isar collections
@@ -23,21 +26,23 @@ class ListModel {
   ListModel.fromTitle(this.title) : labels = [];
 
   void init() {
-    items.loadSync();
+    reload();
     // This ensures that labels is mutable
     labels = labels.toList();
   }
+  void reload() => items.loadSync();
 
-  Future<Iterable<Item>> searchItems(String searchStr) {
-    final words = _parseSearchStr(searchStr);
+  Future<Iterable<Item>> searchItems(String searchQuery) {
+    final words = _parseSearchStr(searchQuery);
     return items
         .filter()
         .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
         .findAll();
   }
 
-  Iterable<String> _parseSearchStr(String searchStr) =>
-      RegExp(r"([^\s]+)").allMatches(searchStr).map((match) => match.group(0)!);
+  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r"([^\s]+)")
+      .allMatches(searchQuery)
+      .map((match) => match.group(0)!);
   // note: the above regex pattern "([^\s]+)" matches a string without spaces.
   // All-in-all, this function breaks a sentence apart into words (though
   // it doesn't filter out punctuation).
@@ -54,6 +59,8 @@ class ListModel {
   Future<void> update(Item item) async {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
+      // The following ensures that the copy of `item` that `this` has is up to date.
+      item.copyOnto(items.lookup(item)!);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
@@ -66,17 +73,17 @@ class ListModel {
     }
   }
 
-  void addLabel(String label) {
-    if (!hasLabel(label)) {
-      labels.add(label);
-    }
-  }
+  // void addLabel(String label) {
+  //   if (!hasLabel(label)) {
+  //     labels.add(label);
+  //   }
+  // }
 
-  void removeLabel(String label) {
-    if (hasLabel(label)) {
-      labels.remove(label);
-    }
-  }
+  // void removeLabel(String label) {
+  //   if (hasLabel(label)) {
+  //     labels.remove(label);
+  //   }
+  // }
 
   bool hasLabel(String label) => labels.contains(label);
 }

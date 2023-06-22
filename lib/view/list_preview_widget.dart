@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/list_widget.dart';
+import 'package:lists/view/list_settings_dialog.dart';
+import 'package:lists/model/database_manager.dart';
 
 /// ListPreviewWidget:
 ///   - a widget representing a tile which contains the metadata
@@ -10,8 +12,9 @@ import 'package:lists/view/list_widget.dart';
 class ListPreviewWidget extends StatefulWidget {
   final ListModel listModel;
   final void Function() onDelete;
+  final Iterable<String> allLabels;
 
-  const ListPreviewWidget(this.listModel, {super.key, required this.onDelete});
+  const ListPreviewWidget(this.listModel, {super.key, required this.onDelete, required this.allLabels});
 
   @override
   State<ListPreviewWidget> createState() => _ListPreviewWidgetState();
@@ -40,7 +43,16 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
       context: context,
       builder: (context) => EditingActionsModalBottomSheet(
         actionButtons: [
-          EditingActionButton.makeDeleteButton(onDelete: widget.onDelete)
+          EditingActionButton.deleteButton(onDelete: widget.onDelete),
+          EditingActionButton.editButton(
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => ListSettingsDialog(
+                      onSubmit: (listModel) async {
+                        await DatabaseManager.putListModel(listModel);
+                        setState(() {});
+                      },
+                      listModel: widget.listModel, allLabels: widget.allLabels))),
         ],
       ),
     );
