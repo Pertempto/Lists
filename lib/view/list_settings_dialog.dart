@@ -47,7 +47,7 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
             child: Wrap(
                 spacing: 4,
                 runSpacing: 4,
-                children: widget.listModel.labels
+                children: selectedLabels
                     .map((label) => Chip(
                         label: Text(label),
                         onDeleted: () {
@@ -63,8 +63,8 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
                         final newLabel = await showDialog(
                           context: context,
                           builder: (context) => AddLabelDialog(
-                              labels: widget.allLabels,
-                              listModel: widget.listModel),
+                              labels: widget.allLabels.where(
+                                  (label) => !selectedLabels.contains(label))),
                         );
                         if (newLabel != null) {
                           selectedLabels.add(newLabel);

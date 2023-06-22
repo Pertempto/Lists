@@ -80,6 +80,7 @@ class _HomePageState extends State<HomePage> {
                   await DatabaseManager.deleteListModel(listModel);
                   setState(() {});
                 },
+                onEdited: () => setState(() {}),
                 allLabels: allLabels,
               ))
           .toList());

@@ -12,9 +12,14 @@ import 'package:lists/model/database_manager.dart';
 class ListPreviewWidget extends StatefulWidget {
   final ListModel listModel;
   final void Function() onDelete;
+  final void Function() onEdited;
   final Iterable<String> allLabels;
 
-  const ListPreviewWidget(this.listModel, {super.key, required this.onDelete, required this.allLabels});
+  const ListPreviewWidget(this.listModel,
+      {super.key,
+      required this.onDelete,
+      required this.onEdited,
+      required this.allLabels});
 
   @override
   State<ListPreviewWidget> createState() => _ListPreviewWidgetState();
@@ -51,8 +56,10 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
                       onSubmit: (listModel) async {
                         await DatabaseManager.putListModel(listModel);
                         setState(() {});
+                        widget.onEdited();
                       },
-                      listModel: widget.listModel, allLabels: widget.allLabels))),
+                      listModel: widget.listModel,
+                      allLabels: widget.allLabels))),
         ],
       ),
     );

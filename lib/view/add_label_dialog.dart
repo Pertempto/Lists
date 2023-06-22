@@ -5,10 +5,9 @@ import 'package:lists/model/list_model.dart';
 ///   - dialog for adding a label to a list (used by `ListSettingsDialog`)
 class AddLabelDialog extends StatefulWidget {
   final Iterable<String> labels;
-  final ListModel listModel;
 
   const AddLabelDialog(
-      {super.key, required this.labels, required this.listModel});
+      {super.key, required this.labels});
 
   @override
   State<AddLabelDialog> createState() => _AddLabelDialogState();
@@ -37,12 +36,11 @@ class _AddLabelDialogState extends State<AddLabelDialog> {
         SizedBox(
           height: 200,
           width:
-              0, // to minimize the width of the `ListTile`s; without this, the `ListTile` would have infinite width.
+              0, // to minimize the width of the `ListTile`s; without this, each `ListTile` would have infinite width.
           child: ListView(
               children: widget.labels
                   .where((label) =>
-                      label.contains(searchQuery) &&
-                      !widget.listModel.hasLabel(label))
+                      label.contains(searchQuery))
                   .map((label) => ListTile(
                       title: Text(label),
                       onTap: () => Navigator.pop(context, label)))
