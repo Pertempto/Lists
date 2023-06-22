@@ -41,33 +41,37 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
             onFieldSubmitted: (_) => _submitNewItemValue(),
           ),
           const SizedBox(height: 16),
-          Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: widget.listModel.labels
-                  .map((label) => Chip(
-                      label: Text(label),
-                      onDeleted: () {
-                        widget.listModel.removeLabel(label);
-                        setState(() {});
-                      }))
-                  .cast<Widget>()
-                  .followedBy([
-                TextButton.icon(
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add label'),
-                    onPressed: () async {
-                      final newLabel = await showDialog(
-                        context: context,
-                        builder: (context) => AddLabelDialog(
-                            labels: widget.labels, listModel: widget.listModel),
-                      );
-                      if (newLabel != null) {
-                        widget.listModel.addLabel(newLabel);
-                        setState(() {});
-                      }
-                    })
-              ]).toList())
+          SizedBox(
+            width: 240,
+            child: Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: widget.listModel.labels
+                    .map((label) => Chip(
+                        label: Text(label),
+                        onDeleted: () {
+                          widget.listModel.removeLabel(label);
+                          setState(() {});
+                        }))
+                    .cast<Widget>()
+                    .followedBy([
+                  TextButton.icon(
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add label'),
+                      onPressed: () async {
+                        final newLabel = await showDialog(
+                          context: context,
+                          builder: (context) => AddLabelDialog(
+                              labels: widget.labels,
+                              listModel: widget.listModel),
+                        );
+                        if (newLabel != null) {
+                          widget.listModel.addLabel(newLabel);
+                          setState(() {});
+                        }
+                      })
+                ]).toList()),
+          )
         ],
       ),
       actions: [
