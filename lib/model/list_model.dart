@@ -22,7 +22,11 @@ class ListModel {
   ListModel();
   ListModel.fromTitle(this.title) : labels = [];
 
-  void init() => items.loadSync();
+  void init() {
+    items.loadSync();
+    // This ensures that labels is mutable
+    labels = labels.toList();
+  }
 
   Future<Iterable<Item>> searchItems(String searchStr) {
     final words = _parseSearchStr(searchStr);
@@ -69,8 +73,9 @@ class ListModel {
   }
 
   void removeLabel(String label) {
-    assert(hasLabel(label));
-    labels.remove(label);
+    if (hasLabel(label)) {
+      labels.remove(label);
+    }
   }
 
   bool hasLabel(String label) => labels.contains(label);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
+import 'package:lists/view/add_label_dialog.dart';
 
 /// ListSettingsDialog:
 ///   - a dialog that allows the user to edit the metadata of the list
@@ -20,7 +21,6 @@ class ListSettingsDialog extends StatefulWidget {
 
 class _ListSettingsDialogState extends State<ListSettingsDialog> {
   late final TextEditingController _editingController;
-  // late Set<String> labels = widget.labels.toSet();
 
   @override
   void initState() {
@@ -66,19 +66,6 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
                         widget.listModel.addLabel(newLabel);
                         setState(() {});
                       }
-                      //   .map((label) =>
-                      //       PopupMenuItem(value: label, child: Text(label)))
-                      //   .followedBy([
-                      // PopupMenuItem(child: TextFormField(
-                      //   onFieldSubmitted: (label) async {
-                      //     print('adding label $label');
-                      //     widget.listModel.addLabel(label);
-                      //     if (context.mounted) Navigator.pop(context);
-                      //     labels.add(label);
-                      //     setState(() {});
-                      //   },
-                      // ))
-                      // ]).toList()),
                     })
               ]).toList())
         ],
@@ -96,65 +83,5 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
     Navigator.pop(context);
     widget.listModel.title = _editingController.text;
     widget.onSubmit(widget.listModel);
-  }
-}
-
-class AddLabelDialog extends StatefulWidget {
-  final Iterable<String> labels;
-  final ListModel listModel;
-
-  const AddLabelDialog(
-      {super.key, required this.labels, required this.listModel});
-
-  @override
-  State<AddLabelDialog> createState() => _AddLabelDialogState();
-}
-
-class _AddLabelDialogState extends State<AddLabelDialog> {
-  String searchQuery = '';
-  late TextEditingController textEditingController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return SimpleDialog(
-      children: [
-        ListTile(
-            title: TextField(
-                controller: textEditingController,
-                decoration: InputDecoration(
-                    hintText: 'Enter a label',
-                    prefixIcon: IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: () => setState(() {
-                              textEditingController.clear();
-                              searchQuery = '';
-                            })),
-                    suffixIcon: IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () => Navigator.pop(
-                            context, textEditingController.text))),
-                onChanged: (value) => setState(() => searchQuery = value),
-                onSubmitted: (newLabel) => Navigator.pop(context, newLabel))),
-        SizedBox(
-          height: 200,
-          width: 0,
-          child: ListView(
-              children: widget.labels
-                  .where((label) =>
-                      label.contains(searchQuery) &&
-                      !widget.listModel.hasLabel(label))
-                  .map((label) => ListTile(
-                      title: Text(label),
-                      onTap: () => Navigator.pop(context, label)))
-                  .toList()),
-        ),
-      ],
-    );
-  }
-
-  @override
-  void dispose() {
-    textEditingController.dispose();
-    super.dispose();
   }
 }

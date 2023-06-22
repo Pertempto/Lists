@@ -4,9 +4,9 @@ import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/list_widget.dart';
 
 /// ListPreviewWidget:
-///   - a widget representing a tile which contains the metadata 
-///     about a ListModel. When selected, pushes a ListWidget 
-///     representing this ListModel.     
+///   - a widget representing a tile which contains the metadata
+///     about a ListModel. When selected, pushes a ListWidget
+///     representing this ListModel.
 class ListPreviewWidget extends StatefulWidget {
   final ListModel listModel;
   final void Function() onDelete;
@@ -40,8 +40,7 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
       context: context,
       builder: (context) => EditingActionsModalBottomSheet(
         actionButtons: [
-          EditingActionButton.makeDeleteButton(
-              onDelete: widget.onDelete)
+          EditingActionButton.makeDeleteButton(onDelete: widget.onDelete)
         ],
       ),
     );

@@ -7,6 +7,7 @@ import 'package:lists/view/list_widget.dart';
 import 'package:lists/view/list_preview_widget.dart';
 import 'package:lists/view/settings_widget.dart';
 import 'package:modal_side_sheet/modal_side_sheet.dart';
+import 'package:lists/view/filter_dialog.dart';
 
 /// HomePage:
 ///   - A widget representing the home page in the app.
@@ -20,13 +21,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Iterable<String> labels;
+  late Iterable<String> allLabels;
+  Iterable<String>? selectedLabels;
+  bool showFilterSideSheet = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          AppBar(title: const Text('Lists'), actions: [_buildSettingsButton()]),
+      appBar: AppBar(
+          title: const Text('Lists'),
+          actions: [_buildFilterButton(), _buildSettingsButton()]),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNewListDialog,
@@ -36,7 +40,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  IconButton _buildSettingsButton() => IconButton(
+  Widget _buildFilterButton() => IconButton(
+      icon: const Icon(Icons.filter_alt),
+      onPressed: () => showDialog(
+          context: context,
+          builder: (context) => FilterDialog(
+                allLabels: allLabels,
+                selectedLabels: selectedLabels,
+                onSelectedLabelsChanged: (selectedLabels) =>
+                    setState(() => this.selectedLabels = selectedLabels),
+              )));
+
+  Widget _buildSettingsButton() => IconButton(
       icon: const Icon(Icons.settings),
       onPressed: () =>
           showModalSideSheet(context: context, body: const SettingsWidget()));
@@ -45,10 +60,7 @@ class _HomePageState extends State<HomePage> {
       future: DatabaseManager.loadListModels(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          labels = snapshot.data!
-              .map((listModel) => listModel.labels)
-              .flattened
-              .toSet();
+          allLabels = _getAllLabels(of: snapshot.data!);
           return _buildListPreviewsWidget(snapshot.data!);
         }
         if (snapshot.hasError) {
@@ -57,8 +69,11 @@ class _HomePageState extends State<HomePage> {
         return Container();
       });
 
+  Set<String> _getAllLabels({required Iterable<ListModel> of}) =>
+      of.map((listModel) => listModel.labels).flattened.toSet();
+
   ListView _buildListPreviewsWidget(List<ListModel> data) => ListView(
-      children: data
+      children: _filteredData(data)
           .map((listModel) => ListPreviewWidget(
                 listModel,
                 onDelete: () async {
@@ -68,10 +83,18 @@ class _HomePageState extends State<HomePage> {
               ))
           .toList());
 
+  Iterable<ListModel> _filteredData(List<ListModel> data) =>
+      selectedLabels == null
+          ? data
+          : data.where(
+              (listModel) => selectedLabels!.any(listModel.labels.contains));
+
   void _showAddNewListDialog() => showDialog(
         context: context,
         builder: (context) => ListSettingsDialog(
-            onSubmit: _submitNewList, labels: labels, listModel: ListModel()),
+            onSubmit: _submitNewList,
+            labels: allLabels,
+            listModel: ListModel()),
       );
 
   void _submitNewList(ListModel listModel) async {
