@@ -80,6 +80,7 @@ class _HomePageState extends State<HomePage> {
                   await DatabaseManager.deleteListModel(listModel);
                   setState(() {});
                 },
+                allLabels: allLabels,
               ))
           .toList());
 
@@ -93,7 +94,7 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (context) => ListSettingsDialog(
             onSubmit: _submitNewList,
-            labels: allLabels,
+            allLabels: allLabels,
             listModel: ListModel()),
       );
 

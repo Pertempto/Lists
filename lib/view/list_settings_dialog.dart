@@ -7,13 +7,13 @@ import 'package:lists/view/add_label_dialog.dart';
 class ListSettingsDialog extends StatefulWidget {
   final void Function(ListModel) onSubmit;
   final ListModel listModel;
-  final Iterable<String> labels;
+  final Iterable<String> allLabels;
 
   const ListSettingsDialog(
       {super.key,
       required this.onSubmit,
       required this.listModel,
-      required this.labels});
+      required this.allLabels});
 
   @override
   State<ListSettingsDialog> createState() => _ListSettingsDialogState();
@@ -21,6 +21,7 @@ class ListSettingsDialog extends StatefulWidget {
 
 class _ListSettingsDialogState extends State<ListSettingsDialog> {
   late final TextEditingController _editingController;
+  late final selectedLabels = widget.listModel.labels.toList();
 
   @override
   void initState() {
@@ -50,7 +51,7 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
                     .map((label) => Chip(
                         label: Text(label),
                         onDeleted: () {
-                          widget.listModel.removeLabel(label);
+                          selectedLabels.remove(label);
                           setState(() {});
                         }))
                     .cast<Widget>()
@@ -62,11 +63,11 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
                         final newLabel = await showDialog(
                           context: context,
                           builder: (context) => AddLabelDialog(
-                              labels: widget.labels,
+                              labels: widget.allLabels,
                               listModel: widget.listModel),
                         );
                         if (newLabel != null) {
-                          widget.listModel.addLabel(newLabel);
+                          selectedLabels.add(newLabel);
                           setState(() {});
                         }
                       })
@@ -86,6 +87,7 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
   void _submitNewItemValue() {
     Navigator.pop(context);
     widget.listModel.title = _editingController.text;
+    widget.listModel.labels = selectedLabels;
     widget.onSubmit(widget.listModel);
   }
 }
