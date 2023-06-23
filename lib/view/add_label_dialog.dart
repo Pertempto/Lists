@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lists/model/list_model.dart';
 
 /// AddLabelDialog:
 ///   - dialog for adding a label to a list (used by `ListSettingsDialog`)

@@ -20,9 +20,21 @@ class FilterDialog extends StatefulWidget {
 class _FilterDialogState extends State<FilterDialog> {
   late final Set<String> _selectedLabels = widget.selectedLabels?.toSet() ?? {};
 
-  // convenience getter. `onSelectedLabelsChanged` is called with the value of this getter.
+  // Convenience getter. `onSelectedLabelsChanged` is called with the value of this getter.
   Set<String>? get _selectedLabelsIfNotEmpty =>
       _selectedLabels.isNotEmpty ? _selectedLabels : null;
+
+  /// The following getter is useful in one particular case: Let's say the user
+  /// selects a label and then deletes that label from every list that has it.
+  /// Now, that label is not contained in `allLabels` (because no list has
+  /// that label), but is contained in `selectedLabels` (because the user never
+  /// unselected it). That label is now 'deleted.' This getter returns deleted
+  /// labels.
+  Iterable<String> get _deletedLabels =>
+      _selectedLabels.difference(widget.allLabels.toSet());
+
+  static const _deletedLabelTextStyle = TextStyle(
+      fontStyle: FontStyle.italic, decoration: TextDecoration.lineThrough);
 
   @override
   Widget build(BuildContext context) {
@@ -67,15 +79,32 @@ class _FilterDialogState extends State<FilterDialog> {
                 },
               )
             ]
-                .followedBy(widget.allLabels.map((label) => FilterChip(
-                    label: Text(label),
-                    selected: _selectedLabels.contains(label),
-                    onSelected: (isSelected) {
-                      setState(() => isSelected
-                          ? _selectedLabels.add(label)
-                          : _selectedLabels.remove(label));
-                      widget.onSelectedLabelsChanged(_selectedLabelsIfNotEmpty);
-                    })))
+                .followedBy(_createLabelChips(
+                    labels: widget.allLabels, areDeleted: false))
+                .followedBy(
+                    _createLabelChips(labels: _deletedLabels, areDeleted: true))
                 .toList()),
       );
+
+  Iterable<FilterChip> _createLabelChips({
+    required Iterable<String> labels,
+    required bool areDeleted,
+  }) {
+    // a different styling is used for when the passed labels are deleted
+    final labelTextStyle = areDeleted ? _deletedLabelTextStyle : null;
+    final chipSelectedColor = areDeleted ? Colors.red : null;
+
+    return labels.map(
+      (label) => FilterChip(
+          label: Text(label, style: labelTextStyle),
+          selectedColor: chipSelectedColor,
+          selected: _selectedLabels.contains(label),
+          onSelected: (isSelected) {
+            setState(() => isSelected
+                ? _selectedLabels.add(label)
+                : _selectedLabels.remove(label));
+            widget.onSelectedLabelsChanged(_selectedLabelsIfNotEmpty);
+          }),
+    );
+  }
 }
