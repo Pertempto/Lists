@@ -29,7 +29,8 @@ class _FilterDialogState extends State<FilterDialog> {
   /// Now, that label is not contained in `allLabels` (because no list has
   /// that label), but is contained in `selectedLabels` (because the user never
   /// unselected it). That label is now 'deleted.' This getter returns deleted
-  /// labels.
+  /// labels. Then, those deleted labels can be treated differently from the 
+  /// non-deleted labels.
   Iterable<String> get _deletedLabels =>
       _selectedLabels.difference(widget.allLabels.toSet());
 
