@@ -35,7 +35,8 @@ class _EditItemDialogState extends State<EditItemDialog> {
             controller: _editingController,
             autofocus: true,
             onFieldSubmitted: (value) {
-              if (!_isBlank(value)) _submitNewItemValue();
+              // we don't want the user to be able to add blank/empty items.
+              if (!_isValueBlank) _submitNewItemValue();
             },
           ),
           const SizedBox(height: 15),
@@ -45,16 +46,15 @@ class _EditItemDialogState extends State<EditItemDialog> {
       actions: [
         ElevatedButton(
           // if the text value for the item is blank, this button is disabled (onPressed == null),
-          // because we don't want the user to be able to add blank/empty items.
-          onPressed:
-              !_isBlank(_editingController.text) ? _submitNewItemValue : null,
+          // because we don't want the user to be able to submit blank/empty items.
+          onPressed: !_isValueBlank ? _submitNewItemValue : null,
           child: const Text('Submit'),
         )
       ],
     );
   }
 
-  bool _isBlank(String str) => str.trim().isEmpty;
+  bool get _isValueBlank => _editingController.text.trim().isEmpty;
 
   Widget _buildItemTypeSwitcher() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
