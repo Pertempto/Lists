@@ -20,6 +20,7 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
   @override
   void initState() {
     _editingController = TextEditingController(text: widget.listModel.title);
+    // Update the state of the submit button when the user input changes
     _editingController.addListener(() => setState(() {}));
     super.initState();
   }
