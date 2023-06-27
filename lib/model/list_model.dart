@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/model/list_model_item_group.dart';
-import 'package:lists/model/item_group_search_results.dart';
+import 'package:lists/model/item_group.dart';
+import 'package:lists/model/filtered_item_group.dart';
 
 part 'list_model.g.dart';
 
@@ -15,17 +15,18 @@ class ListModel {
   Id id = Isar.autoIncrement;
   String title = '';
 
-  final defaultItemGroupLink = IsarLink<ListModelItemGroup>();
-  final itemGroups = IsarLinks<ListModelItemGroup>();
+  final defaultItemGroupLink = IsarLink<ItemGroup>();
+  final itemGroups = IsarLinks<ItemGroup>();
 
   @ignore
-  ListModelItemGroup get defaultItemGroup => defaultItemGroupLink.value!;
-  set defaultItemGroup(ListModelItemGroup itemGroup) =>
+  ItemGroup get defaultItemGroup => defaultItemGroupLink.value!;
+  set defaultItemGroup(ItemGroup itemGroup) =>
       defaultItemGroupLink.value = itemGroup;
 
+  @ignore
   bool get hasDefaultItemGroup => defaultItemGroupLink.value != null;
 
-  Iterable<ListModelItemGroup> groupsView() => [
+  Iterable<ItemGroup> groupsView() => [
         [defaultItemGroup],
         itemGroups
       ].flattened;
@@ -35,6 +36,7 @@ class ListModel {
   @ignore
   int get itemCount => groupsView().fold(0,
       (runningItemCount, itemGroup) => runningItemCount + itemGroup.itemCount);
+  @ignore
   ItemType get lastItemType =>
       itemsView().lastOrNull?.itemType ?? ItemType.text;
 
@@ -55,28 +57,27 @@ class ListModel {
 
   Future<void> ensureHasDefaultItemGroup() async {
     if (!hasDefaultItemGroup) {
-      await DatabaseManager.putItemGroup(
-          defaultItemGroup = ListModelItemGroup());
+      await DatabaseManager.putItemGroup(defaultItemGroup = ItemGroup());
       await DatabaseManager.updateGroupsOfListModel(this);
     }
   }
 
-  Future<void> addGroup(ListModelItemGroup itemGroup) async {
+  Future<void> addGroup(ItemGroup itemGroup) async {
     await DatabaseManager.putItemGroup(itemGroup);
     itemGroups.add(itemGroup);
     await DatabaseManager.updateGroupsOfListModel(this);
   }
 
-  Future<void> updateGroup(ListModelItemGroup itemGroup) async {
+  Future<void> updateGroup(ItemGroup itemGroup) async {
     assert(itemGroups.contains(itemGroup));
     await DatabaseManager.putItemGroup(itemGroup);
     await reloadGroup(itemGroup);
   }
 
-  Future<void> reloadGroup(ListModelItemGroup itemGroup) async =>
+  Future<void> reloadGroup(ItemGroup itemGroup) async =>
       await lookupGroup(itemGroup).items.load();
 
-  ListModelItemGroup lookupGroup(ListModelItemGroup itemGroup) =>
+  ItemGroup lookupGroup(ItemGroup itemGroup) =>
       itemGroup.id == defaultItemGroup.id
           ? defaultItemGroup
           : itemGroups.lookup(itemGroup)!;
@@ -100,7 +101,7 @@ class ListModel {
   Future<void> removeItem(Item item) async =>
       await lookupGroup(item.group).remove(item);
 
-  Future<void> moveItem(Item item, {required ListModelItemGroup to}) async {
+  Future<void> moveItem(Item item, {required ItemGroup to}) async {
     if (!item.hasGroup) item.group = to;
 
     final from = item.group;
@@ -126,10 +127,9 @@ class ListModel {
   // example:
   // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
 
-  Future<Iterable<ItemGroupSearchResults>> searchItems(
-      String searchQuery) async {
+  Future<Iterable<FilteredItemGroup>> searchItems(String searchQuery) async {
     final parsedSearchQuery = _parseSearchQuery(searchQuery);
-    final searchResults = <ItemGroupSearchResults>[];
+    final searchResults = <FilteredItemGroup>[];
 
     for (final itemGroup in groupsView()) {
       searchResults.add(await itemGroup.search(parsedSearchQuery));

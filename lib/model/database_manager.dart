@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/model/list_model_item_group.dart';
+import 'package:lists/model/item_group.dart';
 
 /// DatabaseManager:
 ///   - a class that creates, reads, updates, and
@@ -13,7 +13,7 @@ class DatabaseManager {
   static Future<void> init() async {
     if (Isar.instanceNames.isEmpty) {
       isar = await Isar.open(
-          [ListModelSchema, ItemSchema, ListModelItemGroupSchema],
+          [ListModelSchema, ItemSchema, ItemGroupSchema],
           inspector: kDebugMode);
     }
   }
@@ -49,21 +49,19 @@ class DatabaseManager {
     assert(wasDeleted);
   }
 
-  static Future<ListModelItemGroup> putItemGroup(
-      ListModelItemGroup itemGroup) async {
-    await isar
-        .writeTxn(() async => await isar.listModelItemGroups.put(itemGroup));
+  static Future<ItemGroup> putItemGroup(ItemGroup itemGroup) async {
+    await isar.writeTxn(() async => await isar.itemGroups.put(itemGroup));
     return itemGroup;
   }
 
-  static Future<void> deleteItemGroup(ListModelItemGroup itemGroup) async =>
+  static Future<void> deleteItemGroup(ItemGroup itemGroup) async =>
       await isar.writeTxn(() async {
         await isar.items
             .deleteAll(itemGroup.items.map((item) => item.id).toList());
-        await isar.listModelItemGroups.delete(itemGroup.id);
+        await isar.itemGroups.delete(itemGroup.id);
       });
 
-  static Future<void> updateGroupItems(ListModelItemGroup which) async =>
+  static Future<void> updateGroupItems(ItemGroup which) async =>
       await isar.writeTxn(() async => await which.items.save());
 
   static Future<Item> putItem(Item item) async {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/model/list_model_item_group.dart';
+import 'package:lists/model/item_group.dart';
 import 'package:lists/model/list_model.dart';
 
 /// EditItemDialog:
@@ -24,7 +24,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
   late final TextEditingController _editingController =
       TextEditingController(text: widget.item.value);
   late ItemType selectedItemType = widget.item.itemType;
-  late ListModelItemGroup selectedGroup = widget.item.hasGroup
+  late ItemGroup selectedGroup = widget.item.hasGroup
       ? widget.containingListModel.lookupGroup(widget.item.group)
       : widget.containingListModel.defaultItemGroup;
 
@@ -70,7 +70,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text("Group"),
-          DropdownMenu<ListModelItemGroup>(
+          DropdownMenu<ItemGroup>(
               leadingIcon: const Icon(Icons.category),
               initialSelection: selectedGroup,
               onSelected: (newGroup) =>

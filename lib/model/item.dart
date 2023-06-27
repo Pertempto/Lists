@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
-import 'package:lists/model/list_model_item_group.dart';
+import 'package:lists/model/item_group.dart';
 import 'package:lists/model/list_model.dart';
 
 part 'item.g.dart';
@@ -19,17 +19,17 @@ class Item {
   bool isChecked = false;
 
   @Backlink(to: "items")
-  final groupLink = IsarLink<ListModelItemGroup>();
+  final groupLink = IsarLink<ItemGroup>();
 
   Item([this.value = '', this.itemType = ItemType.text]);
 
   @ignore
   bool get hasGroup => groupLink.value != null;
   @ignore
-  ListModelItemGroup get group => groupLink.value!;
-  set group(ListModelItemGroup newGroup) => groupLink.value = newGroup;
-  // This method is needed to update the fields of a cached `Item` 
-  // in the `IsarLinks` of a `ListModel` with the same `id` as `this`, 
+  ItemGroup get group => groupLink.value!;
+  set group(ItemGroup newGroup) => groupLink.value = newGroup;
+  // This method is needed to update the fields of a cached `Item`
+  // in the `IsarLinks` of a `ListModel` with the same `id` as `this`,
   // but out-of-date fields (see `ListModel.update()`)
   void copyOnto(Item item) {
     item.value = value;

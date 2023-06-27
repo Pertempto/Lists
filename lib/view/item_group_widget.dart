@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lists/model/abstract_item_group.dart';
 import 'package:lists/model/item_group.dart';
 import 'package:lists/view/edit_item_group_dialog.dart';
 
 /// ItemGroupWidget:
 ///   - a widget representing an `ItemGroup`. Assumes `itemGroup.title != null`
 class ItemGroupWidget extends StatefulWidget {
-  final ItemGroup itemGroup;
+  final AbstractItemGroup itemGroup;
   final void Function(ItemGroup) onEdited;
   const ItemGroupWidget(
       {super.key, required this.itemGroup, required this.onEdited});
@@ -21,7 +22,7 @@ class _ItemGroupWidgetState extends State<ItemGroupWidget> {
       onTap: () async => await showDialog(
           context: context,
           builder: (context) => EditItemGroupDialog(
-              itemGroup: widget.itemGroup,
+              itemGroup: widget.itemGroup.originalGroup,
               onSubmit: (itemGroup) {
                 widget.onEdited(itemGroup);
                 setState(() {});

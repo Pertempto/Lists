@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
-import 'package:lists/model/list_model_item_group.dart';
 import 'package:lists/model/item_group.dart';
+import 'package:lists/model/abstract_item_group.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
@@ -23,7 +23,7 @@ class ListWidget extends StatefulWidget {
 class _ListWidgetState extends State<ListWidget> {
   ListModel get listModel => widget.listModel;
 
-  late Iterable<ItemGroup> groupsToBeDisplayed = listModel.groupsView();
+  late Iterable<AbstractItemGroup> groupsToBeDisplayed = listModel.groupsView();
   String searchQuery = '';
 
   @override
@@ -49,10 +49,11 @@ class _ListWidgetState extends State<ListWidget> {
             onPressed: () => showDialog(
               context: context,
               builder: (context) => EditItemGroupDialog(
-                itemGroup: ListModelItemGroup(),
+                itemGroup: ItemGroup(),
                 onSubmit: (itemGroup) async {
+                  // Here, itemGroup will always be an ItemGroup
                   await listModel
-                      .addGroup(await itemGroup.asListModelItemGroup());
+                      .addGroup(itemGroup);
                   await reFetchItems();
                 },
               ),
@@ -79,7 +80,7 @@ class _ListWidgetState extends State<ListWidget> {
                   ItemGroupWidget(
                     itemGroup: group,
                     onEdited: (itemGroup) async => await listModel
-                        .updateGroup(await itemGroup.asListModelItemGroup()),
+                        .updateGroup(itemGroup),
                   )
               ].followedBy(group.itemsView().map(_buildItemWidget)))
           .flattened

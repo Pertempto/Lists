@@ -4,6 +4,7 @@ import 'package:lists/model/item_group.dart';
 /// EditItemDialog:
 ///   - a dialog that allows the user to edit an `ItemGroup`
 class EditItemGroupDialog extends StatefulWidget {
+  // We should only need to edit `ItemGroup`s (they shouldn't be abstract)
   final ItemGroup itemGroup;
   final void Function(ItemGroup) onSubmit;
 
