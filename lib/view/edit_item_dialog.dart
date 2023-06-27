@@ -20,6 +20,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
   @override
   void initState() {
     _editingController = TextEditingController(text: widget.item.value);
+    // Update the state of the submit button when the user input changes
     _editingController.addListener(() => setState(() {}));
     super.initState();
   }
