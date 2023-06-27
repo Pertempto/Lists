@@ -32,7 +32,7 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Enter New List Title', textAlign: TextAlign.center),
+      title: const Text('List Settings', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
