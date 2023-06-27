@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 class AddLabelDialog extends StatefulWidget {
   final Iterable<String> labels;
 
-  const AddLabelDialog(
-      {super.key, required this.labels});
+  const AddLabelDialog({super.key, required this.labels});
 
   @override
   State<AddLabelDialog> createState() => _AddLabelDialogState();
@@ -20,30 +19,34 @@ class _AddLabelDialogState extends State<AddLabelDialog> {
   Widget build(BuildContext context) {
     return SimpleDialog(
       children: [
-        ListTile(
-            title: TextField(
-                autofocus: true,
-                controller: textEditingController,
-                decoration: InputDecoration(
-                    hintText: 'Enter a label',
-                    suffixIcon: IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () => Navigator.pop(
-                            context, textEditingController.text))),
-                onChanged: (value) => setState(() => searchQuery = value),
-                onSubmitted: (newLabel) => Navigator.pop(context, newLabel))),
-        SizedBox(
-          height: 200,
-          width:
-              0, // to minimize the width of the `ListTile`s; without this, each `ListTile` would have infinite width.
-          child: ListView(
-              children: widget.labels
-                  .where((label) =>
-                      label.contains(searchQuery))
-                  .map((label) => ListTile(
-                      title: Text(label),
-                      onTap: () => Navigator.pop(context, label)))
-                  .toList()),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: TextField(
+              autofocus: true,
+              controller: textEditingController,
+              decoration: InputDecoration(
+                  hintText: 'Enter a label',
+                  suffixIcon: IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: () =>
+                          Navigator.pop(context, textEditingController.text))),
+              onChanged: (value) => setState(() => searchQuery = value),
+              onSubmitted: (newLabel) => Navigator.pop(context, newLabel)),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 24.0),
+          child: SizedBox(
+            height: 120,
+            width:
+                0, // to minimize the width of the `ListTile`s; without this, each `ListTile` would have infinite width.
+            child: ListView(
+                children: widget.labels
+                    .where((label) => label.contains(searchQuery))
+                    .map((label) => ListTile(
+                        title: Text(label),
+                        onTap: () => Navigator.pop(context, label)))
+                    .toList()),
+          ),
         ),
       ],
     );
