@@ -30,6 +30,7 @@ class ListModel {
     // This ensures that labels is mutable
     labels = labels.toList();
   }
+
   void reload() => items.loadSync();
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
@@ -72,18 +73,6 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
-
-  // void addLabel(String label) {
-  //   if (!hasLabel(label)) {
-  //     labels.add(label);
-  //   }
-  // }
-
-  // void removeLabel(String label) {
-  //   if (hasLabel(label)) {
-  //     labels.remove(label);
-  //   }
-  // }
 
   bool hasLabel(String label) => labels.contains(label);
 }

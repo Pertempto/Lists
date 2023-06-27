@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
       selectedLabels == null
           ? data
           : data.where(
-              (listModel) => selectedLabels!.any(listModel.labels.contains));
+              (listModel) => selectedLabels!.any(listModel.hasLabel));
 
   void _showAddNewListDialog() => showDialog(
         context: context,
