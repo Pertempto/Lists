@@ -37,8 +37,26 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
         setState(() {});
       },
       onLongPress: _showOptionsModalSheet,
-      title: Text(widget.listModel.title,
-          style: Theme.of(context).textTheme.titleLarge),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.listModel.title,
+              style: Theme.of(context).textTheme.titleLarge),
+          Expanded(
+            child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 4.0,
+                runSpacing: 4.0,
+                children: widget.listModel.labels
+                    .map((label) => Chip(
+                          label: Text(label,
+                              style: Theme.of(context).textTheme.labelSmall),
+                        ))
+                    .toList()),
+          )
+        ],
+      ),
       subtitle: Text('Items: ${widget.listModel.items.length}'),
     );
   }
