@@ -61,6 +61,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           allLabels = _getAllLabels(of: snapshot.data!);
+          _removeSelectedDeletedLabels();
           return _buildListPreviewsWidget(snapshot.data!);
         }
         if (snapshot.hasError) {
@@ -71,6 +72,13 @@ class _HomePageState extends State<HomePage> {
 
   Set<String> _getAllLabels({required Iterable<ListModel> of}) =>
       of.map((listModel) => listModel.labels).flattened.toSet();
+
+  void _removeSelectedDeletedLabels() {
+    selectedLabels = selectedLabels?.where(allLabels.contains);
+    // if there are no labels selected, set selectedLabels to null (which signifies no 
+    // filters).
+    selectedLabels = (selectedLabels?.isEmpty ?? true) ? null : selectedLabels;
+  }
 
   ListView _buildListPreviewsWidget(List<ListModel> data) => ListView(
       children: _filteredData(data)
@@ -88,8 +96,7 @@ class _HomePageState extends State<HomePage> {
   Iterable<ListModel> _filteredData(List<ListModel> data) =>
       selectedLabels == null
           ? data
-          : data.where(
-              (listModel) => selectedLabels!.any(listModel.hasLabel));
+          : data.where((listModel) => selectedLabels!.any(listModel.hasLabel));
 
   void _showAddNewListDialog() => showDialog(
         context: context,

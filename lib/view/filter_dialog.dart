@@ -24,19 +24,6 @@ class _FilterDialogState extends State<FilterDialog> {
   Set<String>? get _selectedLabelsIfNotEmpty =>
       _selectedLabels.isNotEmpty ? _selectedLabels : null;
 
-  /// The following getter is useful in one particular case: Let's say the user
-  /// selects a label and then deletes that label from every list that has it.
-  /// Now, that label is not contained in `allLabels` (because no list has
-  /// that label), but is contained in `selectedLabels` (because the user never
-  /// unselected it). That label is now 'deleted.' This getter returns deleted
-  /// labels. Then, those deleted labels can be treated differently from the 
-  /// non-deleted labels.
-  Iterable<String> get _deletedLabels =>
-      _selectedLabels.difference(widget.allLabels.toSet());
-
-  static const _deletedLabelTextStyle = TextStyle(
-      fontStyle: FontStyle.italic, decoration: TextDecoration.lineThrough);
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -79,33 +66,18 @@ class _FilterDialogState extends State<FilterDialog> {
                   widget.onSelectedLabelsChanged(_selectedLabelsIfNotEmpty);
                 },
               )
-            ]
-                .followedBy(_createLabelChips(
-                    labels: widget.allLabels, areDeleted: false))
-                .followedBy(
-                    _createLabelChips(labels: _deletedLabels, areDeleted: true))
-                .toList()),
+            ].followedBy(_createLabelChips()).toList()),
       );
 
-  Iterable<FilterChip> _createLabelChips({
-    required Iterable<String> labels,
-    required bool areDeleted,
-  }) {
-    // a different styling is used for when the passed labels are deleted
-    final labelTextStyle = areDeleted ? _deletedLabelTextStyle : null;
-    final chipSelectedColor = areDeleted ? Colors.red : null;
-
-    return labels.map(
-      (label) => FilterChip(
-          label: Text(label, style: labelTextStyle),
-          selectedColor: chipSelectedColor,
-          selected: _selectedLabels.contains(label),
-          onSelected: (isSelected) {
-            setState(() => isSelected
-                ? _selectedLabels.add(label)
-                : _selectedLabels.remove(label));
-            widget.onSelectedLabelsChanged(_selectedLabelsIfNotEmpty);
-          }),
-    );
-  }
+  Iterable<FilterChip> _createLabelChips() => widget.allLabels.map(
+        (label) => FilterChip(
+            label: Text(label),
+            selected: _selectedLabels.contains(label),
+            onSelected: (isSelected) {
+              setState(() => isSelected
+                  ? _selectedLabels.add(label)
+                  : _selectedLabels.remove(label));
+              widget.onSelectedLabelsChanged(_selectedLabelsIfNotEmpty);
+            }),
+      );
 }
