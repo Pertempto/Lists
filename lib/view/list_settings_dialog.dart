@@ -26,6 +26,8 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
   @override
   void initState() {
     _editingController = TextEditingController(text: widget.listModel.title);
+    // Update the state of the submit button when the user input changes
+    _editingController.addListener(() => setState(() {}));
     super.initState();
   }
 
@@ -39,7 +41,10 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
           TextFormField(
             controller: _editingController,
             autofocus: true,
-            onFieldSubmitted: (_) => _submitNewItemValue(),
+            onFieldSubmitted: (_) {
+              // we don't want the user to be able to submit blank/empty items.
+              if (!_isTitleBlank) _submitListModel();
+            },
           ),
           const SizedBox(height: 16),
           SizedBox(
@@ -77,14 +82,18 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
       ),
       actions: [
         ElevatedButton(
-          onPressed: () => _submitNewItemValue(),
+          // if the title is blank, this button is disabled (onPressed == null),
+          // because we don't want the user to be able to submit lists with blank titles.
+          onPressed: !_isTitleBlank ? _submitListModel : null,
           child: const Text('Submit'),
         )
       ],
     );
   }
 
-  void _submitNewItemValue() {
+  bool get _isTitleBlank => _editingController.text.trim().isEmpty;
+
+  void _submitListModel() {
     Navigator.pop(context);
     widget.listModel.title = _editingController.text;
     widget.listModel.labels = selectedLabels;
