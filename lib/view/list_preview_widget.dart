@@ -57,7 +57,9 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
             ),
           ),
           Container(
-            width: 160,
+            // Use half of the screen width, to make it look good on different
+            // screen sizes.
+            width: MediaQuery.of(context).size.width * 0.5,
             padding: const EdgeInsets.all(8),
             child: Wrap(
                 alignment: WrapAlignment.end,
