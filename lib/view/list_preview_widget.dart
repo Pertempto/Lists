@@ -56,22 +56,24 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
               ),
             ),
           ),
-          Container(
-            // Use half of the screen width, to make it look good on different
-            // screen sizes.
-            width: MediaQuery.of(context).size.width * 0.5,
-            padding: const EdgeInsets.all(8),
-            child: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 4.0,
-                runSpacing: 4.0,
-                children: widget.listModel.labels
-                    .map((label) => Chip(
-                          label: Text(label,
-                              style: Theme.of(context).textTheme.labelSmall),
-                        ))
-                    .toList()),
-          )
+          if (widget.listModel.labels
+              .isNotEmpty) // if the list has no labels, then don't create a widget to display the list's labels
+            Container(
+              // Use half of the screen width, to make it look good on different
+              // screen sizes.
+              width: MediaQuery.of(context).size.width * 0.5,
+              padding: const EdgeInsets.all(8),
+              child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 4.0,
+                  runSpacing: 4.0,
+                  children: widget.listModel.labels
+                      .map((label) => Chip(
+                            label: Text(label,
+                                style: Theme.of(context).textTheme.labelSmall),
+                          ))
+                      .toList()),
+            )
         ],
       ),
     );
