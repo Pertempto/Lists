@@ -28,22 +28,37 @@ class ListPreviewWidget extends StatefulWidget {
 class _ListPreviewWidgetState extends State<ListPreviewWidget> {
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.list),
-      isThreeLine: true,
+    return InkWell(
       onTap: () async {
         await Navigator.push(context,
             MaterialPageRoute(builder: (_) => ListWidget(widget.listModel)));
         setState(() {});
       },
       onLongPress: _showOptionsModalSheet,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(widget.listModel.title,
-              style: Theme.of(context).textTheme.titleLarge),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Icon(Icons.list),
+          ),
           Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.listModel.title,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: Theme.of(context).textTheme.titleLarge),
+                  Text('Items: ${widget.listModel.items.length}'),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            width: 160,
+            padding: const EdgeInsets.all(8),
             child: Wrap(
                 alignment: WrapAlignment.end,
                 spacing: 4.0,
@@ -57,7 +72,6 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
           )
         ],
       ),
-      subtitle: Text('Items: ${widget.listModel.items.length}'),
     );
   }
 
