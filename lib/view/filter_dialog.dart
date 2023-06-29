@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 ///   -
 class FilterDialog extends StatefulWidget {
   final Iterable<String> allLabels;
-  final Iterable<String>? selectedLabels;
-  final void Function(Iterable<String>?) onSelectedLabelsChanged;
+  final Set<String>? selectedLabels;
+  final void Function(Set<String>?) onSelectedLabelsChanged;
 
   const FilterDialog(
       {super.key,
@@ -18,7 +18,7 @@ class FilterDialog extends StatefulWidget {
 }
 
 class _FilterDialogState extends State<FilterDialog> {
-  late final Set<String> _selectedLabels = widget.selectedLabels?.toSet() ?? {};
+  late final Set<String> _selectedLabels = widget.selectedLabels ?? {};
 
   // Convenience getter. `onSelectedLabelsChanged` is called with the value of this getter.
   Set<String>? get _selectedLabelsIfNotEmpty =>

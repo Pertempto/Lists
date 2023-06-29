@@ -13,12 +13,18 @@ class ListPreviewWidget extends StatefulWidget {
   final ListModel listModel;
   final void Function() onDelete;
   final void Function() onEdited;
+  final bool Function(String) isLabelSelected;
+  final void Function(String) onLabelSelected;
+  final void Function(String) onLabelUnselected;
   final Iterable<String> allLabels;
 
   const ListPreviewWidget(this.listModel,
       {super.key,
       required this.onDelete,
       required this.onEdited,
+      required this.isLabelSelected,
+      required this.onLabelSelected,
+      required this.onLabelUnselected,
       required this.allLabels});
 
   @override
@@ -68,7 +74,11 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
                   spacing: 4.0,
                   runSpacing: 4.0,
                   children: widget.listModel.labels
-                      .map((label) => Chip(
+                      .map((label) => FilterChip(
+                            selected: widget.isLabelSelected(label),
+                            onSelected: (isSelected) => isSelected
+                                ? widget.onLabelSelected(label)
+                                : widget.onLabelUnselected(label),
                             label: Text(label,
                                 style: Theme.of(context).textTheme.labelSmall),
                           ))
