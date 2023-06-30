@@ -14,6 +14,7 @@ class ListModel {
   String title = '';
 
   final items = IsarLinks<Item>();
+  List<String> labels = [];
 
   @ignore
   ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
@@ -22,9 +23,14 @@ class ListModel {
 
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
-  ListModel.fromTitle(this.title);
+  ListModel.fromTitle(this.title) : labels = [];
 
-  void init() => reload();
+  void init() {
+    reload();
+    // This ensures that labels is mutable
+    labels = labels.toList();
+  }
+
   void reload() => items.loadSync();
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
@@ -67,6 +73,8 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
+
+  bool hasLabel(String label) => labels.contains(label);
 }
 
 class ListModelError implements Exception {

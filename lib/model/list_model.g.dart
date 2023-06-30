@@ -17,8 +17,13 @@ const ListModelSchema = CollectionSchema(
   name: r'ListModel',
   id: 5416347897186416744,
   properties: {
-    r'title': PropertySchema(
+    r'labels': PropertySchema(
       id: 0,
+      name: r'labels',
+      type: IsarType.stringList,
+    ),
+    r'title': PropertySchema(
+      id: 1,
       name: r'title',
       type: IsarType.string,
     )
@@ -50,6 +55,13 @@ int _listModelEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.labels.length * 3;
+  {
+    for (var i = 0; i < object.labels.length; i++) {
+      final value = object.labels[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.title.length * 3;
   return bytesCount;
 }
@@ -60,7 +72,8 @@ void _listModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.title);
+  writer.writeStringList(offsets[0], object.labels);
+  writer.writeString(offsets[1], object.title);
 }
 
 ListModel _listModelDeserialize(
@@ -71,7 +84,8 @@ ListModel _listModelDeserialize(
 ) {
   final object = ListModel();
   object.id = id;
-  object.title = reader.readString(offsets[0]);
+  object.labels = reader.readStringList(offsets[0]) ?? [];
+  object.title = reader.readString(offsets[1]);
   return object;
 }
 
@@ -83,6 +97,8 @@ P _listModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 1:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -231,6 +247,228 @@ extension ListModelQueryFilter
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'labels',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'labels',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'labels',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'labels',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'labels',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'labels',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'labels',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'labels',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'labels',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'labels',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> labelsLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'labels',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> labelsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'labels',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> labelsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'labels',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'labels',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition>
+      labelsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'labels',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ListModel, ListModel, QAfterFilterCondition> labelsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'labels',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -471,6 +709,12 @@ extension ListModelQuerySortThenBy
 
 extension ListModelQueryWhereDistinct
     on QueryBuilder<ListModel, ListModel, QDistinct> {
+  QueryBuilder<ListModel, ListModel, QDistinct> distinctByLabels() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'labels');
+    });
+  }
+
   QueryBuilder<ListModel, ListModel, QDistinct> distinctByTitle(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -484,6 +728,12 @@ extension ListModelQueryProperty
   QueryBuilder<ListModel, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<ListModel, List<String>, QQueryOperations> labelsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'labels');
     });
   }
 

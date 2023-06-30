@@ -40,7 +40,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
               if (!_isValueBlank) _submitNewItemValue();
             },
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 16),
           _buildItemTypeSwitcher()
         ],
       ),
