@@ -18,7 +18,11 @@ class _SettingsWidgetState extends State<SettingsWidget> {
     return ListView(
       padding: const EdgeInsets.all(12.0),
       children: [
-        Text('Settings', style: Theme.of(context).textTheme.titleLarge),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child:
+              Text('Settings', style: Theme.of(context).textTheme.titleLarge),
+        ),
         const SettingsBox(label: 'Theme', settingController: ThemePicker()),
       ],
     );
