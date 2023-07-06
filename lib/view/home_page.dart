@@ -56,6 +56,7 @@ class _HomePageState extends State<HomePage> {
       onPressed: () => showModalSideSheet(
           context: context,
           body: const SettingsWidget(),
+          // The close control the modal side sheet displays does not respect the safe area.
           withCloseControll: false,
           barrierDismissible: true));
 
