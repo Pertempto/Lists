@@ -15,12 +15,14 @@ class SettingsWidget extends StatefulWidget {
 class _SettingsWidgetState extends State<SettingsWidget> {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(12.0),
-      children: [
-        Text('Settings', style: Theme.of(context).textTheme.titleLarge),
-        const SettingsBox(label: 'Theme', settingController: ThemePicker()),
-      ],
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.all(12.0),
+        children: [
+          Text('Settings', style: Theme.of(context).textTheme.titleLarge),
+          const SettingsBox(label: 'Theme', settingController: ThemePicker()),
+        ],
+      ),
     );
   }
 }
