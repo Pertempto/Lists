@@ -13,25 +13,26 @@ class ThemePicker extends StatefulWidget {
 class _ThemePickerState extends State<ThemePicker> {
   @override
   Widget build(BuildContext context) {
-    return DropdownMenu(
-        initialSelection: AdaptiveTheme.of(context).mode,
-        onSelected: (newMode) {
+    return DropdownButton<AdaptiveThemeMode>(
+        value: AdaptiveTheme.of(context).mode,
+        onChanged: (newMode) {
           if (newMode != null) {
             AdaptiveTheme.of(context).setThemeMode(newMode);
           }
         },
-        dropdownMenuEntries: const [
-          DropdownMenuEntry(
-            label: 'System',
+        focusColor: Colors.transparent,
+        items: const [
+          DropdownMenuItem(
             value: AdaptiveThemeMode.system,
+            child: Text('System'),
           ),
-          DropdownMenuEntry(
-            label: 'Light',
+          DropdownMenuItem(
             value: AdaptiveThemeMode.light,
+            child: Text('Light'),
           ),
-          DropdownMenuEntry(
-            label: 'Dark',
+          DropdownMenuItem(
             value: AdaptiveThemeMode.dark,
+            child: Text('Dark'),
           )
         ]);
   }
