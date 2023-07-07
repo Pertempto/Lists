@@ -6,8 +6,8 @@ import 'package:lists/view/list_settings_dialog.dart';
 import 'package:lists/view/list_widget.dart';
 import 'package:lists/view/list_preview_widget.dart';
 import 'package:lists/view/settings_widget.dart';
-import 'package:modal_side_sheet/modal_side_sheet.dart';
 import 'package:lists/view/filter_dialog.dart';
+import 'package:side_sheet/side_sheet.dart';
 
 /// HomePage:
 ///   - A widget representing the home page in the app.
@@ -53,8 +53,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildSettingsButton() => IconButton(
       icon: const Icon(Icons.settings),
-      onPressed: () =>
-          showModalSideSheet(context: context, body: const SettingsWidget()));
+      onPressed: () => SideSheet.right(
+          context: context,
+          body: const SettingsWidget()));
 
   Widget _buildBody() => FutureBuilder<List<ListModel>>(
       future: DatabaseManager.loadListModels(),
