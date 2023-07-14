@@ -31,6 +31,9 @@ class DatabaseManager {
 
   static Future<void> deleteListModel(ListModel listModel) async {
     late final bool wasDeleted;
+
+    listModel.itemsView().forEach((item) => item.dispose());
+
     await isar.writeTxn(() async {
       await isar.items
           .deleteAll(listModel.items.map((item) => item.id).toList());
@@ -48,6 +51,28 @@ class DatabaseManager {
     return item;
   }
 
-  static Future<void> deleteItem(Item item) async =>
-      await isar.writeTxn(() async => await isar.items.delete(item.id));
+  static Future<void> deleteItem(Item item) async {
+    item.dispose();
+    await isar.writeTxn(() async => await isar.items.delete(item.id));
+  }
+
+  @visibleForTesting
+  static Future<void> initBeforeTest() async {
+    await Isar.initializeIsarCore(download: true);
+    await init();
+    await isar.writeTxn(isar.clear);
+  }
+
+  @visibleForTesting
+  static Future<void> cleanupAfterTest() async {
+    await isar.writeTxn(isar.clear);
+    await isar.close();
+  }
+
+  @visibleForTesting
+  static Future<void> doTest(Future<void> Function() test) async {
+    await initBeforeTest();
+    await test();
+    await cleanupAfterTest();
+  }
 }

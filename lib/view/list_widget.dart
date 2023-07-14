@@ -64,6 +64,11 @@ class _ListWidgetState extends State<ListWidget> {
                 await refreshItems();
               }, onEdited: () async {
                 try {
+                  if (item.isRepeating) {
+                    item.setScheduledTimer(callback: listModel.update);
+                  } else {
+                    item.scheduledTimer?.cancel();
+                  }
                   await listModel.update(item);
                 } on ItemUpdateError catch (e) {
                   // TODO: handle item update error.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lists/common/time_stamp_format.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
@@ -40,8 +41,25 @@ class _ItemWidgetState extends State<ItemWidget> {
     return ListTile(
       leading: checkbox,
       onLongPress: _showOptionsModalSheet,
-      title: Text(widget.item.value,
-          style: itemTextStyle.copyWith(decoration: textDecoration)),
+      title: Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text(widget.item.value,
+            style: itemTextStyle.copyWith(decoration: textDecoration)),
+      ),
+      subtitle: widget.item.isRepeating
+          ? Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Chip(
+                    avatar: Icon(Icons.repeat,
+                        color: Theme.of(context).iconTheme.color),
+                    label: Text(timeStampFormat
+                        .format(widget.item.scheduledTimeStamp!))),
+              ),
+            )
+          : null,
+      isThreeLine: widget.item.isRepeating,
       onTap: _showEditDialog,
     );
   }
@@ -62,12 +80,10 @@ class _ItemWidgetState extends State<ItemWidget> {
     );
   }
 
-  void _showEditDialog() {
-    showDialog(
+  void _showEditDialog() => showDialog(
       context: context,
-      builder: (context) => EditItemDialog(onSubmit: (_) => updateThis(), item: widget.item),
-    );
-  }
+      builder: (context) =>
+          EditItemDialog(onSubmit: (_) => updateThis(), item: widget.item));
 
   void updateThis() {
     widget.onEdited();

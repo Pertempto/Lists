@@ -1,4 +1,9 @@
+import 'dart:async' show Timer;
+
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
+import 'package:lists/main.dart';
+import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/list_settings_dialog.dart';
@@ -19,6 +24,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late Future<void> startupFuture = _startup();
+  late List<ListModel> data;
+
+  Future<void> _startup() async {
+    data = await DatabaseManager.loadListModels();
+    for (final listModel in data) {
+      listModel.initScheduledRepeatingItems();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +54,7 @@ class _HomePageState extends State<HomePage> {
           showModalSideSheet(context: context, body: const SettingsWidget()));
 
   Widget _buildBody() => FutureBuilder<List<ListModel>>(
-      future: DatabaseManager.loadListModels(),
+      future: startupFuture.then((_) => data),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return _buildListPreviewsWidget(snapshot.data!);
@@ -56,6 +71,7 @@ class _HomePageState extends State<HomePage> {
                 listModel,
                 onDelete: () async {
                   await DatabaseManager.deleteListModel(listModel);
+                  data.remove(listModel);
                   setState(() {});
                 },
               ))
@@ -64,8 +80,7 @@ class _HomePageState extends State<HomePage> {
   void _showAddNewListDialog() => showDialog(
         context: context,
         builder: (context) => ListSettingsDialog(
-            onSubmit: _submitNewList,
-            listModel: ListModel()),
+            onSubmit: _submitNewList, listModel: ListModel()),
       );
 
   void _submitNewList(ListModel listModel) async {
@@ -74,11 +89,12 @@ class _HomePageState extends State<HomePage> {
       await Navigator.push(
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
     }
+    data.add(listModel);
     setState(() {});
   }
 
   void _onListModelsLoadingError(Object error) {
-    //TODO: handle error
+    // TODO: handle error
     debugPrint(error.toString());
   }
 }

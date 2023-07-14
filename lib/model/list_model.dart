@@ -1,3 +1,6 @@
+import 'dart:async' show Timer;
+
+import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
@@ -67,6 +70,16 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
+
+  void initScheduledRepeatingItems() {
+    for (final item in repeatingItems) {
+      item.setScheduledTimer(callback: update);
+    }
+  }
+
+  @ignore
+  Iterable<Item> get repeatingItems =>
+      itemsView().where((item) => item.isRepeating);
 }
 
 class ListModelError implements Exception {

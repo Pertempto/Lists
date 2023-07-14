@@ -130,7 +130,7 @@ packages:
     source: hosted
     version: "2.0.2"
   clock:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: clock
       sha256: cb6d7f03e1de671e34607e909a7213e31d7752be4fb66a86d29fe1eb14bfb5cf
@@ -194,7 +194,7 @@ packages:
     source: hosted
     version: "1.1.0"
   fake_async:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: fake_async
       sha256: "511392330127add0b769b75a987850d136345d9227c6b94c96a04cf4a391bf78"
@@ -669,6 +669,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  weekday_selector:
+    dependency: "direct main"
+    description:
+      name: weekday_selector
+      sha256: "783954997aa30a8890b24196784543752dbf179282ca4d9139ecd70d63fea99e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   win32:
     dependency: transitive
     description:

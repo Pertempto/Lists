@@ -28,8 +28,19 @@ const ItemSchema = CollectionSchema(
       type: IsarType.byte,
       enumMap: _ItemitemTypeEnumValueMap,
     ),
-    r'value': PropertySchema(
+    r'repeatConfiguration': PropertySchema(
       id: 2,
+      name: r'repeatConfiguration',
+      type: IsarType.object,
+      target: r'RepeatConfiguration',
+    ),
+    r'scheduledTimeStamp': PropertySchema(
+      id: 3,
+      name: r'scheduledTimeStamp',
+      type: IsarType.dateTime,
+    ),
+    r'value': PropertySchema(
+      id: 4,
       name: r'value',
       type: IsarType.string,
     )
@@ -41,7 +52,7 @@ const ItemSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {},
-  embeddedSchemas: {},
+  embeddedSchemas: {r'RepeatConfiguration': RepeatConfigurationSchema},
   getId: _itemGetId,
   getLinks: _itemGetLinks,
   attach: _itemAttach,
@@ -54,6 +65,14 @@ int _itemEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.repeatConfiguration;
+    if (value != null) {
+      bytesCount += 3 +
+          RepeatConfigurationSchema.estimateSize(
+              value, allOffsets[RepeatConfiguration]!, allOffsets);
+    }
+  }
   bytesCount += 3 + object.value.length * 3;
   return bytesCount;
 }
@@ -66,7 +85,14 @@ void _itemSerialize(
 ) {
   writer.writeBool(offsets[0], object.isChecked);
   writer.writeByte(offsets[1], object.itemType.index);
-  writer.writeString(offsets[2], object.value);
+  writer.writeObject<RepeatConfiguration>(
+    offsets[2],
+    allOffsets,
+    RepeatConfigurationSchema.serialize,
+    object.repeatConfiguration,
+  );
+  writer.writeDateTime(offsets[3], object.scheduledTimeStamp);
+  writer.writeString(offsets[4], object.value);
 }
 
 Item _itemDeserialize(
@@ -76,12 +102,18 @@ Item _itemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Item(
-    reader.readStringOrNull(offsets[2]) ?? '',
+    reader.readStringOrNull(offsets[4]) ?? '',
     _ItemitemTypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
         ItemType.text,
+    reader.readObjectOrNull<RepeatConfiguration>(
+      offsets[2],
+      RepeatConfigurationSchema.deserialize,
+      allOffsets,
+    ),
   );
   object.id = id;
   object.isChecked = reader.readBool(offsets[0]);
+  object.scheduledTimeStamp = reader.readDateTimeOrNull(offsets[3]);
   return object;
 }
 
@@ -98,6 +130,14 @@ P _itemDeserializeProp<P>(
       return (_ItemitemTypeValueEnumMap[reader.readByteOrNull(offset)] ??
           ItemType.text) as P;
     case 2:
+      return (reader.readObjectOrNull<RepeatConfiguration>(
+        offset,
+        RepeatConfigurationSchema.deserialize,
+        allOffsets,
+      )) as P;
+    case 3:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 4:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -315,6 +355,93 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterFilterCondition> repeatConfigurationIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'repeatConfiguration',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition>
+      repeatConfigurationIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'repeatConfiguration',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'scheduledTimeStamp',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition>
+      scheduledTimeStampIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'scheduledTimeStamp',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampEqualTo(
+      DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'scheduledTimeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'scheduledTimeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'scheduledTimeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'scheduledTimeStamp',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterFilterCondition> valueEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -444,7 +571,14 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }
 }
 
-extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
+extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {
+  QueryBuilder<Item, Item, QAfterFilterCondition> repeatConfiguration(
+      FilterQuery<RepeatConfiguration> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.object(q, r'repeatConfiguration');
+    });
+  }
+}
 
 extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {}
 
@@ -470,6 +604,18 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
   QueryBuilder<Item, Item, QAfterSortBy> sortByItemTypeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'itemType', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByScheduledTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'scheduledTimeStamp', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByScheduledTimeStampDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'scheduledTimeStamp', Sort.desc);
     });
   }
 
@@ -523,6 +669,18 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterSortBy> thenByScheduledTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'scheduledTimeStamp', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByScheduledTimeStampDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'scheduledTimeStamp', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> thenByValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'value', Sort.asc);
@@ -546,6 +704,12 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
   QueryBuilder<Item, Item, QDistinct> distinctByItemType() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'itemType');
+    });
+  }
+
+  QueryBuilder<Item, Item, QDistinct> distinctByScheduledTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'scheduledTimeStamp');
     });
   }
 
@@ -573,6 +737,19 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
   QueryBuilder<Item, ItemType, QQueryOperations> itemTypeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'itemType');
+    });
+  }
+
+  QueryBuilder<Item, RepeatConfiguration?, QQueryOperations>
+      repeatConfigurationProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'repeatConfiguration');
+    });
+  }
+
+  QueryBuilder<Item, DateTime?, QQueryOperations> scheduledTimeStampProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'scheduledTimeStamp');
     });
   }
 
