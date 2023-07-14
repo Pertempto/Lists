@@ -21,14 +21,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<void> startupFuture = _startup();
   late List<ListModel> data;
-
-  Future<void> _startup() async =>
-      data = await DatabaseManager.loadListModels();
-
   late Iterable<String> allLabels;
   Set<String>? selectedLabels;
+
+  late Future<void> startupFuture = _startup();
+  Future<void> _startup() async =>
+      data = await DatabaseManager.loadListModels();
 
   @override
   Widget build(BuildContext context) {
