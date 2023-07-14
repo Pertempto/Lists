@@ -14,6 +14,7 @@ class ListModel {
   String title = '';
 
   final items = IsarLinks<Item>();
+  List<String> labels = [];
 
   @ignore
   ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
@@ -24,15 +25,15 @@ class ListModel {
   Iterable<Item> get repeatingItems =>
       itemsView().where((item) => item.isRepeating);
 
-
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
-  ListModel.fromTitle(this.title);
+  ListModel.fromTitle(this.title) : labels = [];
 
   void reload() => items.loadSync();
   void init() {
     reload();
     setTimersForScheduledItems();
+    labels = labels.toList();
   }
 
   void setTimersForScheduledItems() {
@@ -82,12 +83,15 @@ class ListModel {
   // example:
   // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
 
+  bool hasLabel(String label) => labels.contains(label);
+
   /// To be called when `this` is deleted. See `Item.dispose`.
   void disposeItems() {
     for (final item in items) {
       item.dispose();
     }
   }
+
 }
 
 class ListModelError implements Exception {

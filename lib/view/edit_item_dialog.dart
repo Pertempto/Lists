@@ -31,6 +31,8 @@ class _EditItemDialogState extends State<EditItemDialog> {
   @override
   void initState() {
     _editingController = TextEditingController(text: widget.item.value);
+    // Update the state of the submit button when the user input changes
+    _editingController.addListener(() => setState(() {}));
     super.initState();
   }
 
@@ -45,7 +47,10 @@ class _EditItemDialogState extends State<EditItemDialog> {
           TextFormField(
             controller: _editingController,
             autofocus: true,
-            onFieldSubmitted: (_) => _submitNewItemValue(),
+            onFieldSubmitted: (value) {
+              // we don't want the user to be able to add blank/empty items.
+              if (!_isValueBlank) _submitNewItemValue();
+            },
           ),
           const SizedBox(height: 16),
           _buildItemTypeSwitcher(),
@@ -56,12 +61,16 @@ class _EditItemDialogState extends State<EditItemDialog> {
       ),
       actions: [
         ElevatedButton(
-          onPressed: () => _submitNewItemValue(),
+          // if the text value for the item is blank, this button is disabled (onPressed == null),
+          // because we don't want the user to be able to submit blank/empty items.
+          onPressed: !_isValueBlank ? _submitNewItemValue : null,
           child: const Text('Submit'),
         )
       ],
     );
   }
+
+  bool get _isValueBlank => _editingController.text.trim().isEmpty;
 
   Widget _buildItemTypeSwitcher() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

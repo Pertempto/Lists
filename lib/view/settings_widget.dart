@@ -15,12 +15,25 @@ class SettingsWidget extends StatefulWidget {
 class _SettingsWidgetState extends State<SettingsWidget> {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(12.0),
-      children: [
-        Text('Settings', style: Theme.of(context).textTheme.titleLarge),
-        const SettingsBox(label: 'Theme', settingController: ThemePicker()),
-      ],
+    return Container(
+      // There is no "side modal sheet background color" in the theme, so we use the dialogBackgroundColor
+      color: Theme.of(context).dialogBackgroundColor,
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(12.0),
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Settings', style: Theme.of(context).textTheme.titleLarge),
+                const CloseButton()
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            const SettingsBox(label: 'Theme', settingController: ThemePicker()),
+          ],
+        ),
+      ),
     );
   }
 }
