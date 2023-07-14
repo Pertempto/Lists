@@ -24,7 +24,6 @@ class _ListWidgetState extends State<ListWidget> {
   @override
   void initState() {
     super.initState();
-    listModel.reload();
     itemsToBeDisplayed = listModel.itemsView();
   }
 

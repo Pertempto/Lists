@@ -29,11 +29,10 @@ class ListModel {
   ListModel();
   ListModel.fromTitle(this.title) : labels = [];
 
-  void reload() => items.loadSync();
   void init() {
-    reload();
-    setTimersForScheduledItems();
+    items.loadSync();
     labels = labels.toList();
+    setTimersForScheduledItems();
   }
 
   void setTimersForScheduledItems() {
