@@ -47,17 +47,7 @@ class _ItemWidgetState extends State<ItemWidget> {
             style: itemTextStyle.copyWith(decoration: textDecoration)),
       ),
       subtitle: widget.item.isRepeating
-          ? Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Align(
-                alignment: Alignment.bottomLeft,
-                child: Chip(
-                    avatar: Icon(Icons.repeat,
-                        color: Theme.of(context).iconTheme.color),
-                    label: Text(timeStampFormat
-                        .format(widget.item.scheduledTimeStamp!))),
-              ),
-            )
+          ? _buildRepeatChip()
           : null,
       isThreeLine: widget.item.isRepeating,
       onTap: _showEditDialog,
@@ -68,6 +58,18 @@ class _ItemWidgetState extends State<ItemWidget> {
     widget.item.isChecked = value!;
     updateThis();
   }
+
+  Widget _buildRepeatChip() => Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Chip(
+                  avatar: Icon(Icons.repeat,
+                      color: Theme.of(context).iconTheme.color),
+                  label: Text(timeStampFormat
+                      .format(widget.item.scheduledTimeStamp!))),
+            ),
+          );
 
   void _showOptionsModalSheet() {
     showModalBottomSheet(

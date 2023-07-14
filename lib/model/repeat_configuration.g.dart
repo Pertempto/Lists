@@ -46,7 +46,7 @@ int _repeatConfigurationEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.days.length * 8;
+  bytesCount += 3 + object.weekdays.length * 8;
   return bytesCount;
 }
 
@@ -56,7 +56,7 @@ void _repeatConfigurationSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLongList(offsets[0], object.days);
+  writer.writeLongList(offsets[0], object.weekdays);
   writer.writeLong(offsets[1], object.hour);
   writer.writeLong(offsets[2], object.minute);
   writer.writeDateTime(offsets[3], object.nextRepeat);
@@ -69,7 +69,7 @@ RepeatConfiguration _repeatConfigurationDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = RepeatConfiguration();
-  object.days = reader.readLongList(offsets[0]) ?? [];
+  object.weekdays = reader.readLongList(offsets[0]) ?? [];
   object.hour = reader.readLong(offsets[1]);
   object.minute = reader.readLong(offsets[2]);
   return object;

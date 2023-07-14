@@ -43,6 +43,7 @@ dependencies:
   adaptive_theme: ^3.2.0
   clock: ^1.1.1
   weekday_selector: ^1.1.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lists/common/time_stamp_format.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/view/repeat_dialog.dart';
@@ -26,9 +25,8 @@ class _EditItemDialogState extends State<EditItemDialog> {
   late final TextEditingController _editingController;
   late ItemType selectedItemType = widget.item.itemType;
 
-  late bool isRepeating = widget.item.isRepeating;
-  late RepeatConfiguration repeatConfig =
-      widget.item.repeatConfiguration ?? RepeatConfiguration.fromNow();
+  late RepeatConfiguration? selectedRepeatConfig =
+      widget.item.repeatConfiguration;
 
   @override
   void initState() {
@@ -52,7 +50,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
           const SizedBox(height: 16),
           _buildItemTypeSwitcher(),
           const SizedBox(height: 8),
-          _buildRepeatConfigWidget(),
+          _buildRepeatWidget(),
           // _buildRepeatOptions()
         ],
       ),
@@ -76,11 +74,11 @@ class _EditItemDialogState extends State<EditItemDialog> {
         ],
       );
 
-  Widget _buildRepeatConfigWidget() => isRepeating
+  Widget _buildRepeatWidget() => selectedRepeatConfig != null 
       ? InputChip(
           avatar: Icon(Icons.repeat, color: Theme.of(context).iconTheme.color),
-          label: Text(timeStampFormat.format(repeatConfig.nextRepeat)),
-          onDeleted: () => setState(() => isRepeating = false),
+          label: Text(timeStampFormat.format(selectedRepeatConfig!.nextRepeat)),
+          onDeleted: () => setState(() => selectedRepeatConfig = null),
           onPressed: _showRepeatDialog)
       : ActionChip(
           avatar: Icon(Icons.repeat, color: Theme.of(context).iconTheme.color),
@@ -92,26 +90,23 @@ class _EditItemDialogState extends State<EditItemDialog> {
         context: context,
         builder: (context) => RepeatDialog(
             onSubmit: (newRepeatConfig) {
-              repeatConfig = newRepeatConfig;
-              isRepeating = true;
+              selectedRepeatConfig = newRepeatConfig;
               setState(() {});
             },
-            repeatConfig: repeatConfig));
+            repeatConfig: selectedRepeatConfig));
   }
 
   void _submitNewItemValue() {
     Navigator.pop(context);
     widget.item.value = _editingController.text;
     widget.item.itemType = selectedItemType;
-    if (isRepeating) {
-      widget.item.repeatConfiguration = repeatConfig;
-      widget.item.scheduledTimeStamp = repeatConfig.nextRepeat;
-    } else {
+
+    if (selectedRepeatConfig == null) {
       widget.item.scheduledTimer?.cancel();
       widget.item.scheduledTimer = null;
-      widget.item.repeatConfiguration = null;
-      widget.item.scheduledTimeStamp = null;
     }
+    widget.item.scheduledTimeStamp = selectedRepeatConfig?.nextRepeat;
+    widget.item.repeatConfiguration = selectedRepeatConfig;
 
     widget.onSubmit(widget.item);
   }

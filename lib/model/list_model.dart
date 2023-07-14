@@ -1,6 +1,3 @@
-import 'dart:async' show Timer;
-
-import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
@@ -23,29 +20,26 @@ class ListModel {
 
   Iterable<Item> itemsView() => items;
 
+  @ignore
+  Iterable<Item> get repeatingItems =>
+      itemsView().where((item) => item.isRepeating);
+
+
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
   ListModel.fromTitle(this.title);
 
-  void init() => reload();
   void reload() => items.loadSync();
-
-  Future<Iterable<Item>> searchItems(String searchQuery) {
-    final words = _parseSearchStr(searchQuery);
-    return items
-        .filter()
-        .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
-        .findAll();
+  void init() {
+    reload();
+    setTimersForScheduledItems();
   }
 
-  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r"([^\s]+)")
-      .allMatches(searchQuery)
-      .map((match) => match.group(0)!);
-  // note: the above regex pattern "([^\s]+)" matches a string without spaces.
-  // All-in-all, this function breaks a sentence apart into words (though
-  // it doesn't filter out punctuation).
-  // example:
-  // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
+  void setTimersForScheduledItems() {
+    for (final item in repeatingItems) {
+      item.resetScheduledTimer(callback: update);
+    }
+  }
 
   Future<void> add(Item newItem) async {
     await DatabaseManager.putItem(newItem);
@@ -71,15 +65,29 @@ class ListModel {
     }
   }
 
-  void initScheduledRepeatingItems() {
-    for (final item in repeatingItems) {
-      item.setScheduledTimer(callback: update);
-    }
+  Future<Iterable<Item>> searchItems(String searchQuery) {
+    final words = _parseSearchStr(searchQuery);
+    return items
+        .filter()
+        .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
+        .findAll();
   }
 
-  @ignore
-  Iterable<Item> get repeatingItems =>
-      itemsView().where((item) => item.isRepeating);
+  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r"([^\s]+)")
+      .allMatches(searchQuery)
+      .map((match) => match.group(0)!);
+  // note: the above regex pattern "([^\s]+)" matches a string without spaces.
+  // All-in-all, this function breaks a sentence apart into words (though
+  // it doesn't filter out punctuation).
+  // example:
+  // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
+
+  /// To be called when `this` is deleted. See `Item.dispose`.
+  void disposeItems() {
+    for (final item in items) {
+      item.dispose();
+    }
+  }
 }
 
 class ListModelError implements Exception {

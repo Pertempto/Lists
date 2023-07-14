@@ -37,12 +37,16 @@ class Item {
     item.value = value;
     item.itemType = itemType;
     item.isChecked = isChecked;
+    // Do a deep copy of the repeat configuration so that changing
+    // the repeat config of `this` does not affect the repeat config 
+    // of `item` (or  vice-versa).
     item.repeatConfiguration = repeatConfiguration?.copy();
     item.scheduledTimeStamp = scheduledTimeStamp;
+
     item.scheduledTimer = scheduledTimer;
   }
 
-  void setScheduledTimer({required void Function(Item) callback}) {
+  void resetScheduledTimer({required void Function(Item) callback}) {
     scheduledTimer?.cancel();
     scheduledTimer = Timer(
       scheduledTimeStamp!.difference(clock.now()),
@@ -54,6 +58,9 @@ class Item {
     );
   }
 
+  /// Needed for when an item is deleted.
+  /// Cancels the `scheduledTimer` (if there is one) so that
+  /// its callback is not called on a deleted item (`this`).
   void dispose() => scheduledTimer?.cancel();
 }
 

@@ -65,7 +65,7 @@ class _ListWidgetState extends State<ListWidget> {
               }, onEdited: () async {
                 try {
                   if (item.isRepeating) {
-                    item.setScheduledTimer(callback: listModel.update);
+                    item.resetScheduledTimer(callback: listModel.update);
                   } else {
                     item.scheduledTimer?.cancel();
                   }

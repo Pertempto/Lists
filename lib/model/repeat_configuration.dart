@@ -3,46 +3,51 @@ import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 part 'repeat_configuration.g.dart';
 
+/// RepeatConfiguration:
+///   - The optional repeat configuration of an `Item`.
 @embedded
 class RepeatConfiguration {
-  late List<int> days;
+  late List<int> weekdays;
   int hour = 0;
   int minute = 0;
 
   // We need a default constructor for isar.
   RepeatConfiguration();
 
-  RepeatConfiguration.weekly({required this.days, this.hour = 0, this.minute = 0});
+  RepeatConfiguration.weekly(
+      {required this.weekdays, this.hour = 0, this.minute = 0});
 
   factory RepeatConfiguration.fromNow() =>
-      RepeatConfiguration.weekly(days: [clock.now().weekday]);
+      RepeatConfiguration.weekly(weekdays: [clock.now().weekday]);
 
-  RepeatConfiguration copy() =>
-      RepeatConfiguration.weekly(days: days.toList(), hour: hour, minute: minute);
+  /// Used by `Item.copyOnto()`. Returns a deep copy of `this`.
+  RepeatConfiguration copy() => RepeatConfiguration.weekly(
+      weekdays: weekdays.toList(), hour: hour, minute: minute);
 
-// TODO: clean
   DateTime get nextRepeat {
     final now = clock.now();
-    final adjustedNow =
-        (now.difference(now.copyWith(hour: hour, minute: minute)).isNegative)
-            ? now
-            : now.add(const Duration(days: 1));
+    final nowWithConfiguredTime = now.copyWith(
+        hour: hour, minute: minute, second: 0, millisecond: 0, microsecond: 0);
 
-    return adjustedNow
-        .add(Duration(
-            days: (minBy(
-                        days.map((day) => [
-                              day,
-                              (day - adjustedNow.weekday) % DateTime.daysPerWeek
-                            ]),
-                        (value) => value[1])![0] -
-                    adjustedNow.weekday) %
-                DateTime.daysPerWeek))
-        .copyWith(
-            hour: hour,
-            minute: minute,
-            second: 0,
-            millisecond: 0,
-            microsecond: 0);
+    final closestPossibleNextRepeat = now.isBefore(nowWithConfiguredTime)
+        ? nowWithConfiguredTime
+        : nowWithConfiguredTime.add(const Duration(days: 1));
+
+    final closestWeekday =
+        _calculateClosestWeekday(closestPossibleNextRepeat.weekday);
+
+    return closestPossibleNextRepeat.add(Duration(
+        days: _daysToGetToWeekday(
+            from: closestPossibleNextRepeat.weekday, to: closestWeekday)));
   }
+
+  int _calculateClosestWeekday(int closestPossibleWeekday) => minBy(
+      weekdays,
+      (weekday) =>
+          _daysToGetToWeekday(from: closestPossibleWeekday, to: weekday))!;
+
+  // Returns the number of days to wait from the weekday `from`
+  // to get to the weekday `to`.
+  int _daysToGetToWeekday({required int from, required int to}) =>
+      (to - from) % 7;
 }

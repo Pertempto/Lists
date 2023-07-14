@@ -1,6 +1,4 @@
-import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
-import 'package:lists/model/item.dart';
 import 'package:lists/model/repeat_configuration.dart';
 import 'package:weekday_selector/weekday_selector.dart';
 
@@ -21,30 +19,13 @@ class _RepeatDialogState extends State<RepeatDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final values = List.filled(7, false);
-    for (final weekday in selectedRepeatConfig.days) {
-      values[weekday % 7] = true;
-    }
-
     return AlertDialog(
       title: Text('Repeats', style: Theme.of(context).textTheme.titleLarge),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-              width: 280,
-              child: WeekdaySelector(
-                  firstDayOfWeek: DateTime.sunday,
-                  onChanged: (int weekday) => setState(() {
-                        if (values[weekday % 7]) {
-                          if (selectedRepeatConfig.days.length - 1 > 0)
-                            selectedRepeatConfig.days.remove(weekday);
-                        } else {
-                          selectedRepeatConfig.days.add(weekday);
-                        }
-                      }),
-                  values: values)),
+          _buildWeekdaySelector(),
           const SizedBox(height: 24),
           Row(
             children: [
@@ -83,5 +64,37 @@ class _RepeatDialogState extends State<RepeatDialog> {
         )
       ],
     );
+  }
+
+  Widget _buildWeekdaySelector() {
+    // Note:
+    // The weekday selector takes a `List<bool?>` (values) with a length of 7.
+    // Each index corresponds to a day, where index 0 corresponds to Sunday, 
+    // index 1 to Monday, and index 6 to Saturday. This is slightly different from 
+    // how `DateTime` does things, where Sunday equals 7 and everything else is the same. So,
+    // a weekday stored in `selectedRepeatConfig.weekdays` needs to be modulated by 7
+    // before being used as an index into `values`.
+    final values = List.filled(7, false);
+    for (final weekday in selectedRepeatConfig.weekdays) {
+      values[weekday % 7] = true;
+    }
+
+    return SizedBox(
+            width: 280,
+            child: WeekdaySelector(
+                firstDayOfWeek: DateTime.sunday,
+                onChanged: (int weekday) => setState(() {
+                      if (values[weekday % 7]) {
+                        // If there is only one we don't remove it, because 
+                        // having a `RepeatConfiguration` with an empty weekdays field
+                        // is not implemented.
+                        if (selectedRepeatConfig.weekdays.length - 1 > 0) {
+                          selectedRepeatConfig.weekdays.remove(weekday);
+                        }
+                      } else {
+                        selectedRepeatConfig.weekdays.add(weekday);
+                      }
+                    }),
+                values: values));
   }
 }

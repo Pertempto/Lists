@@ -1,9 +1,4 @@
-import 'dart:async' show Timer;
-
-import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
-import 'package:lists/main.dart';
-import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/view/list_settings_dialog.dart';
@@ -27,12 +22,8 @@ class _HomePageState extends State<HomePage> {
   late Future<void> startupFuture = _startup();
   late List<ListModel> data;
 
-  Future<void> _startup() async {
-    data = await DatabaseManager.loadListModels();
-    for (final listModel in data) {
-      listModel.initScheduledRepeatingItems();
-    }
-  }
+  Future<void> _startup() async =>
+      data = await DatabaseManager.loadListModels();
 
   @override
   Widget build(BuildContext context) {
@@ -53,26 +44,28 @@ class _HomePageState extends State<HomePage> {
       onPressed: () =>
           showModalSideSheet(context: context, body: const SettingsWidget()));
 
-  Widget _buildBody() => FutureBuilder<List<ListModel>>(
-      future: startupFuture.then((_) => data),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return _buildListPreviewsWidget(snapshot.data!);
-        }
-        if (snapshot.hasError) {
-          _onListModelsLoadingError(snapshot.error!);
-        }
-        return Container();
-      });
+  Widget _buildBody() =>
+      // We use the `data` only if `startupFuture` has completed (and loaded the 
+      // `ListModel`s from the database into `data`).
+      FutureBuilder<void>(
+          future: startupFuture,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return _buildListPreviewsWidget();
+            }
+            if (snapshot.hasError) {
+              _onListModelsLoadingError(snapshot.error!);
+            }
+            return Container();
+          });
 
-  ListView _buildListPreviewsWidget(List<ListModel> data) => ListView(
+  ListView _buildListPreviewsWidget() => ListView(
       children: data
           .map((listModel) => ListPreviewWidget(
                 listModel,
                 onDelete: () async {
                   await DatabaseManager.deleteListModel(listModel);
-                  data.remove(listModel);
-                  setState(() {});
+                  setState(() => data.remove(listModel));
                 },
               ))
           .toList());
@@ -89,8 +82,7 @@ class _HomePageState extends State<HomePage> {
       await Navigator.push(
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
     }
-    data.add(listModel);
-    setState(() {});
+    setState(() => data.add(listModel));
   }
 
   void _onListModelsLoadingError(Object error) {
