@@ -38,11 +38,12 @@ class Item {
     item.itemType = itemType;
     item.isChecked = isChecked;
     // Do a deep copy of the repeat configuration so that changing
-    // the repeat config of `this` does not affect the repeat config 
+    // the repeat config of `this` does not affect the repeat config
     // of `item` (or  vice-versa).
     item.repeatConfiguration = repeatConfiguration?.copy();
     item.scheduledTimeStamp = scheduledTimeStamp;
 
+    item.scheduledTimer?.cancel();
     item.scheduledTimer = scheduledTimer;
   }
 
