@@ -100,12 +100,6 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
           onPressed: !_isTitleBlank ? _submitListModel : null,
           child: const Text('Submit'),
         ),
-        // ElevatedButton(
-        //   // if the title is blank, this button is disabled (onPressed == null),
-        //   // because we don't want the user to be able to submit lists with blank titles.
-        //   onPressed: !_isTitleBlank ? _submitListModel : null,
-        //   child: const Text('Submit'),
-        // ),
       ],
     );
   }
