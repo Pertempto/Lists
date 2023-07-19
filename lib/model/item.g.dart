@@ -28,19 +28,14 @@ const ItemSchema = CollectionSchema(
       type: IsarType.byte,
       enumMap: _ItemitemTypeEnumValueMap,
     ),
-    r'repeatConfiguration': PropertySchema(
+    r'scheduling': PropertySchema(
       id: 2,
-      name: r'repeatConfiguration',
+      name: r'scheduling',
       type: IsarType.object,
-      target: r'RepeatConfiguration',
-    ),
-    r'scheduledTimeStamp': PropertySchema(
-      id: 3,
-      name: r'scheduledTimeStamp',
-      type: IsarType.dateTime,
+      target: r'ItemScheduling',
     ),
     r'value': PropertySchema(
-      id: 4,
+      id: 3,
       name: r'value',
       type: IsarType.string,
     )
@@ -52,7 +47,10 @@ const ItemSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {},
-  embeddedSchemas: {r'RepeatConfiguration': RepeatConfigurationSchema},
+  embeddedSchemas: {
+    r'ItemScheduling': ItemSchedulingSchema,
+    r'RepeatConfiguration': RepeatConfigurationSchema
+  },
   getId: _itemGetId,
   getLinks: _itemGetLinks,
   attach: _itemAttach,
@@ -66,11 +64,11 @@ int _itemEstimateSize(
 ) {
   var bytesCount = offsets.last;
   {
-    final value = object.repeatConfiguration;
+    final value = object.scheduling;
     if (value != null) {
       bytesCount += 3 +
-          RepeatConfigurationSchema.estimateSize(
-              value, allOffsets[RepeatConfiguration]!, allOffsets);
+          ItemSchedulingSchema.estimateSize(
+              value, allOffsets[ItemScheduling]!, allOffsets);
     }
   }
   bytesCount += 3 + object.value.length * 3;
@@ -85,14 +83,13 @@ void _itemSerialize(
 ) {
   writer.writeBool(offsets[0], object.isChecked);
   writer.writeByte(offsets[1], object.itemType.index);
-  writer.writeObject<RepeatConfiguration>(
+  writer.writeObject<ItemScheduling>(
     offsets[2],
     allOffsets,
-    RepeatConfigurationSchema.serialize,
-    object.repeatConfiguration,
+    ItemSchedulingSchema.serialize,
+    object.scheduling,
   );
-  writer.writeDateTime(offsets[3], object.scheduledTimeStamp);
-  writer.writeString(offsets[4], object.value);
+  writer.writeString(offsets[3], object.value);
 }
 
 Item _itemDeserialize(
@@ -102,18 +99,17 @@ Item _itemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Item(
-    reader.readStringOrNull(offsets[4]) ?? '',
+    reader.readStringOrNull(offsets[3]) ?? '',
     _ItemitemTypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
         ItemType.text,
-    reader.readObjectOrNull<RepeatConfiguration>(
+    reader.readObjectOrNull<ItemScheduling>(
       offsets[2],
-      RepeatConfigurationSchema.deserialize,
+      ItemSchedulingSchema.deserialize,
       allOffsets,
     ),
   );
   object.id = id;
   object.isChecked = reader.readBool(offsets[0]);
-  object.scheduledTimeStamp = reader.readDateTimeOrNull(offsets[3]);
   return object;
 }
 
@@ -130,14 +126,12 @@ P _itemDeserializeProp<P>(
       return (_ItemitemTypeValueEnumMap[reader.readByteOrNull(offset)] ??
           ItemType.text) as P;
     case 2:
-      return (reader.readObjectOrNull<RepeatConfiguration>(
+      return (reader.readObjectOrNull<ItemScheduling>(
         offset,
-        RepeatConfigurationSchema.deserialize,
+        ItemSchedulingSchema.deserialize,
         allOffsets,
       )) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 4:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -355,89 +349,18 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> repeatConfigurationIsNull() {
+  QueryBuilder<Item, Item, QAfterFilterCondition> schedulingIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'repeatConfiguration',
+        property: r'scheduling',
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition>
-      repeatConfigurationIsNotNull() {
+  QueryBuilder<Item, Item, QAfterFilterCondition> schedulingIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'repeatConfiguration',
-      ));
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'scheduledTimeStamp',
-      ));
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterFilterCondition>
-      scheduledTimeStampIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'scheduledTimeStamp',
-      ));
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampEqualTo(
-      DateTime? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'scheduledTimeStamp',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampGreaterThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'scheduledTimeStamp',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampLessThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'scheduledTimeStamp',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterFilterCondition> scheduledTimeStampBetween(
-    DateTime? lower,
-    DateTime? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'scheduledTimeStamp',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
+        property: r'scheduling',
       ));
     });
   }
@@ -572,10 +495,10 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 }
 
 extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {
-  QueryBuilder<Item, Item, QAfterFilterCondition> repeatConfiguration(
-      FilterQuery<RepeatConfiguration> q) {
+  QueryBuilder<Item, Item, QAfterFilterCondition> scheduling(
+      FilterQuery<ItemScheduling> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.object(q, r'repeatConfiguration');
+      return query.object(q, r'scheduling');
     });
   }
 }
@@ -604,18 +527,6 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
   QueryBuilder<Item, Item, QAfterSortBy> sortByItemTypeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'itemType', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterSortBy> sortByScheduledTimeStamp() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'scheduledTimeStamp', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterSortBy> sortByScheduledTimeStampDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'scheduledTimeStamp', Sort.desc);
     });
   }
 
@@ -669,18 +580,6 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterSortBy> thenByScheduledTimeStamp() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'scheduledTimeStamp', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Item, Item, QAfterSortBy> thenByScheduledTimeStampDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'scheduledTimeStamp', Sort.desc);
-    });
-  }
-
   QueryBuilder<Item, Item, QAfterSortBy> thenByValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'value', Sort.asc);
@@ -704,12 +603,6 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
   QueryBuilder<Item, Item, QDistinct> distinctByItemType() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'itemType');
-    });
-  }
-
-  QueryBuilder<Item, Item, QDistinct> distinctByScheduledTimeStamp() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'scheduledTimeStamp');
     });
   }
 
@@ -740,16 +633,9 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
     });
   }
 
-  QueryBuilder<Item, RepeatConfiguration?, QQueryOperations>
-      repeatConfigurationProperty() {
+  QueryBuilder<Item, ItemScheduling?, QQueryOperations> schedulingProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'repeatConfiguration');
-    });
-  }
-
-  QueryBuilder<Item, DateTime?, QQueryOperations> scheduledTimeStampProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'scheduledTimeStamp');
+      return query.addPropertyName(r'scheduling');
     });
   }
 

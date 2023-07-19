@@ -22,8 +22,8 @@ class ListModel {
   Iterable<Item> itemsView() => items;
 
   @ignore
-  Iterable<Item> get repeatingItems =>
-      itemsView().where((item) => item.isRepeating);
+  Iterable<Item> get scheduledItems =>
+      itemsView().where((item) => item.isScheduled);
 
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
@@ -36,8 +36,8 @@ class ListModel {
   }
 
   void setTimersForScheduledItems() {
-    for (final item in repeatingItems) {
-      item.resetScheduledTimer(callback: update);
+    for (final item in scheduledItems) {
+      item.updateScheduledTimer(timerCallback: update);
     }
   }
 
@@ -51,8 +51,11 @@ class ListModel {
   Future<void> update(Item item) async {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
+
+      final databaseItem = items.lookup(item)!;
       // The following ensures that the copy of `item` that `this` has is up to date.
-      item.copyOnto(items.lookup(item)!);
+      item.copyOnto(databaseItem);
+      databaseItem.updateScheduledTimer(timerCallback: update);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
@@ -90,7 +93,6 @@ class ListModel {
       item.dispose();
     }
   }
-
 }
 
 class ListModelError implements Exception {

@@ -13,25 +13,25 @@ const RepeatConfigurationSchema = Schema(
   name: r'RepeatConfiguration',
   id: 1538701297182978727,
   properties: {
-    r'days': PropertySchema(
-      id: 0,
-      name: r'days',
-      type: IsarType.longList,
-    ),
     r'hour': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'hour',
       type: IsarType.long,
     ),
     r'minute': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'minute',
       type: IsarType.long,
     ),
     r'nextRepeat': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'nextRepeat',
       type: IsarType.dateTime,
+    ),
+    r'weekdays': PropertySchema(
+      id: 3,
+      name: r'weekdays',
+      type: IsarType.longList,
     )
   },
   estimateSize: _repeatConfigurationEstimateSize,
@@ -56,10 +56,10 @@ void _repeatConfigurationSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLongList(offsets[0], object.weekdays);
-  writer.writeLong(offsets[1], object.hour);
-  writer.writeLong(offsets[2], object.minute);
-  writer.writeDateTime(offsets[3], object.nextRepeat);
+  writer.writeLong(offsets[0], object.hour);
+  writer.writeLong(offsets[1], object.minute);
+  writer.writeDateTime(offsets[2], object.nextRepeat);
+  writer.writeLongList(offsets[3], object.weekdays);
 }
 
 RepeatConfiguration _repeatConfigurationDeserialize(
@@ -69,9 +69,9 @@ RepeatConfiguration _repeatConfigurationDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = RepeatConfiguration();
-  object.weekdays = reader.readLongList(offsets[0]) ?? [];
-  object.hour = reader.readLong(offsets[1]);
-  object.minute = reader.readLong(offsets[2]);
+  object.hour = reader.readLong(offsets[0]);
+  object.minute = reader.readLong(offsets[1]);
+  object.weekdays = reader.readLongList(offsets[3]) ?? [];
   return object;
 }
 
@@ -83,13 +83,13 @@ P _repeatConfigurationDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLongList(offset) ?? []) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
       return (reader.readLong(offset)) as P;
     case 2:
-      return (reader.readLong(offset)) as P;
-    case 3:
       return (reader.readDateTime(offset)) as P;
+    case 3:
+      return (reader.readLongList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -97,151 +97,6 @@ P _repeatConfigurationDeserializeProp<P>(
 
 extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     RepeatConfiguration, QFilterCondition> {
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysElementEqualTo(int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'days',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysElementGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'days',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysElementLessThan(
-    int value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'days',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysElementBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'days',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'days',
-        length,
-        true,
-        length,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'days',
-        0,
-        true,
-        0,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'days',
-        0,
-        false,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'days',
-        0,
-        true,
-        length,
-        include,
-      );
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'days',
-        length,
-        include,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      daysLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'days',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
-    });
-  }
-
   QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
       hourEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
@@ -407,6 +262,151 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
         upper: upper,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'weekdays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysElementGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'weekdays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysElementLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'weekdays',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'weekdays',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'weekdays',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'weekdays',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'weekdays',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'weekdays',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'weekdays',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+      weekdaysLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'weekdays',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 }

@@ -4,7 +4,8 @@ import 'package:isar/isar.dart';
 part 'repeat_configuration.g.dart';
 
 /// RepeatConfiguration:
-///   - The optional repeat configuration of an `Item`.
+///   - This class contains the information used by `ItemScheduling` to 
+///     schedule/reschedule a repeating item.
 @embedded
 class RepeatConfiguration {
   late List<int> weekdays;

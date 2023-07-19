@@ -85,7 +85,7 @@ class _RepeatDialogState extends State<RepeatDialog> {
                 firstDayOfWeek: DateTime.sunday,
                 onChanged: (int weekday) => setState(() {
                       if (values[weekday % 7]) {
-                        // If there is only one we don't remove it, because 
+                        // If there is only one weekday selected we don't unselect it, because 
                         // having a `RepeatConfiguration` with an empty weekdays field
                         // is not implemented.
                         if (selectedRepeatConfig.weekdays.length - 1 > 0) {

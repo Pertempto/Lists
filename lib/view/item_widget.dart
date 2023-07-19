@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lists/common/time_stamp_format.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/item_scheduling.dart';
 import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
+import 'package:lists/view/repeat_dialog.dart';
 
 /// ItemWidget:
 ///   - a widget representing the view of a single item
@@ -46,10 +49,8 @@ class _ItemWidgetState extends State<ItemWidget> {
         child: Text(widget.item.value,
             style: itemTextStyle.copyWith(decoration: textDecoration)),
       ),
-      subtitle: widget.item.isRepeating
-          ? _buildRepeatChip()
-          : null,
-      isThreeLine: widget.item.isRepeating,
+      subtitle: widget.item.isScheduled ? _buildScheduledTimeStampChip() : null,
+      isThreeLine: widget.item.isScheduled,
       onTap: _showEditDialog,
     );
   }
@@ -59,17 +60,28 @@ class _ItemWidgetState extends State<ItemWidget> {
     updateThis();
   }
 
-  Widget _buildRepeatChip() => Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Chip(
-                  avatar: Icon(Icons.repeat,
-                      color: Theme.of(context).iconTheme.color),
-                  label: Text(timeStampFormat
-                      .format(widget.item.scheduledTimeStamp!))),
-            ),
-          );
+  Widget _buildScheduledTimeStampChip() => Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: ActionChip(
+            avatar:
+                Icon(Icons.repeat, color: Theme.of(context).iconTheme.color),
+            label: Text(timeStampFormat
+                .format(widget.item.scheduling!.scheduledTimeStamp)),
+            onPressed: () => showDialog(
+                context: context,
+                builder: (context) => RepeatDialog(
+                    onSubmit: (newRepeatConfig) async {
+                      widget.item.scheduling =
+                          ItemScheduling.fromRepeatConfiguration(
+                              newRepeatConfig);
+                      updateThis();
+                    },
+                    repeatConfig: widget.item.scheduling?.repeatConfiguration)),
+          ),
+        ),
+      );
 
   void _showOptionsModalSheet() {
     showModalBottomSheet(

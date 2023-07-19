@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lists/common/time_stamp_format.dart';
 import 'package:lists/model/item.dart';
+import 'package:lists/model/item_scheduling.dart';
 import 'package:lists/view/repeat_dialog.dart';
-
-import 'package:lists/model/repeat_configuration.dart';
 
 /// EditItemDialog:
 ///   - a dialog that allows the user to edit an `Item`
@@ -25,8 +24,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
   late final TextEditingController _editingController;
   late ItemType selectedItemType = widget.item.itemType;
 
-  late RepeatConfiguration? selectedRepeatConfig =
-      widget.item.repeatConfiguration;
+  late ItemScheduling? selectedScheduling = widget.item.scheduling?.copy();
 
   @override
   void initState() {
@@ -83,11 +81,12 @@ class _EditItemDialogState extends State<EditItemDialog> {
         ],
       );
 
-  Widget _buildRepeatWidget() => selectedRepeatConfig != null 
+  Widget _buildRepeatWidget() => selectedScheduling != null
       ? InputChip(
           avatar: Icon(Icons.repeat, color: Theme.of(context).iconTheme.color),
-          label: Text(timeStampFormat.format(selectedRepeatConfig!.nextRepeat)),
-          onDeleted: () => setState(() => selectedRepeatConfig = null),
+          label: Text(
+              timeStampFormat.format(selectedScheduling!.scheduledTimeStamp)),
+          onDeleted: () => setState(() => selectedScheduling = null),
           onPressed: _showRepeatDialog)
       : ActionChip(
           avatar: Icon(Icons.repeat, color: Theme.of(context).iconTheme.color),
@@ -99,10 +98,11 @@ class _EditItemDialogState extends State<EditItemDialog> {
         context: context,
         builder: (context) => RepeatDialog(
             onSubmit: (newRepeatConfig) {
-              selectedRepeatConfig = newRepeatConfig;
+              selectedScheduling =
+                  ItemScheduling.fromRepeatConfiguration(newRepeatConfig);
               setState(() {});
             },
-            repeatConfig: selectedRepeatConfig));
+            repeatConfig: selectedScheduling?.repeatConfiguration));
   }
 
   void _submitNewItemValue() {
@@ -110,12 +110,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
     widget.item.value = _editingController.text;
     widget.item.itemType = selectedItemType;
 
-    if (selectedRepeatConfig == null) {
-      widget.item.scheduledTimer?.cancel();
-      widget.item.scheduledTimer = null;
-    }
-    widget.item.scheduledTimeStamp = selectedRepeatConfig?.nextRepeat;
-    widget.item.repeatConfiguration = selectedRepeatConfig;
+    widget.item.scheduling = selectedScheduling;
 
     widget.onSubmit(widget.item);
   }
