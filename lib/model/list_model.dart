@@ -74,6 +74,57 @@ class ListModel {
     }
   }
 
+  Future<void> moveItem({required int from, required int to}) async {
+    assert(from < items.length && from >= 0);
+    assert(to <= items.length && to >= 0);
+
+    if (to > from) {
+      await _moveItemUp(from: from, to: to);
+    } else if (to < from) {
+      await _moveItemDown(from: from, to: to);
+    }
+  }
+
+  Future<void> _moveItemUp({required int from, required int to}) async {
+    int editedRangeStart = from;
+    int editedRangeEnd = to;
+    int editedRangeSize = editedRangeEnd - editedRangeStart;
+
+    final editedItems =
+        items.skip(editedRangeStart).take(editedRangeSize).toList();
+
+    final movedItemCopy = Item();
+    var prev = movedItemCopy;
+
+    for (final item in editedItems) {
+      item.copyOnto(prev);
+      prev = item;
+    }
+
+    movedItemCopy.copyOnto(editedItems.last);
+    await DatabaseManager.putItems(editedItems);
+  }
+
+  Future<void> _moveItemDown({required int from, required int to}) async {
+    int editedRangeStart = to;
+    int editedRangeEnd = from+1;
+    int editedRangeSize = editedRangeEnd - editedRangeStart;
+
+    final editedItems =
+        items.skip(editedRangeStart).take(editedRangeSize).toList();
+
+    final movedItemCopy = Item();
+    var prev = movedItemCopy;
+
+    for (final item in editedItems.reversed) {
+      item.copyOnto(prev);
+      prev = item;
+    }
+
+    movedItemCopy.copyOnto(editedItems.first);
+    await DatabaseManager.putItems(editedItems);
+  }
+
   bool hasLabel(String label) => labels.contains(label);
 }
 
