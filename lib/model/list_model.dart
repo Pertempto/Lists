@@ -74,55 +74,53 @@ class ListModel {
     }
   }
 
-  Future<void> moveItem({required int from, required int to}) async {
+  void moveItem({required int from, required int to}) {
     assert(from < items.length && from >= 0);
     assert(to <= items.length && to >= 0);
 
     if (to > from) {
-      await _moveItemUp(from: from, to: to);
+      _moveItemUp(from: from, to: to);
     } else if (to < from) {
-      await _moveItemDown(from: from, to: to);
+      _moveItemDown(from: from, to: to);
     }
   }
 
-  Future<void> _moveItemUp({required int from, required int to}) async {
-    int editedRangeStart = from;
-    int editedRangeEnd = to;
-    int editedRangeSize = editedRangeEnd - editedRangeStart;
+  void _moveItemUp({required int from, required int to}) {
+    final startIndexOfItemsToBeRotated = from;
+    final endIndexOfItemsToBeRotated = to;
+    final itemsToBeRotated = _sliceItems(
+        start: startIndexOfItemsToBeRotated, end: endIndexOfItemsToBeRotated);
 
-    final editedItems =
-        items.skip(editedRangeStart).take(editedRangeSize).toList();
+    _rotateItemsLeft(items: itemsToBeRotated);
+    DatabaseManager.putItems(itemsToBeRotated);
+  }
 
+  void _moveItemDown({required int from, required int to}) {
+    final startIndexOfItemsToBeRotated = to;
+    final endIndexOfItemsToBeRotated = from+1;
+    final itemsToBeRotated = _sliceItems(
+        start: startIndexOfItemsToBeRotated, end: endIndexOfItemsToBeRotated);
+
+    _rotateItemsLeft(items: itemsToBeRotated.reversed);
+    DatabaseManager.putItems(itemsToBeRotated);
+  }
+
+  /// returns a list containing the items with indexes in the range [start, end)
+  List<Item> _sliceItems({required int start, required int end}) {
+    final numberOfSlicedItems = end - start;
+    return items.skip(start).take(numberOfSlicedItems).toList();
+  }
+
+  static void _rotateItemsLeft({required Iterable<Item> items}) {
     final movedItemCopy = Item();
     var prev = movedItemCopy;
 
-    for (final item in editedItems) {
+    for (final item in items) {
       item.copyOnto(prev);
       prev = item;
     }
 
-    movedItemCopy.copyOnto(editedItems.last);
-    await DatabaseManager.putItems(editedItems);
-  }
-
-  Future<void> _moveItemDown({required int from, required int to}) async {
-    int editedRangeStart = to;
-    int editedRangeEnd = from+1;
-    int editedRangeSize = editedRangeEnd - editedRangeStart;
-
-    final editedItems =
-        items.skip(editedRangeStart).take(editedRangeSize).toList();
-
-    final movedItemCopy = Item();
-    var prev = movedItemCopy;
-
-    for (final item in editedItems.reversed) {
-      item.copyOnto(prev);
-      prev = item;
-    }
-
-    movedItemCopy.copyOnto(editedItems.first);
-    await DatabaseManager.putItems(editedItems);
+    movedItemCopy.copyOnto(items.last);
   }
 
   bool hasLabel(String label) => labels.contains(label);

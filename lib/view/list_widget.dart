@@ -73,10 +73,9 @@ class _ListWidgetState extends State<ListWidget> {
                   }
                 }))
             .toList(),
-        onReorder: (from, to) async {
-          print(
-              'moving:\n\tfrom: $from, item at from: "${listModel.items.elementAtOrNull(from)?.value}"\n\tto: $to, item at to: "${listModel.items.elementAtOrNull(to)?.value}"');
-          await listModel.moveItem(from: from, to: to);
+        onReorder: (from, to) {
+          listModel.moveItem(
+              from: from, to: to); //.then((_) => setState((){}));
           setState(() {});
         },
       );
