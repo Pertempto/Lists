@@ -85,16 +85,15 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
       ),
       actions: [
         if (widget.onDelete != null)
-          ElevatedButton.icon(
-              icon: const Icon(Icons.delete),
-              label: const Text('Delete'),
+          TextButton(
               onPressed: () {
                 Navigator.pop(context);
                 widget.onDelete?.call();
               },
               style: const ButtonStyle(
-                  foregroundColor: MaterialStatePropertyAll(Colors.red))),
-        ElevatedButton(
+                  foregroundColor: MaterialStatePropertyAll(Colors.red)),
+              child: const Text('Delete')),
+        FilledButton(
           // if the title is blank, this button is disabled (onPressed == null),
           // because we don't want the user to be able to submit lists with blank titles.
           onPressed: !_isTitleBlank ? _submitListModel : null,
