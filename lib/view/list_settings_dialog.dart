@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/view/add_label_dialog.dart';
 import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
+import 'package:lists/view/submit_button.dart';
 
 /// ListSettingsDialog:
 ///   - a dialog that allows the user to edit the metadata of the list
@@ -93,11 +94,10 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
               style: const ButtonStyle(
                   foregroundColor: MaterialStatePropertyAll(Colors.red)),
               child: const Text('Delete')),
-        FilledButton(
+        SubmitButton(
           // if the title is blank, this button is disabled (onPressed == null),
           // because we don't want the user to be able to submit lists with blank titles.
-          onPressed: !_isTitleBlank ? _submitListModel : null,
-          child: const Text('Submit'),
+          onPressed: !_isTitleBlank ? _submitListModel : null
         ),
       ],
     );
