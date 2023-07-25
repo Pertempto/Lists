@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
@@ -57,20 +58,33 @@ class _ListWidgetState extends State<ListWidget> {
     );
   }
 
-  ListView _buildBody() => ListView(
-      children: itemsToBeDisplayed
-          .map((item) => ItemWidget(item, onDelete: () async {
-                await listModel.remove(item);
-                await refreshItems();
-              }, onEdited: () async {
-                try {
-                  await listModel.update(item);
-                } on ItemUpdateError catch (e) {
-                  // TODO: handle item update error.
-                  debugPrint(e.toString());
-                }
-              }))
-          .toList());
+  ListView _buildBody() {
+    bool isItemChecked(Item item) =>
+        (item.itemType == ItemType.checkbox && item.isChecked);
+
+    final unCheckedItems = itemsToBeDisplayed.whereNot(isItemChecked);
+    final checkedItems = itemsToBeDisplayed.where(isItemChecked);
+
+    return ListView(
+        children: _buildItemWidgets(fromItems: unCheckedItems)
+            .followedBy([if (checkedItems.isNotEmpty) const Divider()])
+            .followedBy(_buildItemWidgets(fromItems: checkedItems))
+            .toList());
+  }
+
+  Iterable<Widget> _buildItemWidgets({required Iterable<Item> fromItems}) =>
+      fromItems.map((item) => ItemWidget(item, onDelete: () async {
+            await listModel.remove(item);
+            await refreshItems();
+          }, onEdited: () async {
+            try {
+              await listModel.update(item);
+              setState(() {});
+            } on ItemUpdateError catch (e) {
+              // TODO: handle item update error.
+              debugPrint(e.toString());
+            }
+          }));
 
   void _addNewItem() async {
     // Imitate the type of the last item.
