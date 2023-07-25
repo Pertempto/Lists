@@ -42,14 +42,6 @@ class EditingActionButton extends StatelessWidget {
           label: 'Delete',
           color: Colors.red);
 
-  factory EditingActionButton.editButton(
-          {required void Function() onPressed}) =>
-      EditingActionButton(
-          onPressed: onPressed,
-          icon: Icons.edit,
-          label: 'Edit',
-          color: Colors.lightGreen);
-
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(

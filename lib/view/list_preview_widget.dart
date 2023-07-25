@@ -40,7 +40,7 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
             MaterialPageRoute(builder: (_) => ListWidget(widget.listModel)));
         setState(() {});
       },
-      onLongPress: _showOptionsModalSheet,
+      onLongPress: _showListSettingsDialog,
       child: Row(
         children: [
           const Padding(
@@ -89,14 +89,7 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
     );
   }
 
-  void _showOptionsModalSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => EditingActionsModalBottomSheet(
-        actionButtons: [
-          EditingActionButton.deleteButton(onDelete: widget.onDelete),
-          EditingActionButton.editButton(
-              onPressed: () => showDialog(
+  void _showListSettingsDialog() => showDialog(
                   context: context,
                   builder: (context) => ListSettingsDialog(
                       onSubmit: (listModel) async {
@@ -104,10 +97,9 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
                         setState(() {});
                         widget.onEdited();
                       },
+                      onDelete: ()=>
+                        widget.onDelete(),
+                      
                       listModel: widget.listModel,
-                      allLabels: widget.allLabels))),
-        ],
-      ),
-    );
-  }
+                      allLabels: widget.allLabels));
 }
