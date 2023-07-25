@@ -79,13 +79,13 @@ class ListModel {
     assert(to <= items.length && to >= 0);
 
     if (to > from) {
-      _moveItemUp(from: from, to: to);
+      _moveItemRight(from: from, to: to);
     } else if (to < from) {
-      _moveItemDown(from: from, to: to);
+      _moveItemLeft(from: from, to: to);
     }
   }
 
-  void _moveItemUp({required int from, required int to}) {
+  void _moveItemRight({required int from, required int to}) {
     final startIndexOfItemsToBeRotated = from;
     final endIndexOfItemsToBeRotated = to;
     final itemsToBeRotated = _sliceItems(
@@ -95,7 +95,7 @@ class ListModel {
     DatabaseManager.putItems(itemsToBeRotated);
   }
 
-  void _moveItemDown({required int from, required int to}) {
+  void _moveItemLeft({required int from, required int to}) {
     final startIndexOfItemsToBeRotated = to;
     final endIndexOfItemsToBeRotated = from+1;
     final itemsToBeRotated = _sliceItems(
