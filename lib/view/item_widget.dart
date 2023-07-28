@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lists/common/time_stamp_format.dart';
-import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_scheduling.dart';
 import 'package:lists/view/edit_item_dialog.dart';
@@ -101,6 +100,5 @@ class _ItemWidgetState extends State<ItemWidget> {
 
   void updateThis() {
     widget.onEdited();
-    setState(() {});
   }
 }

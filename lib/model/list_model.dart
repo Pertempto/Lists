@@ -48,14 +48,16 @@ class ListModel {
     }
   }
 
-  Future<void> update(Item item) async {
+  Future<void> update(Item item,
+      {void Function(Item)? scheduledTimerCallback}) async {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
 
-      final databaseItem = items.lookup(item)!;
+      final databaseItem = lookup(item);
       // The following ensures that the copy of `item` that `this` has is up to date.
       item.copyOnto(databaseItem);
-      databaseItem.updateScheduledTimer(timerCallback: update);
+      databaseItem.updateScheduledTimer(
+          timerCallback: scheduledTimerCallback ?? update);
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
@@ -67,6 +69,8 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
+
+  Item lookup(Item item) => items.lookup(item)!;
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
     final words = _parseSearchStr(searchQuery);

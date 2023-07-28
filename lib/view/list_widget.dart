@@ -57,19 +57,33 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildBody() => ListView(
-      children: itemsToBeDisplayed
-          .map((item) => ItemWidget(item, onDelete: () async {
-                await listModel.remove(item);
-                await refreshItems();
-              }, onEdited: () async {
-                try {
-                  await listModel.update(item);
-                } on ItemUpdateError catch (e) {
-                  // TODO: handle item update error.
-                  debugPrint(e.toString());
-                }
-              }))
-          .toList());
+          children: itemsToBeDisplayed.map((item) {
+        if(item.isScheduled) listModel.lookup(item).updateScheduledTimer(timerCallback: _onItemEdited);
+        return ItemWidget(
+          item,
+          onDelete: () async {
+            await listModel.remove(item);
+            await refreshItems();
+          },
+          onEdited: () => _onItemEdited(item),
+        );
+      }).toList());
+
+  void _onItemEdited(Item item) async {
+    try {
+      await listModel.update(item, scheduledTimerCallback: _onItemEdited);
+      // rebuild the ListWidget since an item has changed,
+      // but only if `this` is mounted (which indicates
+      // that `this` has not been disposed, and we can call
+      // `setState`).
+      if (mounted) {
+        setState(() {});
+      }
+    } on ItemUpdateError catch (e) {
+      // TODO: handle item update error.
+      debugPrint(e.toString());
+    }
+  }
 
   void _addNewItem() async {
     // Imitate the type of the last item.
