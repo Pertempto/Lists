@@ -40,15 +40,33 @@ class _ItemWidgetState extends State<ItemWidget> {
           widget.item.isChecked ? TextDecoration.lineThrough : null;
     }
 
-    return ListTile(
-      leading: checkbox,
-      onLongPress: _showOptionsModalSheet,
-      title: Text(widget.item.value,
-          style: itemTextStyle.copyWith(decoration: textDecoration)),
-      subtitle: widget.item.isScheduled ? _buildScheduledTimeStampChip() : null,
-      isThreeLine: widget.item.isScheduled,
-      onTap: _showEditDialog,
-    );
+    return InkWell(
+        onTap: _showEditDialog,
+        onLongPress: _showOptionsModalSheet,
+        child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (checkbox != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: checkbox,
+                  ),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.item.value,
+                            style: itemTextStyle.copyWith(
+                                decoration: textDecoration)),
+                        if (widget.item.isScheduled)
+                          _buildScheduledTimeStampChip()
+                      ]),
+                )
+              ],
+            )));
   }
 
   void _onNewCheckedState(bool? value) {
