@@ -5,9 +5,11 @@ import 'package:lists/model/item.dart';
 ///   - a dialog that allows the user to edit an `Item`
 class EditItemDialog extends StatefulWidget {
   final void Function(Item) onSubmit;
+  final void Function()? onDelete;
   final Item item;
 
-  const EditItemDialog({super.key, required this.onSubmit, required this.item});
+  const EditItemDialog(
+      {super.key, required this.onSubmit, this.onDelete, required this.item});
 
   @override
   State<EditItemDialog> createState() => _EditItemDialogState();
@@ -45,12 +47,22 @@ class _EditItemDialogState extends State<EditItemDialog> {
         ],
       ),
       actions: [
+        if (widget.onDelete != null)
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              widget.onDelete?.call();
+            },
+            style: const ButtonStyle(
+                foregroundColor: MaterialStatePropertyAll(Colors.red)),
+            child: const Text('Delete'),
+          ),
         ElevatedButton(
           // if the text value for the item is blank, this button is disabled (onPressed == null),
           // because we don't want the user to be able to submit blank/empty items.
           onPressed: !_isValueBlank ? _submitNewItemValue : null,
           child: const Text('Submit'),
-        )
+        ),
       ],
     );
   }

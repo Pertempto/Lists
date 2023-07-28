@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/list_widget.dart';
-import 'package:lists/view/list_settings_dialog.dart';
-import 'package:lists/model/database_manager.dart';
 
 /// ListPreviewWidget:
 ///   - a widget representing a tile which contains the metadata
@@ -40,7 +37,6 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
             MaterialPageRoute(builder: (_) => ListWidget(widget.listModel)));
         setState(() {});
       },
-      onLongPress: _showOptionsModalSheet,
       child: Row(
         children: [
           const Padding(
@@ -84,28 +80,6 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
                           ))
                       .toList()),
             )
-        ],
-      ),
-    );
-  }
-
-  void _showOptionsModalSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => EditingActionsModalBottomSheet(
-        actionButtons: [
-          EditingActionButton.deleteButton(onDelete: widget.onDelete),
-          EditingActionButton.editButton(
-              onPressed: () => showDialog(
-                  context: context,
-                  builder: (context) => ListSettingsDialog(
-                      onSubmit: (listModel) async {
-                        await DatabaseManager.putListModel(listModel);
-                        setState(() {});
-                        widget.onEdited();
-                      },
-                      listModel: widget.listModel,
-                      allLabels: widget.allLabels))),
         ],
       ),
     );

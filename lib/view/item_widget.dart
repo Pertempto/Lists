@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/view/edit_item_dialog.dart';
-import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 
 /// ItemWidget:
 ///   - a widget representing the view of a single item
@@ -39,7 +38,6 @@ class _ItemWidgetState extends State<ItemWidget> {
 
     return ListTile(
       leading: checkbox,
-      onLongPress: _showOptionsModalSheet,
       title: Text(widget.item.value,
           style: itemTextStyle.copyWith(decoration: textDecoration)),
       onTap: _showEditDialog,
@@ -51,21 +49,13 @@ class _ItemWidgetState extends State<ItemWidget> {
     updateThis();
   }
 
-  void _showOptionsModalSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => EditingActionsModalBottomSheet(
-        actionButtons: [
-          EditingActionButton.deleteButton(onDelete: widget.onDelete)
-        ],
-      ),
-    );
-  }
-
   void _showEditDialog() {
     showDialog(
       context: context,
-      builder: (context) => EditItemDialog(onSubmit: (_) => updateThis(), item: widget.item),
+      builder: (context) => EditItemDialog(
+          onSubmit: (_) => updateThis(),
+          onDelete: widget.onDelete,
+          item: widget.item),
     );
   }
 
