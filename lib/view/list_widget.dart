@@ -25,6 +25,7 @@ class _ListWidgetState extends State<ListWidget> {
   void initState() {
     super.initState();
     itemsToBeDisplayed = listModel.itemsView();
+    listModel.updateTimersForScheduledItems(timerCallback: _onItemEdited);
   }
 
   @override
@@ -57,27 +58,26 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   ListView _buildBody() => ListView(
-          children: itemsToBeDisplayed.map((item) {
-        if(item.isScheduled) listModel.lookup(item).updateScheduledTimer(timerCallback: _onItemEdited);
-        return ItemWidget(
-          item,
-          onDelete: () async {
-            await listModel.remove(item);
-            await refreshItems();
-          },
-          onEdited: () => _onItemEdited(item),
-        );
-      }).toList());
+      children: itemsToBeDisplayed
+          .map((item) => ItemWidget(
+                item,
+                onDelete: () async {
+                  await listModel.remove(item);
+                  await refreshItems();
+                },
+                onEdited: () => _onItemEdited(item),
+              ))
+          .toList());
 
   void _onItemEdited(Item item) async {
     try {
       await listModel.update(item, scheduledTimerCallback: _onItemEdited);
-      // rebuild the ListWidget since an item has changed,
-      // but only if `this` is mounted (which indicates
+      // rebuild the ListWidget because an item has changed,
+      // but only rebuild if `this` is mounted (which indicates
       // that `this` has not been disposed, and we can call
       // `setState`).
       if (mounted) {
-        setState(() {});
+        await refreshItems();
       }
     } on ItemUpdateError catch (e) {
       // TODO: handle item update error.
@@ -95,6 +95,7 @@ class _ListWidgetState extends State<ListWidget> {
         builder: (context) => EditItemDialog(
             onSubmit: (newItem) async {
               await listModel.add(newItem);
+              newItem.updateScheduledTimer(timerCallback: _onItemEdited);
               await refreshItems();
             },
             item: newItem),

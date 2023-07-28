@@ -43,11 +43,8 @@ class _ItemWidgetState extends State<ItemWidget> {
     return ListTile(
       leading: checkbox,
       onLongPress: _showOptionsModalSheet,
-      title: Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: Text(widget.item.value,
-            style: itemTextStyle.copyWith(decoration: textDecoration)),
-      ),
+      title: Text(widget.item.value,
+          style: itemTextStyle.copyWith(decoration: textDecoration)),
       subtitle: widget.item.isScheduled ? _buildScheduledTimeStampChip() : null,
       isThreeLine: widget.item.isScheduled,
       onTap: _showEditDialog,

@@ -32,12 +32,12 @@ class ListModel {
   void init() {
     items.loadSync();
     labels = labels.toList();
-    setTimersForScheduledItems();
+    updateTimersForScheduledItems();
   }
 
-  void setTimersForScheduledItems() {
+  void updateTimersForScheduledItems({void Function(Item)? timerCallback}) {
     for (final item in scheduledItems) {
-      item.updateScheduledTimer(timerCallback: update);
+      item.updateScheduledTimer(timerCallback: timerCallback ?? update);
     }
   }
 
@@ -53,7 +53,7 @@ class ListModel {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
 
-      final databaseItem = lookup(item);
+      final databaseItem = items.lookup(item)!;
       // The following ensures that the copy of `item` that `this` has is up to date.
       item.copyOnto(databaseItem);
       databaseItem.updateScheduledTimer(
@@ -69,8 +69,6 @@ class ListModel {
       await DatabaseManager.updateListModelItems(this);
     }
   }
-
-  Item lookup(Item item) => items.lookup(item)!;
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
     final words = _parseSearchStr(searchQuery);
