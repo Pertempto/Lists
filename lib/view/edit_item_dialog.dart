@@ -3,6 +3,7 @@ import 'package:lists/common/time_stamp_format.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_scheduling.dart';
 import 'package:lists/view/repeat_dialog.dart';
+import 'package:lists/view/submit_button.dart';
 
 /// EditItemDialog:
 ///   - a dialog that allows the user to edit an `Item`
@@ -58,12 +59,10 @@ class _EditItemDialogState extends State<EditItemDialog> {
         ],
       ),
       actions: [
-        ElevatedButton(
-          // if the text value for the item is blank, this button is disabled (onPressed == null),
-          // because we don't want the user to be able to submit blank/empty items.
-          onPressed: !_isValueBlank ? _submitNewItemValue : null,
-          child: const Text('Submit'),
-        )
+        SubmitButton(
+            // if the text value for the item is blank, this button is disabled (onPressed == null),
+            // because we don't want the user to be able to submit blank/empty items.
+            onPressed: !_isValueBlank ? _submitNewItemValue : null)
       ],
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/view/add_label_dialog.dart';
+import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
+import 'package:lists/view/submit_button.dart';
 
 /// ListSettingsDialog:
 ///   - a dialog that allows the user to edit the settings of the list
@@ -8,12 +10,14 @@ class ListSettingsDialog extends StatefulWidget {
   final void Function(ListModel) onSubmit;
   final ListModel listModel;
   final Iterable<String> allLabels;
+  final void Function()? onDelete;
 
   const ListSettingsDialog(
       {super.key,
       required this.onSubmit,
       required this.listModel,
-      required this.allLabels});
+      required this.allLabels,
+      this.onDelete});
 
   @override
   State<ListSettingsDialog> createState() => _ListSettingsDialogState();
@@ -81,12 +85,20 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
         ],
       ),
       actions: [
-        ElevatedButton(
+        if (widget.onDelete != null)
+          TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                widget.onDelete?.call();
+              },
+              style: const ButtonStyle(
+                  foregroundColor: MaterialStatePropertyAll(Colors.red)),
+              child: const Text('Delete')),
+        SubmitButton(
           // if the title is blank, this button is disabled (onPressed == null),
           // because we don't want the user to be able to submit lists with blank titles.
-          onPressed: !_isTitleBlank ? _submitListModel : null,
-          child: const Text('Submit'),
-        )
+          onPressed: !_isTitleBlank ? _submitListModel : null
+        ),
       ],
     );
   }
