@@ -1,6 +1,5 @@
 import 'dart:async' show Timer;
 
-import 'package:clock/clock.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/repeat_configuration.dart';
 part 'item_scheduling.g.dart';
@@ -25,7 +24,7 @@ class ItemScheduling {
   void updateScheduledTimer({required void Function() timerCallback}) {
     cancelTimerIfScheduled();
     scheduledTimer = Timer(
-      scheduledTimeStamp.difference(clock.now()),
+      scheduledTimeStamp.difference(DateTime.now()),
       () {
         scheduledTimeStamp = repeatConfiguration.nextRepeat;
         timerCallback();

@@ -1,4 +1,3 @@
-import 'package:clock/clock.dart';
 import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 part 'repeat_configuration.g.dart';
@@ -19,14 +18,14 @@ class RepeatConfiguration {
       {required this.weekdays, this.hour = 0, this.minute = 0});
 
   factory RepeatConfiguration.fromNow() =>
-      RepeatConfiguration.weekly(weekdays: [clock.now().weekday]);
+      RepeatConfiguration.weekly(weekdays: [DateTime.now().weekday]);
 
   /// Used by `Item.copyOnto()`. Returns a deep copy of `this`.
   RepeatConfiguration copy() => RepeatConfiguration.weekly(
       weekdays: weekdays.toList(), hour: hour, minute: minute);
 
   DateTime get nextRepeat {
-    final now = clock.now();
+    final now = DateTime.now();
     final nowWithConfiguredTime = now.copyWith(
         hour: hour, minute: minute, second: 0, millisecond: 0, microsecond: 0);
 
