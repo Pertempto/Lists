@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/view/add_label_dialog.dart';
-import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/submit_button.dart';
 
 /// ListSettingsDialog:
