@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/list_model.dart';
+import 'package:lists/view/list_settings_dialog.dart';
 import 'package:lists/view/list_widget.dart';
 
 /// ListPreviewWidget:
@@ -37,6 +39,7 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
             MaterialPageRoute(builder: (_) => ListWidget(widget.listModel)));
         setState(() {});
       },
+      onLongPress: _showListSettingsDialog,
       child: Row(
         children: [
           const Padding(
@@ -84,4 +87,18 @@ class _ListPreviewWidgetState extends State<ListPreviewWidget> {
       ),
     );
   }
+
+  void _showListSettingsDialog() => showDialog(
+                  context: context,
+                  builder: (context) => ListSettingsDialog(
+                      onSubmit: (listModel) async {
+                        await DatabaseManager.putListModel(listModel);
+                        setState(() {});
+                        widget.onEdited();
+                      },
+                      onDelete: ()=>
+                        widget.onDelete(),
+                      
+                      listModel: widget.listModel,
+                      allLabels: widget.allLabels));
 }

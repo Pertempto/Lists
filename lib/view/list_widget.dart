@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
@@ -58,40 +59,50 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   Widget _buildBody() {
-    final itemWidgets = itemsToBeDisplayed
-        .map((item) =>
-            ItemWidget(item, key: ObjectKey(item), onDelete: () async {
-              await listModel.remove(item);
-              await refreshItems();
-            }, onEdited: () async {
-              try {
-                await listModel.update(item);
-              } on ItemUpdateError catch (e) {
-                // TODO: handle item update error.
-                debugPrint(e.toString());
-              }
-            }))
+    bool isItemChecked(Item item) =>
+        (item.itemType == ItemType.checkbox && item.isChecked);
+
+    final unCheckedItems = itemsToBeDisplayed.whereNot(isItemChecked);
+    final checkedItems = itemsToBeDisplayed.where(isItemChecked);
+
+    final itemWidgets = _buildItemWidgets(fromItems: unCheckedItems)
+        .followedBy([if (checkedItems.isNotEmpty) const Divider()])
+        .followedBy(_buildItemWidgets(fromItems: checkedItems))
         .toList();
 
     return searchQuery.isEmpty
         ? ReorderableListView(
-            children: itemWidgets,
+            children: [..._buildItemWidgets(fromItems: un)],
             onReorder: (from, to) {
               listModel.moveItem(from: from, to: to);
               // We set `itemsToBeDisplayed` to `listModel.itemsView()` because
               // 1) `moveItem` puts the moved items to the database asynchronously (so we can't
-              // load the items from the database), but updates the `IsarLinks` cached copy 
+              // load the items from the database), but updates the `IsarLinks` cached copy
               // of them (`listModel.itemsView()`) synchronously, and
               // 2) if the user previously searched the items, then `itemsToBeDisplayed`
               // holds a copy of the `listModel`'s items separate from the `IsarLinks`, and
               // so is not updated.
-              // So, `listModel.itemsView()` holds the only updated copy of the 
+              // So, `listModel.itemsView()` holds the only updated copy of the
               // `listModel`'s items.
               setState(() => itemsToBeDisplayed = listModel.itemsView());
             },
           )
         : ListView(children: itemWidgets);
   }
+
+  Iterable<Widget> _buildItemWidgets({required Iterable<Item> fromItems}) =>
+      fromItems.map(
+          (item) => ItemWidget(item, key: ObjectKey(item), onDelete: () async {
+                await listModel.remove(item);
+                await refreshItems();
+              }, onEdited: () async {
+                try {
+                  await listModel.update(item);
+                } on ItemUpdateError catch (e) {
+                  // TODO: handle item update error.
+                  debugPrint(e.toString());
+                }
+              }));
 
   void _addNewItem() async {
     // Imitate the type of the last item.

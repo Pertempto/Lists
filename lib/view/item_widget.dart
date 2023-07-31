@@ -49,15 +49,12 @@ class _ItemWidgetState extends State<ItemWidget> {
     updateThis();
   }
 
-  void _showEditDialog() {
-    showDialog(
+  void _showEditDialog() => showDialog(
       context: context,
       builder: (context) => EditItemDialog(
           onSubmit: (_) => updateThis(),
           onDelete: widget.onDelete,
-          item: widget.item),
-    );
-  }
+          item: widget.item));
 
   void updateThis() {
     widget.onEdited();
