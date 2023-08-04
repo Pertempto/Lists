@@ -8,6 +8,8 @@ part 'item.g.dart';
 @Collection()
 class Item {
   Id id = Isar.autoIncrement;
+  late int order;
+
   late String value;
   @enumerated
   late ItemType itemType;
@@ -16,8 +18,8 @@ class Item {
 
   Item([this.value = '', this.itemType = ItemType.text]);
 
-  // This method is needed to update the fields of a cached `Item` 
-  // in the `IsarLinks` of a `ListModel` with the same `id` as `this`, 
+  // This method is needed to update the fields of a cached `Item`
+  // in the `IsarLinks` of a `ListModel` with the same `id` as `this`,
   // but out-of-date fields (see `ListModel.update()`)
   void copyOnto(Item item) {
     item.value = value;

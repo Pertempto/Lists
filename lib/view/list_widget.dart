@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
+import 'package:reorderables/reorderables.dart';
 
 /// ListWidget:
 ///   - a widget representing a ListModel
@@ -62,18 +63,19 @@ class _ListWidgetState extends State<ListWidget> {
     bool isItemChecked(Item item) =>
         (item.itemType == ItemType.checkbox && item.isChecked);
 
-    final unCheckedItems = itemsToBeDisplayed.whereNot(isItemChecked);
-    final checkedItems = itemsToBeDisplayed.where(isItemChecked);
+    final unCheckedItems = _ordered(itemsToBeDisplayed.whereNot(isItemChecked));
+    final checkedItems = _ordered(itemsToBeDisplayed.where(isItemChecked));
 
-    final itemWidgets = _buildItemWidgets(fromItems: unCheckedItems)
-        .followedBy([if (checkedItems.isNotEmpty) const Divider()])
-        .followedBy(_buildItemWidgets(fromItems: checkedItems))
-        .toList();
+    final unCheckedItemWidgetsSliver = searchQuery.isEmpty
+        ? ReorderableSliverList(
+            delegate: ReorderableSliverChildListDelegate(
+                _buildItemWidgets(fromItems: unCheckedItems).toList()),
+            onReorder: (oldIndex, newIndex) {
+              final from = unCheckedItems[oldIndex].order;
+              final to = oldIndex < newIndex
+                  ? unCheckedItems[newIndex].order + 1
+                  : unCheckedItems[newIndex].order;
 
-    return searchQuery.isEmpty
-        ? ReorderableListView(
-            children: [..._buildItemWidgets(fromItems: un)],
-            onReorder: (from, to) {
               listModel.moveItem(from: from, to: to);
               // We set `itemsToBeDisplayed` to `listModel.itemsView()` because
               // 1) `moveItem` puts the moved items to the database asynchronously (so we can't
@@ -85,24 +87,39 @@ class _ListWidgetState extends State<ListWidget> {
               // So, `listModel.itemsView()` holds the only updated copy of the
               // `listModel`'s items.
               setState(() => itemsToBeDisplayed = listModel.itemsView());
-            },
-          )
-        : ListView(children: itemWidgets);
+              print(itemsToBeDisplayed.map((e) => e.order).toList());
+            })
+        : SliverList(
+            delegate: SliverChildListDelegate(
+                _buildItemWidgets(fromItems: unCheckedItems).toList()),
+          );
+    final dividerSliver = SliverList(
+        delegate: SliverChildListDelegate.fixed(
+            [if (checkedItems.isNotEmpty) Divider(key: UniqueKey())]));
+    final checkedItemWidgetsSliver = SliverList(
+        delegate: SliverChildListDelegate(
+            _buildItemWidgets(fromItems: checkedItems).toList()));
+
+    return CustomScrollView(slivers: [
+      unCheckedItemWidgetsSliver,
+      dividerSliver,
+      checkedItemWidgetsSliver
+    ]);
   }
 
   Iterable<Widget> _buildItemWidgets({required Iterable<Item> fromItems}) =>
-      fromItems.map(
-          (item) => ItemWidget(item, key: ObjectKey(item), onDelete: () async {
-                await listModel.remove(item);
-                await refreshItems();
-              }, onEdited: () async {
-                try {
-                  await listModel.update(item);
-                } on ItemUpdateError catch (e) {
-                  // TODO: handle item update error.
-                  debugPrint(e.toString());
-                }
-              }));
+      fromItems.map((item) => ItemWidget(item, onDelete: () async {
+            await listModel.remove(item);
+            await refreshItems();
+          }, onEdited: () async {
+            try {
+              await listModel.update(item);
+              await refreshItems();
+            } on ItemUpdateError catch (e) {
+              // TODO: handle item update error.
+              debugPrint(e.toString());
+            }
+          }, key: ValueKey(item.id)));
 
   void _addNewItem() async {
     // Imitate the type of the last item.
@@ -125,4 +142,7 @@ class _ListWidgetState extends State<ListWidget> {
     itemsToBeDisplayed = await listModel.searchItems(searchQuery);
     setState(() {});
   }
+
+  List<Item> _ordered(Iterable<Item> items) =>
+      items.sorted((a, b) => a.order - b.order);
 }

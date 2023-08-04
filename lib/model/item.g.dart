@@ -28,8 +28,13 @@ const ItemSchema = CollectionSchema(
       type: IsarType.byte,
       enumMap: _ItemitemTypeEnumValueMap,
     ),
-    r'value': PropertySchema(
+    r'order': PropertySchema(
       id: 2,
+      name: r'order',
+      type: IsarType.long,
+    ),
+    r'value': PropertySchema(
+      id: 3,
       name: r'value',
       type: IsarType.string,
     )
@@ -66,7 +71,8 @@ void _itemSerialize(
 ) {
   writer.writeBool(offsets[0], object.isChecked);
   writer.writeByte(offsets[1], object.itemType.index);
-  writer.writeString(offsets[2], object.value);
+  writer.writeLong(offsets[2], object.order);
+  writer.writeString(offsets[3], object.value);
 }
 
 Item _itemDeserialize(
@@ -76,12 +82,13 @@ Item _itemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Item(
-    reader.readStringOrNull(offsets[2]) ?? '',
+    reader.readStringOrNull(offsets[3]) ?? '',
     _ItemitemTypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
         ItemType.text,
   );
   object.id = id;
   object.isChecked = reader.readBool(offsets[0]);
+  object.order = reader.readLong(offsets[2]);
   return object;
 }
 
@@ -98,6 +105,8 @@ P _itemDeserializeProp<P>(
       return (_ItemitemTypeValueEnumMap[reader.readByteOrNull(offset)] ??
           ItemType.text) as P;
     case 2:
+      return (reader.readLong(offset)) as P;
+    case 3:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -315,6 +324,58 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterFilterCondition> orderEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'order',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> orderGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'order',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> orderLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'order',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> orderBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'order',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterFilterCondition> valueEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -473,6 +534,18 @@ extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterSortBy> sortByOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'order', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> sortByOrderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'order', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> sortByValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'value', Sort.asc);
@@ -523,6 +596,18 @@ extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterSortBy> thenByOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'order', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterSortBy> thenByOrderDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'order', Sort.desc);
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterSortBy> thenByValue() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'value', Sort.asc);
@@ -546,6 +631,12 @@ extension ItemQueryWhereDistinct on QueryBuilder<Item, Item, QDistinct> {
   QueryBuilder<Item, Item, QDistinct> distinctByItemType() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'itemType');
+    });
+  }
+
+  QueryBuilder<Item, Item, QDistinct> distinctByOrder() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'order');
     });
   }
 
@@ -573,6 +664,12 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
   QueryBuilder<Item, ItemType, QQueryOperations> itemTypeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'itemType');
+    });
+  }
+
+  QueryBuilder<Item, int, QQueryOperations> orderProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'order');
     });
   }
 

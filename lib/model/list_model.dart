@@ -19,6 +19,8 @@ class ListModel {
   @ignore
   ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
 
+  @ignore
+  int get itemCount => items.length;
   Iterable<Item> itemsView() => items;
 
   // a zero-arg constructor is required for classes that are isar collections
@@ -51,6 +53,7 @@ class ListModel {
   // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
 
   Future<void> add(Item newItem) async {
+    newItem.order = itemCount;
     await DatabaseManager.putItem(newItem);
     if (items.add(newItem)) {
       await DatabaseManager.updateListModelItems(this);
@@ -61,7 +64,7 @@ class ListModel {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
       // The following ensures that the copy of `item` that `this` has is up to date.
-      item.copyOnto(items.lookup(item)!);
+      item.copyOnto(lookup(item));
     } else {
       throw ItemUpdateError(item: item, listModel: this);
     }
@@ -69,58 +72,38 @@ class ListModel {
 
   Future<void> remove(Item item) async {
     if (items.remove(item)) {
+      final itemsOrderedAfterRemovedItem =
+          await items.filter().orderGreaterThan(item.order).findAll();
+      for (final item in itemsOrderedAfterRemovedItem) {
+        --item.order;
+      }
+
       await DatabaseManager.deleteItem(item);
+      await DatabaseManager.putItems(itemsOrderedAfterRemovedItem);
       await DatabaseManager.updateListModelItems(this);
     }
   }
+
+  Item lookup(Item item) => items.lookup(item)!;
 
   void moveItem({required int from, required int to}) {
     assert(from < items.length && from >= 0);
     assert(to <= items.length && to >= 0);
 
-    if (to > from) {
-      _moveItemRight(from: from, to: to);
-    } else if (to < from) {
-      _moveItemLeft(from: from, to: to);
-    }
-  }
+    final bounds = [from, to].sorted((a, b) => a - b);
+    int lower = bounds[0] == from ? bounds[0] + 1 : bounds[0];
+    int upper = bounds[1] - 1;
+    final itemsToRotate = items
+        .filter()
+        .orderBetween(lower, upper)
+        .findAllSync()
+        .map((item) => lookup(item));
+    final itemFrom =
+        lookup(items.filter().orderEqualTo(from).findAllSync().single);
 
-  void _moveItemRight({required int from, required int to}) {
-    final startIndexOfItemsToBeRotated = from;
-    final endIndexOfItemsToBeRotated = to;
-    final itemsToBeRotated = _sliceItems(
-        start: startIndexOfItemsToBeRotated, end: endIndexOfItemsToBeRotated);
-
-    _rotateItemsLeft(items: itemsToBeRotated);
-    DatabaseManager.putItems(itemsToBeRotated);
-  }
-
-  void _moveItemLeft({required int from, required int to}) {
-    final startIndexOfItemsToBeRotated = to;
-    final endIndexOfItemsToBeRotated = from+1;
-    final itemsToBeRotated = _sliceItems(
-        start: startIndexOfItemsToBeRotated, end: endIndexOfItemsToBeRotated);
-
-    _rotateItemsLeft(items: itemsToBeRotated.reversed);
-    DatabaseManager.putItems(itemsToBeRotated);
-  }
-
-  /// returns a list containing the items with indexes in the range [start, end)
-  List<Item> _sliceItems({required int start, required int end}) {
-    final numberOfSlicedItems = end - start;
-    return items.skip(start).take(numberOfSlicedItems).toList();
-  }
-
-  static void _rotateItemsLeft({required Iterable<Item> items}) {
-    final movedItemCopy = Item();
-    var prev = movedItemCopy;
-
-    for (final item in items) {
-      item.copyOnto(prev);
-      prev = item;
-    }
-
-    movedItemCopy.copyOnto(items.last);
+    itemsToRotate.forEach((item) => item.order += ((from - to).sign));
+    itemFrom.order = from < to ? to - 1 : to;
+    DatabaseManager.putItems([...itemsToRotate, itemFrom]);
   }
 
   bool hasLabel(String label) => labels.contains(label);
