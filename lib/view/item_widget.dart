@@ -7,11 +7,15 @@ import 'package:lists/view/edit_item_dialog.dart';
 ///     in a list (see Item)
 class ItemWidget extends StatefulWidget {
   final Item item;
+  final bool tappable;
   final void Function() onDelete;
   final void Function() onEdited;
 
   const ItemWidget(this.item,
-      {required this.onDelete, required this.onEdited, super.key});
+      {this.tappable = true,
+      required this.onDelete,
+      required this.onEdited,
+      super.key});
 
   @override
   State<ItemWidget> createState() => _ItemWidgetState();
@@ -40,7 +44,7 @@ class _ItemWidgetState extends State<ItemWidget> {
       leading: checkbox,
       title: Text(widget.item.value,
           style: itemTextStyle.copyWith(decoration: textDecoration)),
-      onTap: _showEditDialog,
+      onTap: widget.tappable ? _showEditDialog : null,
     );
   }
 

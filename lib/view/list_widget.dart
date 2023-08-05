@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
@@ -22,6 +24,7 @@ class _ListWidgetState extends State<ListWidget> {
 
   late Iterable<Item> itemsToBeDisplayed;
   String searchQuery = '';
+  bool isReordering = true;
 
   @override
   void initState() {
@@ -69,8 +72,8 @@ class _ListWidgetState extends State<ListWidget> {
     final unCheckedItemWidgetsSliver = searchQuery.isEmpty
         ? ReorderableSliverList(
             delegate: ReorderableSliverChildListDelegate(
-                _buildItemWidgets(fromItems: unCheckedItems).toList()),
-            onReorder: (oldIndex, newIndex) async {
+                _buildItemWidgets(fromItems: unCheckedItems)),
+            onReorder: (oldIndex, newIndex) {
               int oldOrder = unCheckedItems[oldIndex].order;
               int newOrder = unCheckedItems[newIndex].order;
               listModel.moveItem(oldOrder: oldOrder, newOrder: newOrder);
@@ -83,19 +86,25 @@ class _ListWidgetState extends State<ListWidget> {
               // so is not updated.
               // So, `listModel.itemsView()` holds the only updated copy of the
               // `listModel`'s items.
+              // Note onReorder can't be async (which would allow us to `await` for the
+              // update items to be put to Isar) because if it was, the list could flicker briefly
+              // between the old ordering and the new ordering (tested).
 
               setState(() => itemsToBeDisplayed = listModel.itemsView());
-            })
+            },
+            onDragStart: () => setState(() => isReordering = true),
+            onDragEnd: () => setState(() => isReordering = false),
+          )
         : SliverList(
             delegate: SliverChildListDelegate(
-                _buildItemWidgets(fromItems: unCheckedItems).toList()),
-          );
+                _buildItemWidgets(fromItems: unCheckedItems)));
+
     final dividerSliver = SliverList(
-        delegate: SliverChildListDelegate.fixed([Divider(key: UniqueKey())]));
+        delegate: SliverChildListDelegate([Divider(key: UniqueKey())]));
 
     final checkedItemWidgetsSliver = SliverList(
-        delegate: SliverChildListDelegate(
-            _buildItemWidgets(fromItems: checkedItems).toList()));
+        delegate: SliverChildListDelegate(_buildItemWidgets(
+            fromItems: checkedItems, tappable: !isReordering)));
 
     return CustomScrollView(slivers: [
       unCheckedItemWidgetsSliver,
@@ -104,8 +113,10 @@ class _ListWidgetState extends State<ListWidget> {
     ]);
   }
 
-  Iterable<Widget> _buildItemWidgets({required Iterable<Item> fromItems}) =>
-      fromItems.map((item) => ItemWidget(item, onDelete: () async {
+  List<Widget> _buildItemWidgets(
+          {required Iterable<Item> fromItems, bool tappable = true}) =>
+      fromItems
+          .map((item) => ItemWidget(item, tappable: tappable, onDelete: () async {
             await listModel.remove(item);
             await refreshItems();
           }, onEdited: () async {
@@ -116,7 +127,8 @@ class _ListWidgetState extends State<ListWidget> {
               // TODO: handle item update error.
               debugPrint(e.toString());
             }
-          }, key: ValueKey(item.id)));
+          }))
+          .toList();
 
   void _addNewItem() async {
     // Imitate the type of the last item.
