@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
@@ -86,24 +88,33 @@ class ListModel {
 
   Item lookup(Item item) => items.lookup(item)!;
 
-  void moveItem({required int from, required int to}) {
-    assert(from < items.length && from >= 0);
-    assert(to <= items.length && to >= 0);
+  void moveItem({required int oldOrder, required int newOrder}) {
+    //TODO: fix for moving up
+    assert(oldOrder < items.length && oldOrder >= 0);
+    assert(newOrder < items.length && newOrder >= 0);
 
-    final bounds = [from, to].sorted((a, b) => a - b);
-    int lower = bounds[0] == from ? bounds[0] + 1 : bounds[0];
-    int upper = bounds[1] - 1;
-    final itemsToRotate = items
+    int lower = min(oldOrder, newOrder);
+    int upper = max(oldOrder, newOrder);
+
+    final itemsToReorder = items
         .filter()
         .orderBetween(lower, upper)
         .findAllSync()
+        // lookup all the items so that changes are instantly reflected in the `IsarLinks` copy
+        // of the database items.
         .map((item) => lookup(item));
-    final itemFrom =
-        lookup(items.filter().orderEqualTo(from).findAllSync().single);
+    // note: we can use `findFirst` since there should be exactly one
+    // element ordered with `oldOrder`.
+    final itemWithOldOrder =
+        lookup(items.filter().orderEqualTo(oldOrder).findFirstSync()!);
+    final reorderingOffset = (oldOrder - newOrder).sign;
 
-    itemsToRotate.forEach((item) => item.order += ((from - to).sign));
-    itemFrom.order = from < to ? to - 1 : to;
-    DatabaseManager.putItems([...itemsToRotate, itemFrom]);
+    for (final item in itemsToReorder) {
+      item.order += reorderingOffset;
+    }
+
+    itemWithOldOrder.order = newOrder;
+    DatabaseManager.putItems([...itemsToReorder, itemWithOldOrder]);
   }
 
   bool hasLabel(String label) => labels.contains(label);

@@ -70,13 +70,10 @@ class _ListWidgetState extends State<ListWidget> {
         ? ReorderableSliverList(
             delegate: ReorderableSliverChildListDelegate(
                 _buildItemWidgets(fromItems: unCheckedItems).toList()),
-            onReorder: (oldIndex, newIndex) {
-              final from = unCheckedItems[oldIndex].order;
-              final to = oldIndex < newIndex
-                  ? unCheckedItems[newIndex].order + 1
-                  : unCheckedItems[newIndex].order;
-
-              listModel.moveItem(from: from, to: to);
+            onReorder: (oldIndex, newIndex) async {
+              int oldOrder = unCheckedItems[oldIndex].order;
+              int newOrder = unCheckedItems[newIndex].order;
+              listModel.moveItem(oldOrder: oldOrder, newOrder: newOrder);
               // We set `itemsToBeDisplayed` to `listModel.itemsView()` because
               // 1) `moveItem` puts the moved items to the database asynchronously (so we can't
               // load the items from the database), but updates the `IsarLinks` cached copy
@@ -86,23 +83,23 @@ class _ListWidgetState extends State<ListWidget> {
               // so is not updated.
               // So, `listModel.itemsView()` holds the only updated copy of the
               // `listModel`'s items.
+
               setState(() => itemsToBeDisplayed = listModel.itemsView());
-              print(itemsToBeDisplayed.map((e) => e.order).toList());
             })
         : SliverList(
             delegate: SliverChildListDelegate(
                 _buildItemWidgets(fromItems: unCheckedItems).toList()),
           );
     final dividerSliver = SliverList(
-        delegate: SliverChildListDelegate.fixed(
-            [if (checkedItems.isNotEmpty) Divider(key: UniqueKey())]));
+        delegate: SliverChildListDelegate.fixed([Divider(key: UniqueKey())]));
+
     final checkedItemWidgetsSliver = SliverList(
         delegate: SliverChildListDelegate(
             _buildItemWidgets(fromItems: checkedItems).toList()));
 
     return CustomScrollView(slivers: [
       unCheckedItemWidgetsSliver,
-      dividerSliver,
+      if (checkedItems.isNotEmpty) dividerSliver,
       checkedItemWidgetsSliver
     ]);
   }
