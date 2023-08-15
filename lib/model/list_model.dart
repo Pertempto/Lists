@@ -86,6 +86,7 @@ class ListModel {
     }
   }
 
+  /// Gets the `Item` stored in `IsarLinks` with `item`'s id.
   Item lookup(Item item) => items.lookup(item)!;
 
   void reorderItem({required int oldOrder, required int newOrder}) {
