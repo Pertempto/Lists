@@ -88,8 +88,7 @@ class ListModel {
 
   Item lookup(Item item) => items.lookup(item)!;
 
-  void moveItem({required int oldOrder, required int newOrder}) {
-    //TODO: fix for moving up
+  void reorderItem({required int oldOrder, required int newOrder}) {
     assert(oldOrder < items.length && oldOrder >= 0);
     assert(newOrder < items.length && newOrder >= 0);
 
@@ -100,8 +99,8 @@ class ListModel {
         .filter()
         .orderBetween(lower, upper)
         .findAllSync()
-        // lookup all the items so that changes are instantly reflected in the `IsarLinks` copy
-        // of the database items.
+        // lookup all the items so that the new orderings are instantly/synchronously reflected
+        // in the `IsarLinks` copy of the database items.
         .map((item) => lookup(item));
     // note: we can use `findFirst` since there should be exactly one
     // element ordered with `oldOrder`.

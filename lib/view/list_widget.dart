@@ -24,7 +24,7 @@ class _ListWidgetState extends State<ListWidget> {
 
   late Iterable<Item> itemsToBeDisplayed;
   String searchQuery = '';
-  bool isReordering = true;
+  bool isReordering = false;
 
   @override
   void initState() {
@@ -73,22 +73,23 @@ class _ListWidgetState extends State<ListWidget> {
         ? ReorderableSliverList(
             delegate: ReorderableSliverChildListDelegate(
                 _buildItemWidgets(fromItems: unCheckedItems)),
+            // Note onReorder can't be async (which would allow us to `await` for the
+            // ordering of the items to be updated) because if it was, the list would
+            // sometimes flicker briefly between the old ordering and the new ordering (tested).
             onReorder: (oldIndex, newIndex) {
               int oldOrder = unCheckedItems[oldIndex].order;
               int newOrder = unCheckedItems[newIndex].order;
-              listModel.moveItem(oldOrder: oldOrder, newOrder: newOrder);
+              listModel.reorderItem(oldOrder: oldOrder, newOrder: newOrder);
               // We set `itemsToBeDisplayed` to `listModel.itemsView()` because
-              // 1) `moveItem` puts the moved items to the database asynchronously (so we can't
-              // load the items from the database), but updates the `IsarLinks` cached copy
-              // of them (`listModel.itemsView()`) synchronously, and
+              // 1) `reorderItem` uses `DatabaseManager.putItems` to update the ordering of the
+              // items, which is asynchronous, meaning that the items in the database my not be
+              // updated. However the function does update the `IsarLinks` cached copy
+              // of the items (which is `listModel.itemsView()`) synchronously; and
               // 2) if the user previously searched the items, then `itemsToBeDisplayed`
               // holds a copy of the `listModel`'s items separate from the `IsarLinks`, and
               // so is not updated.
               // So, `listModel.itemsView()` holds the only updated copy of the
               // `listModel`'s items.
-              // Note onReorder can't be async (which would allow us to `await` for the
-              // update items to be put to Isar) because if it was, the list could flicker briefly
-              // between the old ordering and the new ordering (tested).
 
               setState(() => itemsToBeDisplayed = listModel.itemsView());
             },
@@ -116,18 +117,19 @@ class _ListWidgetState extends State<ListWidget> {
   List<Widget> _buildItemWidgets(
           {required Iterable<Item> fromItems, bool tappable = true}) =>
       fromItems
-          .map((item) => ItemWidget(item, tappable: tappable, onDelete: () async {
-            await listModel.remove(item);
-            await refreshItems();
-          }, onEdited: () async {
-            try {
-              await listModel.update(item);
-              await refreshItems();
-            } on ItemUpdateError catch (e) {
-              // TODO: handle item update error.
-              debugPrint(e.toString());
-            }
-          }))
+          .map((item) =>
+              ItemWidget(item, tappable: tappable, onDelete: () async {
+                await listModel.remove(item);
+                await refreshItems();
+              }, onEdited: () async {
+                try {
+                  await listModel.update(item);
+                  await refreshItems();
+                } on ItemUpdateError catch (e) {
+                  // TODO: handle item update error.
+                  debugPrint(e.toString());
+                }
+              }))
           .toList();
 
   void _addNewItem() async {
