@@ -82,9 +82,9 @@ class _ListWidgetState extends State<ListWidget> {
               listModel.reorderItem(oldOrder: oldOrder, newOrder: newOrder);
               // We set `itemsToBeDisplayed` to `listModel.itemsView()` because
               // 1) `reorderItem` uses `DatabaseManager.putItems` to update the ordering of the
-              // items, which is asynchronous, meaning that the items in the database my not be
+              // items, which is asynchronous, meaning that the items in the database may not be
               // updated. However the function does update the `IsarLinks` cached copy
-              // of the items (which is `listModel.itemsView()`) synchronously; and
+              // of the items (which is `listModel.itemsView()`) synchronously. Also,
               // 2) if the user previously searched the items, then `itemsToBeDisplayed`
               // holds a copy of the `listModel`'s items separate from the `IsarLinks`, and
               // so is not updated.
