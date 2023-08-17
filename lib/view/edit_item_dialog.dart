@@ -54,8 +54,7 @@ class _EditItemDialogState extends State<EditItemDialog> {
           const SizedBox(height: 16),
           _buildItemTypeSwitcher(),
           const SizedBox(height: 8),
-          _buildRepeatWidget(),
-          // _buildRepeatOptions()
+          _buildRepeatWidget()
         ],
       ),
       actions: [
