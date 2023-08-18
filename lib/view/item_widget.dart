@@ -31,10 +31,12 @@ class _ItemWidgetState extends State<ItemWidget> {
     TextDecoration? textDecoration;
 
     if (widget.item.itemType == ItemType.checkbox) {
-      checkbox = Checkbox(
-        value: widget.item.isChecked,
-        onChanged: _onNewCheckedState,
-      );
+      checkbox = Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: Checkbox(
+            value: widget.item.isChecked,
+            onChanged: _onNewCheckedState,
+          ));
 
       textDecoration =
           widget.item.isChecked ? TextDecoration.lineThrough : null;
@@ -49,11 +51,7 @@ class _ItemWidgetState extends State<ItemWidget> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (checkbox != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: checkbox,
-                  ),
+                if (checkbox != null) checkbox,
                 Expanded(
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
