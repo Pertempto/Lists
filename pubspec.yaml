@@ -59,6 +59,8 @@ dev_dependencies:
   isar_generator: *isar_version
   build_runner: ^2.3.3
 
+  flutter_launcher_icons: ^0.13.1
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
