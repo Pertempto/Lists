@@ -32,7 +32,7 @@ class DatabaseManager {
   static Future<void> deleteListModel(ListModel listModel) async {
     late final bool wasDeleted;
 
-    listModel.disposeItems();
+    await listModel.dispose();
 
     await isar.writeTxn(() async {
       await isar.items

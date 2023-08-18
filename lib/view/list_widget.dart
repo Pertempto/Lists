@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
@@ -22,11 +24,14 @@ class _ListWidgetState extends State<ListWidget> {
   late Iterable<Item> itemsToBeDisplayed;
   String searchQuery = '';
 
+  late final StreamSubscription<ListModelEvent> eventStreamSubscription;
+
   @override
   void initState() {
     super.initState();
     itemsToBeDisplayed = listModel.itemsView();
-    listModel.updateTimersForScheduledItems(timerCallback: _onItemEdited);
+    eventStreamSubscription =
+        listModel.eventStream.listen((event) async => await refreshItems());
   }
 
   @override
@@ -73,28 +78,9 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   Iterable<Widget> _buildItemWidgets({required Iterable<Item> fromItems}) =>
-      fromItems.map((item) => ItemWidget(item,
-          onDelete: () async {
-            await listModel.remove(item);
-            await refreshItems();
-          },
-          onEdited: () => _onItemEdited(item)));
-
-  void _onItemEdited(Item item) async {
-    try {
-      await listModel.update(item, scheduledTimerCallback: _onItemEdited);
-      // rebuild the ListWidget because an item has changed,
-      // but only rebuild if `this` is mounted (which indicates
-      // that `this` has not been disposed, and we can call
-      // `setState`).
-      if (mounted) {
-        await refreshItems();
-      }
-    } on ItemUpdateError catch (e) {
-      // TODO: handle item update error.
-      debugPrint(e.toString());
-    }
-  }
+      fromItems.map((item) => ItemWidget(item, onDelete: () async =>
+            await listModel.remove(item), onEdited: () async =>
+            await listModel.update(item)));
 
   void _addNewItem() async {
     // Imitate the type of the last item.
@@ -104,11 +90,8 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            onSubmit: (newItem) async {
-              await listModel.add(newItem);
-              newItem.updateScheduledTimer(timerCallback: _onItemEdited);
-              await refreshItems();
-            },
+            onSubmit: (newItem) async =>
+              await listModel.add(newItem),
             item: newItem),
       );
     }
@@ -117,5 +100,14 @@ class _ListWidgetState extends State<ListWidget> {
   Future<void> refreshItems() async {
     itemsToBeDisplayed = await listModel.searchItems(searchQuery);
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    // Note we don't need to await for the subscription to cancel;
+    // this call is needed just so that unneeded and unreferenced 
+    // subscriptions are removed from listModel's eventStream.
+    eventStreamSubscription.cancel();
+    super.dispose();
   }
 }
