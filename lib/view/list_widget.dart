@@ -26,11 +26,14 @@ class _ListWidgetState extends State<ListWidget> {
   String searchQuery = '';
   bool isReordering = false;
 
+  late final StreamSubscription<ListModelEvent> eventStreamSubscription;
+
   @override
   void initState() {
     super.initState();
-    listModel.reload();
     itemsToBeDisplayed = listModel.itemsView();
+    eventStreamSubscription =
+        listModel.eventStream.listen((event) async => await refreshItems());
   }
 
   @override
@@ -114,23 +117,10 @@ class _ListWidgetState extends State<ListWidget> {
     ]);
   }
 
-  List<Widget> _buildItemWidgets(
-          {required Iterable<Item> fromItems, bool tappable = true}) =>
-      fromItems
-          .map((item) =>
-              ItemWidget(item, tappable: tappable, onDelete: () async {
-                await listModel.remove(item);
-                await refreshItems();
-              }, onEdited: () async {
-                try {
-                  await listModel.update(item);
-                  await refreshItems();
-                } on ItemUpdateError catch (e) {
-                  // TODO: handle item update error.
-                  debugPrint(e.toString());
-                }
-              }))
-          .toList();
+  List<Widget> _buildItemWidgets({required Iterable<Item> fromItems, bool tappable = true}) =>
+      fromItems.map((item) => ItemWidget(item,tappable: tappable,  onDelete: () async =>
+            await listModel.remove(item), onEdited: () async =>
+            await listModel.update(item))).toList();
 
   void _addNewItem() async {
     // Imitate the type of the last item.
@@ -140,10 +130,8 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            onSubmit: (newItem) async {
-              await listModel.add(newItem);
-              await refreshItems();
-            },
+            onSubmit: (newItem) async =>
+              await listModel.add(newItem),
             item: newItem),
       );
     }
@@ -156,4 +144,13 @@ class _ListWidgetState extends State<ListWidget> {
 
   List<Item> _ordered(Iterable<Item> items) =>
       items.sorted((a, b) => a.order - b.order);
+      
+  @override
+  void dispose() {
+    // Note we don't need to await for the subscription to cancel;
+    // this call is needed just so that unneeded and unreferenced 
+    // subscriptions are removed from listModel's eventStream.
+    eventStreamSubscription.cancel();
+    super.dispose();
+  }
 }

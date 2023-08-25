@@ -1,0 +1,11 @@
+flutter_launcher_icons:
+  image_path: icon/lists_app_icon.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true

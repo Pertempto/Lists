@@ -31,6 +31,9 @@ class DatabaseManager {
 
   static Future<void> deleteListModel(ListModel listModel) async {
     late final bool wasDeleted;
+
+    await listModel.dispose();
+
     await isar.writeTxn(() async {
       await isar.items
           .deleteAll(listModel.items.map((item) => item.id).toList());
@@ -51,6 +54,8 @@ class DatabaseManager {
   static Future<void> putItems(List<Item> items) async =>
       await isar.writeTxn(() async => await isar.items.putAll(items));
 
-  static Future<void> deleteItem(Item item) async =>
-      await isar.writeTxn(() async => await isar.items.delete(item.id));
+  static Future<void> deleteItem(Item item) async {
+    item.dispose();
+    await isar.writeTxn(() async => await isar.items.delete(item.id));
+  }
 }

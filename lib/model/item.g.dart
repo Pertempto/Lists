@@ -33,8 +33,14 @@ const ItemSchema = CollectionSchema(
       name: r'order',
       type: IsarType.long,
     ),
-    r'value': PropertySchema(
+    r'scheduling': PropertySchema(
       id: 3,
+      name: r'scheduling',
+      type: IsarType.object,
+      target: r'ItemScheduling',
+    ),
+    r'value': PropertySchema(
+      id: 4,
       name: r'value',
       type: IsarType.string,
     )
@@ -46,7 +52,10 @@ const ItemSchema = CollectionSchema(
   idName: r'id',
   indexes: {},
   links: {},
-  embeddedSchemas: {},
+  embeddedSchemas: {
+    r'ItemScheduling': ItemSchedulingSchema,
+    r'RepeatConfiguration': RepeatConfigurationSchema
+  },
   getId: _itemGetId,
   getLinks: _itemGetLinks,
   attach: _itemAttach,
@@ -59,6 +68,14 @@ int _itemEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.scheduling;
+    if (value != null) {
+      bytesCount += 3 +
+          ItemSchedulingSchema.estimateSize(
+              value, allOffsets[ItemScheduling]!, allOffsets);
+    }
+  }
   bytesCount += 3 + object.value.length * 3;
   return bytesCount;
 }
@@ -72,7 +89,13 @@ void _itemSerialize(
   writer.writeBool(offsets[0], object.isChecked);
   writer.writeByte(offsets[1], object.itemType.index);
   writer.writeLong(offsets[2], object.order);
-  writer.writeString(offsets[3], object.value);
+  writer.writeObject<ItemScheduling>(
+    offsets[3],
+    allOffsets,
+    ItemSchedulingSchema.serialize,
+    object.scheduling,
+  );
+  writer.writeString(offsets[4], object.value);
 }
 
 Item _itemDeserialize(
@@ -82,13 +105,18 @@ Item _itemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Item(
-    reader.readStringOrNull(offsets[3]) ?? '',
+    reader.readStringOrNull(offsets[4]) ?? '',
     _ItemitemTypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
         ItemType.text,
   );
   object.id = id;
   object.isChecked = reader.readBool(offsets[0]);
   object.order = reader.readLong(offsets[2]);
+  object.scheduling = reader.readObjectOrNull<ItemScheduling>(
+    offsets[3],
+    ItemSchedulingSchema.deserialize,
+    allOffsets,
+  );
   return object;
 }
 
@@ -107,6 +135,12 @@ P _itemDeserializeProp<P>(
     case 2:
       return (reader.readLong(offset)) as P;
     case 3:
+      return (reader.readObjectOrNull<ItemScheduling>(
+        offset,
+        ItemSchedulingSchema.deserialize,
+        allOffsets,
+      )) as P;
+    case 4:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -376,6 +410,22 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterFilterCondition> schedulingIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'scheduling',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> schedulingIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'scheduling',
+      ));
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterFilterCondition> valueEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -505,7 +555,14 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }
 }
 
-extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
+extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {
+  QueryBuilder<Item, Item, QAfterFilterCondition> scheduling(
+      FilterQuery<ItemScheduling> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.object(q, r'scheduling');
+    });
+  }
+}
 
 extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {}
 
@@ -670,6 +727,12 @@ extension ItemQueryProperty on QueryBuilder<Item, Item, QQueryProperty> {
   QueryBuilder<Item, int, QQueryOperations> orderProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'order');
+    });
+  }
+
+  QueryBuilder<Item, ItemScheduling?, QQueryOperations> schedulingProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'scheduling');
     });
   }
 
