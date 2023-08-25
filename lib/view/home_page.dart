@@ -21,9 +21,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late List<ListModel> data;
   late Iterable<String> allLabels;
   Set<String>? selectedLabels;
-  bool showFilterSideSheet = false;
+
+  late Future<void> startupFuture = _startup();
+  Future<void> _startup() async =>
+      data = await DatabaseManager.loadListModels();
 
   @override
   Widget build(BuildContext context) {
@@ -53,39 +57,42 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildSettingsButton() => IconButton(
       icon: const Icon(Icons.settings),
-      onPressed: () => SideSheet.right(
-          context: context,
-          body: const SettingsWidget()));
+      onPressed: () =>
+          SideSheet.right(context: context, body: const SettingsWidget()));
 
-  Widget _buildBody() => FutureBuilder<List<ListModel>>(
-      future: DatabaseManager.loadListModels(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          allLabels = _getAllLabels(of: snapshot.data!);
-          // remove labels that are selected but have been deleted.
-          selectedLabels = selectedLabels?.where(allLabels.contains).toSet();
-          // if there are no labels selected, set selectedLabels to null (which signifies no
-          // filters, returning to the 'All' option).
-          selectedLabels =
-              (selectedLabels?.isEmpty ?? true) ? null : selectedLabels;
-          return _buildListPreviewsWidget(snapshot.data!);
-        }
-        if (snapshot.hasError) {
-          _onListModelsLoadingError(snapshot.error!);
-        }
-        return Container();
-      });
+  Widget _buildBody() =>
+      // We use the `data` only if `startupFuture` has completed (and loaded the
+      // `ListModel`s from the database into `data`).
+      FutureBuilder<void>(
+          future: startupFuture,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              allLabels = _getAllLabels();
+              // remove labels that are selected but have been deleted.
+              selectedLabels =
+                  selectedLabels?.where(allLabels.contains).toSet();
+              // if there are no labels selected, set selectedLabels to null (which signifies no
+              // filters, returning to the 'All' option).
+              selectedLabels =
+                  (selectedLabels?.isEmpty ?? true) ? null : selectedLabels;
+              return _buildListPreviewsWidget();
+            }
+            if (snapshot.hasError) {
+              _onListModelsLoadingError(snapshot.error!);
+            }
+            return Container();
+          });
 
-  Set<String> _getAllLabels({required Iterable<ListModel> of}) =>
-      of.map((listModel) => listModel.labels).flattened.toSet();
+  Set<String> _getAllLabels() =>
+      data.map((listModel) => listModel.labels).flattened.toSet();
 
-  ListView _buildListPreviewsWidget(List<ListModel> data) => ListView(
+  ListView _buildListPreviewsWidget() => ListView(
       children: _filteredData(data)
           .map((listModel) => ListPreviewWidget(
                 listModel,
                 onDelete: () async {
                   await DatabaseManager.deleteListModel(listModel);
-                  setState(() {});
+                  setState(() => data.remove(listModel));
                 },
                 onEdited: () => setState(() {}),
                 isLabelSelected: (label) =>
@@ -122,11 +129,11 @@ class _HomePageState extends State<HomePage> {
       await Navigator.push(
           context, MaterialPageRoute(builder: (_) => ListWidget(newListModel)));
     }
-    setState(() {});
+    setState(() => data.add(listModel));
   }
 
   void _onListModelsLoadingError(Object error) {
-    //TODO: handle error
+    // TODO: handle error
     debugPrint(error.toString());
   }
 }
