@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
 import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/item.dart';
 
 part 'list_model.g.dart';
+
+enum ListModelEvent { itemAdded, itemRemoved, itemUpdated }
 
 /// ListModel:
 ///   - this class models a list in the app, such as a
@@ -21,17 +25,57 @@ class ListModel {
 
   Iterable<Item> itemsView() => items;
 
+  @ignore
+  Iterable<Item> get scheduledItems =>
+      itemsView().where((item) => item.isScheduled);
+
+  @ignore
+  Stream<ListModelEvent> get eventStream => _eventStreamController.stream;
+
+  final _eventStreamController = StreamController<ListModelEvent>.broadcast();
+
   // a zero-arg constructor is required for classes that are isar collections
   ListModel();
   ListModel.fromTitle(this.title) : labels = [];
 
   void init() {
-    reload();
-    // This ensures that labels is mutable
+    items.loadSync();
     labels = labels.toList();
+    for (final item in scheduledItems) {
+      item.updateScheduledTimer(timerCallback: update);
+    }
   }
 
-  void reload() => items.loadSync();
+  Future<void> add(Item newItem) async {
+    await DatabaseManager.putItem(newItem);
+    if (items.add(newItem)) {
+      await DatabaseManager.updateListModelItems(this);
+      newItem.updateScheduledTimer(timerCallback: update);
+      _eventStreamController.add(ListModelEvent.itemAdded);
+    }
+  }
+
+  Future<void> update(Item item) async {
+    if (items.contains(item)) {
+      await DatabaseManager.putItem(item);
+
+      final databaseItem = items.lookup(item)!;
+      // The following ensures that the copy of `item` that `this` has is up to date.
+      item.copyOnto(databaseItem);
+      databaseItem.updateScheduledTimer(timerCallback: update);
+      _eventStreamController.add(ListModelEvent.itemUpdated);
+    } else {
+      throw ItemUpdateError(item: item, listModel: this);
+    }
+  }
+
+  Future<void> remove(Item item) async {
+    if (items.remove(item)) {
+      await DatabaseManager.deleteItem(item);
+      await DatabaseManager.updateListModelItems(this);
+      _eventStreamController.add(ListModelEvent.itemRemoved);
+    }
+  }
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
     final words = _parseSearchStr(searchQuery);
@@ -50,31 +94,15 @@ class ListModel {
   // example:
   // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
 
-  Future<void> add(Item newItem) async {
-    await DatabaseManager.putItem(newItem);
-    if (items.add(newItem)) {
-      await DatabaseManager.updateListModelItems(this);
-    }
-  }
-
-  Future<void> update(Item item) async {
-    if (items.contains(item)) {
-      await DatabaseManager.putItem(item);
-      // The following ensures that the copy of `item` that `this` has is up to date.
-      item.copyOnto(items.lookup(item)!);
-    } else {
-      throw ItemUpdateError(item: item, listModel: this);
-    }
-  }
-
-  Future<void> remove(Item item) async {
-    if (items.remove(item)) {
-      await DatabaseManager.deleteItem(item);
-      await DatabaseManager.updateListModelItems(this);
-    }
-  }
-
   bool hasLabel(String label) => labels.contains(label);
+
+  /// To be called when `this` is deleted. See also `Item.dispose`.
+  Future<void> dispose() async {
+    for (final item in items) {
+      item.dispose();
+    }
+    await _eventStreamController.close();
+  }
 }
 
 class ListModelError implements Exception {
