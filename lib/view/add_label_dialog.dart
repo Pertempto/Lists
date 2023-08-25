@@ -27,7 +27,7 @@ class _AddLabelDialogState extends State<AddLabelDialog> {
               decoration: InputDecoration(
                   hintText: 'Enter a label',
                   suffixIcon: IconButton(
-                      icon: Icon(Icons.add),
+                      icon: const Icon(Icons.add),
                       onPressed: () =>
                           Navigator.pop(context, textEditingController.text))),
               onChanged: (value) => setState(() => searchQuery = value),

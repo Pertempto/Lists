@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/view/add_label_dialog.dart';
 import 'package:lists/view/confirmation_dialog.dart';
-import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/submit_button.dart';
 
 /// ListSettingsDialog:
-///   - a dialog that allows the user to edit the metadata of the list
+///   - a dialog that allows the user to edit the settings of the list
 class ListSettingsDialog extends StatefulWidget {
   final void Function(ListModel) onSubmit;
   final ListModel listModel;
@@ -39,7 +38,7 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('List Settings', textAlign: TextAlign.center),
+      title: const Text('Edit List Settings', textAlign: TextAlign.center),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
