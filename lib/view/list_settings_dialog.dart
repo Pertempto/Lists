@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/view/add_label_dialog.dart';
+import 'package:lists/view/confirmation_dialog.dart';
 import 'package:lists/view/submit_button.dart';
 
 /// ListSettingsDialog:
@@ -86,18 +87,21 @@ class _ListSettingsDialogState extends State<ListSettingsDialog> {
       actions: [
         if (widget.onDelete != null)
           TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                widget.onDelete?.call();
-              },
+              onPressed: () async => await showDialog(
+                  context: context,
+                  builder: (context) => ConfirmationDialog(
+                      description: 'Delete List \'${widget.listModel.title}\'?',
+                      onConfirm: () {
+                        if (context.mounted) Navigator.pop(context);
+                        widget.onDelete?.call();
+                      })),
               style: const ButtonStyle(
                   foregroundColor: MaterialStatePropertyAll(Colors.red)),
               child: const Text('Delete')),
         SubmitButton(
-          // if the title is blank, this button is disabled (onPressed == null),
-          // because we don't want the user to be able to submit lists with blank titles.
-          onPressed: !_isTitleBlank ? _submitListModel : null
-        ),
+            // if the title is blank, this button is disabled (onPressed == null),
+            // because we don't want the user to be able to submit lists with blank titles.
+            onPressed: !_isTitleBlank ? _submitListModel : null),
       ],
     );
   }
