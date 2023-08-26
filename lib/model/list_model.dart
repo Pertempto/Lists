@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -85,9 +84,8 @@ class ListModel {
   /// Gets the `Item` stored in `IsarLinks` with `item`'s id.
   Item lookup(Item item) => items.lookup(item)!;
 
-  reorderItems(List<Item> items) async {
-    await DatabaseManager.putItems(items);
-  }
+  Future<void> reorderItems(List<Item> items) async =>
+      DatabaseManager.putItems(items);
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
     final words = _parseSearchStr(searchQuery);
