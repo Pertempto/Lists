@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -50,7 +49,8 @@ class ListModel {
   }
 
   Future<void> add(Item newItem) async {
-    newItem.order = itemCount;
+    // Use an order value larger than the largest order value.
+    newItem.order = (maxBy(items, (item) => item.order)?.order ?? -1) + 1;
     await DatabaseManager.putItem(newItem);
     if (items.add(newItem)) {
       await DatabaseManager.updateListModelItems(this);
@@ -75,14 +75,7 @@ class ListModel {
 
   Future<void> remove(Item item) async {
     if (items.remove(item)) {
-      final itemsOrderedAfterRemovedItem =
-          await items.filter().orderGreaterThan(item.order).findAll();
-      for (final item in itemsOrderedAfterRemovedItem) {
-        --item.order;
-      }
-
       await DatabaseManager.deleteItem(item);
-      await DatabaseManager.putItems(itemsOrderedAfterRemovedItem);
       await DatabaseManager.updateListModelItems(this);
       _eventStreamController.add(ListModelEvent.itemRemoved);
     }
@@ -91,33 +84,8 @@ class ListModel {
   /// Gets the `Item` stored in `IsarLinks` with `item`'s id.
   Item lookup(Item item) => items.lookup(item)!;
 
-  void reorderItem({required int oldOrder, required int newOrder}) {
-    assert(oldOrder < items.length && oldOrder >= 0);
-    assert(newOrder < items.length && newOrder >= 0);
-
-    int lower = min(oldOrder, newOrder);
-    int upper = max(oldOrder, newOrder);
-
-    final itemsToReorder = items
-        .filter()
-        .orderBetween(lower, upper)
-        .findAllSync()
-        // lookup all the items so that the new orderings are instantly/synchronously reflected
-        // in the `IsarLinks` copy of the database items.
-        .map((item) => lookup(item));
-    // note: we can use `findFirst` since there should be exactly one
-    // element ordered with `oldOrder`.
-    final itemWithOldOrder =
-        lookup(items.filter().orderEqualTo(oldOrder).findFirstSync()!);
-    final reorderingOffset = (oldOrder - newOrder).sign;
-
-    for (final item in itemsToReorder) {
-      item.order += reorderingOffset;
-    }
-
-    itemWithOldOrder.order = newOrder;
-    DatabaseManager.putItems([...itemsToReorder, itemWithOldOrder]);
-  }
+  Future<void> reorderItems(List<Item> items) async =>
+      DatabaseManager.putItems(items);
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
     final words = _parseSearchStr(searchQuery);
