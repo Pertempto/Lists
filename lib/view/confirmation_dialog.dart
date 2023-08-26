@@ -13,6 +13,7 @@ class ConfirmationDialog extends StatelessWidget {
         title: Text(description, textAlign: TextAlign.start),
         content: const Text('This can not be undone'),
         icon: const Icon(Icons.warning),
+        iconColor: Colors.red,
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
