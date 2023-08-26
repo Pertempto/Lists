@@ -39,6 +39,9 @@ class _ItemWidgetState extends State<ItemWidget> {
           child: Checkbox(
             value: widget.item.isChecked,
             onChanged: _onNewCheckedState,
+            visualDensity: const VisualDensity(
+                horizontal: VisualDensity.maximumDensity,
+                vertical: VisualDensity.maximumDensity),
           ));
 
       textDecoration =
