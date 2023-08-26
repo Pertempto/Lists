@@ -118,7 +118,7 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   List<Widget> _buildItemWidgets({required Iterable<Item> fromItems, bool tappable = true}) =>
-      fromItems.map((item) => ItemWidget(item,tappable: tappable,  onDelete: () async =>
+      fromItems.map((item) => ItemWidget(item, tappable: tappable, onDelete: () async =>
             await listModel.remove(item), onEdited: () async =>
             await listModel.update(item))).toList();
 
