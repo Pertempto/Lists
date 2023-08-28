@@ -25,6 +25,27 @@ class ItemWidget extends StatefulWidget {
 }
 
 class _ItemWidgetState extends State<ItemWidget> {
+  late TextEditingController _controller;
+  FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.item.value);
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        widget.item.value = _controller.text;
+        updateThis();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final itemTextStyle =
@@ -36,40 +57,61 @@ class _ItemWidgetState extends State<ItemWidget> {
     if (widget.item.itemType == ItemType.checkbox) {
       checkbox = Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: Checkbox(
-            value: widget.item.isChecked,
-            onChanged: _onNewCheckedState,
-            visualDensity: const VisualDensity(
-                horizontal: VisualDensity.maximumDensity,
-                vertical: VisualDensity.maximumDensity),
+          child: Container(
+            color: Colors.blue,
+            child: Checkbox(
+              value: widget.item.isChecked,
+              onChanged: _onNewCheckedState,
+              visualDensity: VisualDensity.compact,
+            ),
           ));
 
       textDecoration =
           widget.item.isChecked ? TextDecoration.lineThrough : null;
     }
 
-    return InkWell(
-        onTap: widget.tappable ? _showEditDialog : null,
-        child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (checkbox != null) checkbox,
-                Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.item.value,
-                            style: itemTextStyle.copyWith(
-                                decoration: textDecoration)),
-                        if (widget.item.isScheduled)
-                          _buildScheduledTimeStampChip()
-                      ]),
+    Widget textField = Container(
+      color: Colors.red,
+      child: TextField(
+        controller: _controller,
+        decoration:
+            const InputDecoration(border: InputBorder.none, isDense: true),
+        style: itemTextStyle.copyWith(decoration: textDecoration),
+        focusNode: _focusNode,
+        enabled: false && !widget.item.isChecked,
+      ),
+    );
+
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              if (checkbox != null) checkbox,
+              Expanded(child: textField),
+              if (!widget.item.isChecked)
+                const Padding(
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: Icon(Icons.drag_handle),
                 )
-              ],
-            )));
+            ]),
+            if (widget.item.isScheduled && checkbox != null)
+              Row(
+                children: [
+                  // This matches the width of the checkbox in the first row
+                  Visibility(
+                    child: checkbox,
+                    visible: false,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                  ),
+                  _buildScheduledTimeStampChip(),
+                ],
+              )
+          ],
+        ));
   }
 
   void _onNewCheckedState(bool? value) {
