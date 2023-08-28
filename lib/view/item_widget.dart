@@ -78,7 +78,7 @@ class _ItemWidgetState extends State<ItemWidget> {
             const InputDecoration(border: InputBorder.none, isDense: true),
         style: itemTextStyle.copyWith(decoration: textDecoration),
         focusNode: _focusNode,
-        enabled: false && !widget.item.isChecked,
+        enabled: !widget.item.isChecked,
       ),
     );
 
