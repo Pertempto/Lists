@@ -10,6 +10,8 @@ part 'item.g.dart';
 @Collection()
 class Item {
   Id id = Isar.autoIncrement;
+  late int order;
+
   late String value;
   @enumerated
   late ItemType itemType;

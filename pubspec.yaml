@@ -41,6 +41,7 @@ dependencies:
   collection: ^1.17.0
   side_sheet: ^1.0.4
   adaptive_theme: ^3.2.0
+  reorderables: ^0.6.0
   weekday_selector: ^1.1.0
   intl: ^0.18.1
 

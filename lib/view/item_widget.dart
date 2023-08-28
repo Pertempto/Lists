@@ -3,7 +3,6 @@ import 'package:lists/common/time_stamp_format.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_scheduling.dart';
 import 'package:lists/view/edit_item_dialog.dart';
-import 'package:lists/view/editing_actions_modal_bottom_sheet.dart';
 import 'package:lists/view/repeat_dialog.dart';
 
 /// ItemWidget:
@@ -11,11 +10,15 @@ import 'package:lists/view/repeat_dialog.dart';
 ///     in a list (see Item)
 class ItemWidget extends StatefulWidget {
   final Item item;
+  final bool tappable;
   final void Function() onDelete;
   final void Function() onEdited;
 
   const ItemWidget(this.item,
-      {required this.onDelete, required this.onEdited, super.key});
+      {this.tappable = true,
+      required this.onDelete,
+      required this.onEdited,
+      super.key});
 
   @override
   State<ItemWidget> createState() => _ItemWidgetState();
@@ -36,6 +39,9 @@ class _ItemWidgetState extends State<ItemWidget> {
           child: Checkbox(
             value: widget.item.isChecked,
             onChanged: _onNewCheckedState,
+            visualDensity: const VisualDensity(
+                horizontal: VisualDensity.maximumDensity,
+                vertical: VisualDensity.maximumDensity),
           ));
 
       textDecoration =
@@ -43,8 +49,7 @@ class _ItemWidgetState extends State<ItemWidget> {
     }
 
     return InkWell(
-        onTap: _showEditDialog,
-        onLongPress: _showOptionsModalSheet,
+        onTap: widget.tappable ? _showEditDialog : null,
         child: Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -95,21 +100,12 @@ class _ItemWidgetState extends State<ItemWidget> {
         ),
       );
 
-  void _showOptionsModalSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => EditingActionsModalBottomSheet(
-        actionButtons: [
-          EditingActionButton.deleteButton(onDelete: widget.onDelete)
-        ],
-      ),
-    );
-  }
-
   void _showEditDialog() => showDialog(
       context: context,
-      builder: (context) =>
-          EditItemDialog(onSubmit: (_) => updateThis(), item: widget.item));
+      builder: (context) => EditItemDialog(
+          onSubmit: (_) => updateThis(),
+          onDelete: widget.onDelete,
+          item: widget.item));
 
   void updateThis() {
     widget.onEdited();

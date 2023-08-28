@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lists/model/database_manager.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:lists/view/list_widget.dart';
 import 'package:lists/view/list_settings_dialog.dart';
-import 'package:lists/model/database_manager.dart';
 
 /// ListPreviewWidget:
 ///   - a widget representing a tile which contains the metadata

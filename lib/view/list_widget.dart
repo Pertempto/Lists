@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
+import 'package:reorderables/reorderables.dart';
 
 /// ListWidget:
 ///   - a widget representing a ListModel
@@ -23,6 +24,7 @@ class _ListWidgetState extends State<ListWidget> {
 
   late Iterable<Item> itemsToBeDisplayed;
   String searchQuery = '';
+  bool isReordering = false;
 
   late final StreamSubscription<ListModelEvent> eventStreamSubscription;
 
@@ -63,24 +65,57 @@ class _ListWidgetState extends State<ListWidget> {
     );
   }
 
-  ListView _buildBody() {
+  Widget _buildBody() {
     bool isItemChecked(Item item) =>
         (item.itemType == ItemType.checkbox && item.isChecked);
 
-    final unCheckedItems = itemsToBeDisplayed.whereNot(isItemChecked);
-    final checkedItems = itemsToBeDisplayed.where(isItemChecked);
+    final unCheckedItems = _ordered(itemsToBeDisplayed.whereNot(isItemChecked));
+    final checkedItems = _ordered(itemsToBeDisplayed.where(isItemChecked));
 
-    return ListView(
-        children: _buildItemWidgets(fromItems: unCheckedItems)
-            .followedBy([if (checkedItems.isNotEmpty) const Divider()])
-            .followedBy(_buildItemWidgets(fromItems: checkedItems))
-            .toList());
+    final unCheckedItemWidgetsSliver = searchQuery.isEmpty
+        ? ReorderableSliverList(
+            delegate: ReorderableSliverChildListDelegate(
+                _buildItemWidgets(fromItems: unCheckedItems)),
+            onReorder: (oldIndex, newIndex) {
+              // Move the item
+              var item = unCheckedItems.removeAt(oldIndex);
+              unCheckedItems.insert(newIndex, item);
+              // Update the order values
+              var combined = unCheckedItems + checkedItems;
+              combined
+                  .forEachIndexed((index, element) => element.order = index);
+              // Save to DB
+              listModel.reorderItems(combined);
+            },
+            onDragStart: () => setState(() => isReordering = true),
+            onDragEnd: () => setState(() => isReordering = false),
+          )
+        : SliverList(
+            delegate: SliverChildListDelegate(
+                _buildItemWidgets(fromItems: unCheckedItems)));
+
+    final dividerSliver = SliverList(
+        delegate: SliverChildListDelegate([Divider(key: UniqueKey())]));
+
+    final checkedItemWidgetsSliver = SliverList(
+        delegate: SliverChildListDelegate(_buildItemWidgets(
+            fromItems: checkedItems, tappable: !isReordering)));
+
+    return CustomScrollView(slivers: [
+      unCheckedItemWidgetsSliver,
+      if (checkedItems.isNotEmpty) dividerSliver,
+      checkedItemWidgetsSliver
+    ]);
   }
 
-  Iterable<Widget> _buildItemWidgets({required Iterable<Item> fromItems}) =>
-      fromItems.map((item) => ItemWidget(item, onDelete: () async =>
-            await listModel.remove(item), onEdited: () async =>
-            await listModel.update(item)));
+  List<Widget> _buildItemWidgets(
+          {required Iterable<Item> fromItems, bool tappable = true}) =>
+      fromItems
+          .map((item) => ItemWidget(item,
+              tappable: tappable,
+              onDelete: () async => await listModel.remove(item),
+              onEdited: () async => await listModel.update(item)))
+          .toList();
 
   void _addNewItem() async {
     // Imitate the type of the last item.
@@ -90,8 +125,7 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            onSubmit: (newItem) async =>
-              await listModel.add(newItem),
+            onSubmit: (newItem) async => await listModel.add(newItem),
             item: newItem),
       );
     }
@@ -102,10 +136,13 @@ class _ListWidgetState extends State<ListWidget> {
     setState(() {});
   }
 
+  List<Item> _ordered(Iterable<Item> items) =>
+      items.sorted((a, b) => a.order - b.order);
+
   @override
   void dispose() {
     // Note we don't need to await for the subscription to cancel;
-    // this call is needed just so that unneeded and unreferenced 
+    // this call is needed just so that unneeded and unreferenced
     // subscriptions are removed from listModel's eventStream.
     eventStreamSubscription.cancel();
     super.dispose();
