@@ -5,7 +5,9 @@ import 'package:flutter_camera/flutter_camera.dart';
 // TODO: doc and manage cam lifetime
 class CameraPage extends StatefulWidget {
   final List<CameraDescription> cameras;
-  const CameraPage({super.key, required this.cameras});
+  final void Function(XFile) usePicture;
+  const CameraPage(
+      {super.key, required this.cameras, required this.usePicture});
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -47,9 +49,10 @@ class _CameraPageState extends State<CameraPage> {
                   onPressed: controller.value.isInitialized
                       ? () async {
                           if (mounted) {
-                            Navigator.pop(
-                                context, await controller.takePicture());
+                            Navigator.pop(context);
                           }
+                          widget
+                              .usePicture(await controller.takePicture());
                         }
                       : null,
                   child: const Icon(Icons.camera_alt)),

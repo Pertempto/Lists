@@ -29,37 +29,36 @@ class _ScanHandwrittenListPageState extends State<ScanHandwrittenListPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    availableCameras().then((cameras) => Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CameraPage(
+                cameras: cameras,
+                usePicture: (imageFile) =>
+                    setState(() => scanItemsFuture = scanItems(imageFile))))));
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO: improve OCR, allow for final picture edits.
-    return Scaffold(
-        body: scanItemsFuture == null
-            ? Center(
-                child: IconButton(
-                    icon: const Icon(Icons.camera_alt, size: 60.0),
-                    onPressed: () async {
-                      final cameras = await availableCameras();
-                      if (!mounted) return;
-                      final imageFile = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  CameraPage(cameras: cameras)));
-
-                      scanItemsFuture = scanItems(imageFile);
-
-                      setState(() {});
-                    }))
-            : FutureBuilder(
-                future: scanItemsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView(
-                        children: snapshot.data!
-                            .map((item) => ListTile(title: Text(item.value)))
-                            .toList());
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                }));
+    return () {
+            return Scaffold(
+                body: FutureBuilder(
+                    future: scanItemsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView(
+                            children: snapshot.data!
+                                .map(
+                                    (item) => ListTile(title: Text(item.value)))
+                                .toList());
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    }));
+          
+        }();
   }
 }
