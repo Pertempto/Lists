@@ -43,6 +43,10 @@ dependencies:
   adaptive_theme: ^3.2.0
   weekday_selector: ^1.1.0
   intl: ^0.18.1
+  camera: ^0.10.5+3
+  flutter_camera: ^1.0.0
+  google_mlkit_text_recognition: ^0.10.0
+  cross_file: ^0.3.3+4
 
 dev_dependencies:
   flutter_test:

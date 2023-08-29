@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
+import 'package:lists/view/scan_handwritten_list_page.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 
@@ -49,6 +52,32 @@ class _ListWidgetState extends State<ListWidget> {
               },
             ),
           ),
+          // Camera only works on these platforms
+          if (kIsWeb || Platform.isAndroid || Platform.isIOS)
+            PopupMenuButton(
+              child: const Icon(Icons.more_vert),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                    // TODO: better text
+                    child: const Text('Scan Handwritten Items'),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ScanHandwrittenListPage(
+                                      useItems: (items) async {
+                                    for (final item in items) {
+                                      await listModel.add(item);
+                                    }
+                                    await refreshItems();
+                                  })));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SizedBox()));
+                    })
+              ],
+            ),
         ],
       ),
       body: _buildBody(),
@@ -78,9 +107,9 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   Iterable<Widget> _buildItemWidgets({required Iterable<Item> fromItems}) =>
-      fromItems.map((item) => ItemWidget(item, onDelete: () async =>
-            await listModel.remove(item), onEdited: () async =>
-            await listModel.update(item)));
+      fromItems.map((item) => ItemWidget(item,
+          onDelete: () async => await listModel.remove(item),
+          onEdited: () async => await listModel.update(item)));
 
   void _addNewItem() async {
     // Imitate the type of the last item.
@@ -90,8 +119,7 @@ class _ListWidgetState extends State<ListWidget> {
       showDialog(
         context: context,
         builder: (context) => EditItemDialog(
-            onSubmit: (newItem) async =>
-              await listModel.add(newItem),
+            onSubmit: (newItem) async => await listModel.add(newItem),
             item: newItem),
       );
     }
@@ -105,7 +133,7 @@ class _ListWidgetState extends State<ListWidget> {
   @override
   void dispose() {
     // Note we don't need to await for the subscription to cancel;
-    // this call is needed just so that unneeded and unreferenced 
+    // this call is needed just so that unneeded and unreferenced
     // subscriptions are removed from listModel's eventStream.
     eventStreamSubscription.cancel();
     super.dispose();
