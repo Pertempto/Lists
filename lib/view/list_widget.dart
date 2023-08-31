@@ -114,7 +114,8 @@ class _ListWidgetState extends State<ListWidget> {
           .map((item) => ItemWidget(item,
               tappable: tappable,
               onDelete: () async => await listModel.remove(item),
-              onEdited: () async => await listModel.update(item)))
+              onEdited: () async => await listModel.update(item),
+              key: Key(item.id.toString())))
           .toList();
 
   void _addNewItem() async {
