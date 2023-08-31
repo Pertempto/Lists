@@ -57,29 +57,23 @@ class _ItemWidgetState extends State<ItemWidget> {
     if (widget.item.itemType == ItemType.checkbox) {
       checkbox = Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: Container(
-            color: Colors.blue,
-            child: Checkbox(
-              value: widget.item.isChecked,
-              onChanged: _onNewCheckedState,
-              visualDensity: VisualDensity.compact,
-            ),
+          child: Checkbox(
+            value: widget.item.isChecked,
+            onChanged: _onNewCheckedState,
+            visualDensity: VisualDensity.compact,
           ));
 
       textDecoration =
           widget.item.isChecked ? TextDecoration.lineThrough : null;
     }
 
-    Widget textField = Container(
-      color: Colors.red,
-      child: TextField(
-        controller: _controller,
-        decoration:
-            const InputDecoration(border: InputBorder.none, isDense: true),
-        style: itemTextStyle.copyWith(decoration: textDecoration),
-        focusNode: _focusNode,
-        enabled: !widget.item.isChecked,
-      ),
+    Widget textField = TextField(
+      controller: _controller,
+      decoration:
+          const InputDecoration(border: InputBorder.none, isDense: true),
+      style: itemTextStyle.copyWith(decoration: textDecoration),
+      focusNode: _focusNode,
+      enabled: !widget.item.isChecked,
     );
 
     return Padding(
