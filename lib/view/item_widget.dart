@@ -13,14 +13,12 @@ class ItemWidget extends StatefulWidget {
   final bool tappable;
   final void Function() onFocus;
   final void Function() onUnfocus;
-  final void Function() onDelete;
   final void Function() onEdited;
 
   const ItemWidget(this.item,
       {this.tappable = true,
       required this.onFocus,
       required this.onUnfocus,
-      required this.onDelete,
       required this.onEdited,
       super.key});
 
@@ -142,13 +140,6 @@ class _ItemWidgetState extends State<ItemWidget> {
           ),
         ),
       );
-
-  void _showEditDialog() => showDialog(
-      context: context,
-      builder: (context) => EditItemDialog(
-          onSubmit: (_) => updateThis(),
-          onDelete: widget.onDelete,
-          item: widget.item));
 
   void updateThis() {
     widget.onEdited();

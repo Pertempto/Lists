@@ -9,6 +9,8 @@ import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:reorderables/reorderables.dart';
 
+import 'confirmation_dialog.dart';
+
 /// ListWidget:
 ///   - a widget representing a ListModel
 class ListWidget extends StatefulWidget {
@@ -126,7 +128,6 @@ class _ListWidgetState extends State<ListWidget> {
               tappable: tappable,
               onFocus: () => setState(() => selectedItem = item),
               onUnfocus: () => setState(() => selectedItem = null),
-              onDelete: () async => await listModel.remove(item),
               onEdited: () async => await listModel.update(item),
               key: Key(item.id.toString())))
           .toList();
@@ -165,9 +166,7 @@ class _ListWidgetState extends State<ListWidget> {
                   icon: const Icon(Icons.repeat),
                 ),
                 IconButton(
-                  onPressed: () {
-                    print('DELETE!');
-                  },
+                  onPressed: () => listModel.remove(selectedItem!),
                   icon: const Icon(Icons.delete),
                 ),
               ]
