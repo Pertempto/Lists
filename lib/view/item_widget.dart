@@ -11,11 +11,15 @@ import 'package:lists/view/repeat_dialog.dart';
 class ItemWidget extends StatefulWidget {
   final Item item;
   final bool tappable;
+  final void Function() onFocus;
+  final void Function() onUnfocus;
   final void Function() onDelete;
   final void Function() onEdited;
 
   const ItemWidget(this.item,
       {this.tappable = true,
+      required this.onFocus,
+      required this.onUnfocus,
       required this.onDelete,
       required this.onEdited,
       super.key});
@@ -33,9 +37,12 @@ class _ItemWidgetState extends State<ItemWidget> {
     super.initState();
     _controller = TextEditingController(text: widget.item.value);
     _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
+      if (_focusNode.hasFocus) {
+        widget.onFocus();
+      } else {
         widget.item.value = _controller.text;
         updateThis();
+        widget.onUnfocus();
       }
     });
   }

@@ -25,6 +25,7 @@ class _ListWidgetState extends State<ListWidget> {
   late Iterable<Item> itemsToBeDisplayed;
   String searchQuery = '';
   bool isReordering = false;
+  Item? selectedItem;
 
   late final StreamSubscription<ListModelEvent> eventStreamSubscription;
 
@@ -101,11 +102,21 @@ class _ListWidgetState extends State<ListWidget> {
         delegate: SliverChildListDelegate(_buildItemWidgets(
             fromItems: checkedItems, tappable: !isReordering)));
 
-    return CustomScrollView(slivers: [
-      unCheckedItemWidgetsSliver,
-      if (checkedItems.isNotEmpty) dividerSliver,
-      checkedItemWidgetsSliver
-    ]);
+    return Column(
+      children: [
+        Expanded(
+          child: CustomScrollView(
+            slivers: [
+              unCheckedItemWidgetsSliver,
+              if (checkedItems.isNotEmpty) dividerSliver,
+              checkedItemWidgetsSliver
+            ],
+            shrinkWrap: true,
+          ),
+        ),
+        _buildToolBar()
+      ],
+    );
   }
 
   List<Widget> _buildItemWidgets(
@@ -113,6 +124,8 @@ class _ListWidgetState extends State<ListWidget> {
       fromItems
           .map((item) => ItemWidget(item,
               tappable: tappable,
+              onFocus: () => setState(() => selectedItem = item),
+              onUnfocus: () => setState(() => selectedItem = null),
               onDelete: () async => await listModel.remove(item),
               onEdited: () async => await listModel.update(item),
               key: Key(item.id.toString())))
@@ -130,6 +143,37 @@ class _ListWidgetState extends State<ListWidget> {
             item: newItem),
       );
     }
+  }
+
+  Widget _buildToolBar() {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      color: colorScheme.surfaceVariant,
+      child: Row(
+        children: selectedItem != null
+            ? [
+                IconButton(
+                  onPressed: () {
+                    print('TOGGLE TYPE!');
+                  },
+                  icon: const Icon(Icons.check_box_outlined),
+                ),
+                IconButton(
+                  onPressed: () {
+                    print('REPEAT CONFIG');
+                  },
+                  icon: const Icon(Icons.repeat),
+                ),
+                IconButton(
+                  onPressed: () {
+                    print('DELETE!');
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+              ]
+            : [],
+      ),
+    );
   }
 
   Future<void> refreshItems() async {
