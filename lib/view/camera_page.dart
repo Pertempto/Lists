@@ -16,13 +16,14 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
   late CameraController controller;
   bool hasError = false;
+  bool takingPicture = false;
 
   Future<void> _initCameraController(CameraDescription camera) async {
     controller =
         CameraController(camera, ResolutionPreset.max, enableAudio: false);
     try {
       await controller.initialize();
-    } on CameraException catch (e) {
+    } on CameraException {
       hasError = true;
     }
     if (mounted) setState(() {});
@@ -37,28 +38,34 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      children: [
-        Expanded(child: _buildCameraPreview()),
-        //TODO fix for flipped screens.
-        Container(
-            width: double.infinity,
-            height: 100,
-            child: Center(
-              child: FloatingActionButton(
-                  onPressed: controller.value.isInitialized
-                      ? () async {
-                          if (mounted) {
-                            Navigator.pop(context);
-                          }
-                          widget
-                              .usePicture(await controller.takePicture());
-                        }
-                      : null,
-                  child: const Icon(Icons.camera_alt)),
-            ))
-      ],
-    ));
+        body: Stack(children: [
+      Column(
+        children: [
+          Expanded(child: _buildCameraPreview()),
+          //TODO fix for flipped screens.
+          Container(
+              width: double.infinity,
+              height: 100,
+              child: Center(
+                child: !takingPicture
+                    ? FloatingActionButton(
+                        onPressed: controller.value.isInitialized
+                            ? () async {
+                                setState(() => takingPicture = true);
+                                final picture = await controller.takePicture();
+                                if (mounted) {
+                                  Navigator.pop(context);
+                                }
+                                widget.usePicture(picture);
+                              }
+                            : null,
+                        child: const Icon(Icons.camera_alt))
+                    : const FloatingActionButton(
+                        onPressed: null, child: CircularProgressIndicator()),
+              ))
+        ],
+      ),
+    ]));
   }
 
   Widget _buildCameraPreview() {
@@ -75,6 +82,18 @@ class _CameraPageState extends State<CameraPage> {
       );
     } else {
       return const Center(child: CircularProgressIndicator());
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // App state changed before we got the chance to initialize.
+    if (!controller.value.isInitialized) return;
+
+    if (state == AppLifecycleState.inactive) {
+      controller.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      _initCameraController(controller.description);
     }
   }
 
