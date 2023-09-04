@@ -23,6 +23,8 @@ class ListModel {
   @ignore
   ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
 
+  @ignore
+  int get itemCount => items.length;
   Iterable<Item> itemsView() => items;
 
   @ignore
@@ -47,6 +49,8 @@ class ListModel {
   }
 
   Future<void> add(Item newItem) async {
+    // Use an order value larger than the largest order value.
+    newItem.order = (maxBy(items, (item) => item.order)?.order ?? -1) + 1;
     await DatabaseManager.putItem(newItem);
     if (items.add(newItem)) {
       await DatabaseManager.updateListModelItems(this);
@@ -59,7 +63,7 @@ class ListModel {
     if (items.contains(item)) {
       await DatabaseManager.putItem(item);
 
-      final databaseItem = items.lookup(item)!;
+      final databaseItem = lookup(item);
       // The following ensures that the copy of `item` that `this` has is up to date.
       item.copyOnto(databaseItem);
       databaseItem.updateScheduledTimer(timerCallback: update);
@@ -76,6 +80,12 @@ class ListModel {
       _eventStreamController.add(ListModelEvent.itemRemoved);
     }
   }
+
+  /// Gets the `Item` stored in `IsarLinks` with `item`'s id.
+  Item lookup(Item item) => items.lookup(item)!;
+
+  Future<void> reorderItems(List<Item> items) async =>
+      DatabaseManager.putItems(items);
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
     final words = _parseSearchStr(searchQuery);

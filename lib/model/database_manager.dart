@@ -51,6 +51,9 @@ class DatabaseManager {
     return item;
   }
 
+  static Future<void> putItems(List<Item> items) async =>
+      await isar.writeTxn(() async => await isar.items.putAll(items));
+
   static Future<void> deleteItem(Item item) async {
     item.dispose();
     await isar.writeTxn(() async => await isar.items.delete(item.id));
