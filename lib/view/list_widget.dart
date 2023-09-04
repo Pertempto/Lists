@@ -73,10 +73,6 @@ class _ListWidgetState extends State<ListWidget> {
                                     }
                                     await refreshItems();
                                   })));
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SizedBox()));
                     })
               ],
             ),

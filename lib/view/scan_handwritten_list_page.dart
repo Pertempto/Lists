@@ -96,78 +96,54 @@ class _ScanHandwrittenListPageState extends State<ScanHandwrittenListPage> {
                           onEdited: () => setState(() {})))
                       .toList()),
               floatingActionButton: FloatingActionButton.extended(
-                  onPressed: _showAddItemsDialog,
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await widget.useItems(scannedItems);
+                  },
                   icon: const Icon(Icons.add),
                   label: const Text('Add Items')),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerFloat,
+              persistentFooterButtons: [
+                IconButton(
+                    icon: const Icon(Icons.camera_alt),
+                    tooltip: 'Retake Picture',
+                    onPressed: () =>
+                        availableCameras().then((cameras) => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CameraPage(
+                                    cameras: cameras,
+                                    usePicture: (imageFile) => setState(() {
+                                          scanItemsFuture =
+                                              scanItems(imageFile);
+                                        })))))),
+                IconButton(
+                    tooltip: 'Toggle whether all items are checkbox or text',
+                    icon: const Icon(Icons.check_box),
+                    onPressed: () => setState(() => scannedItems.forEach(
+                        scannedItems.first.itemType == ItemType.checkbox
+                            ? (element) {
+                                element.itemType = ItemType.text;
+                              }
+                            : (element) {
+                                element.itemType = ItemType.checkbox;
+                              }))),
+                IconButton(
+                    tooltip: 'Discard',
+                    icon: const Icon(Icons.cancel),
+                    color: Colors.red,
+                    onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => ConfirmationDialog(
+                            description: 'Discard All Scanned Items?',
+                            onConfirm: () => Navigator.pop(context)))),
+              ],
             );
           } else {
             return const Scaffold(
                 body: Center(child: CircularProgressIndicator()));
           }
         });
-  }
-
-  void _showAddItemsDialog() {
-    showDialog(
-        context: context,
-        builder: (context) => GIVEMEANAME(
-            initialAreCheckbox: scannedItems.every(
-                    (item) => scannedItems.first.itemType == item.itemType)
-                ? scannedItems.first.itemType == ItemType.checkbox
-                : null,
-            onSubmit: (areCheckbox) async {
-              Navigator.pop(context);
-              await widget.useItems(areCheckbox != null
-                  ? (scannedItems
-                    ..forEach((item) => item.itemType =
-                        areCheckbox ? ItemType.checkbox : ItemType.text))
-                  : scannedItems);
-            }));
-  }
-}
-
-class GIVEMEANAME extends StatefulWidget {
-  final void Function(bool?) onSubmit;
-  const GIVEMEANAME(
-      {super.key, required this.initialAreCheckbox, required this.onSubmit});
-
-  final bool? initialAreCheckbox;
-
-  @override
-  State<GIVEMEANAME> createState() => _GIVEMEANAMEState();
-}
-
-class _GIVEMEANAMEState extends State<GIVEMEANAME> {
-  late bool? areCheckbox = widget.initialAreCheckbox;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Final Edits'),
-      content: Column(mainAxisSize: MainAxisSize.min, children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Checkbox?'),
-            Checkbox(
-              value: areCheckbox,
-              onChanged: (newAreCheckbox) =>
-                  setState(() => areCheckbox = newAreCheckbox),
-              tristate: areCheckbox == null,
-            )
-          ],
-        )
-      ]),
-      actions: [
-        SubmitButton(
-          onPressed: () {
-            Navigator.pop(context);
-            widget.onSubmit(areCheckbox);
-          },
-        )
-      ],
-    );
   }
 }
