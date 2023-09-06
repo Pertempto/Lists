@@ -1,7 +1,7 @@
 import 'dart:async' show Timer;
 
 import 'package:isar/isar.dart';
-import 'package:lists/model/repeat_configuration.dart';
+import 'package:lists/model/repeat_config.dart';
 part 'item_scheduling.g.dart';
 
 /// ItemScheduling:
