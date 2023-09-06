@@ -105,10 +105,10 @@ class _EditItemDialogState extends State<EditItemDialog> {
         builder: (context) => RepeatDialog(
             onSubmit: (newRepeatConfig) {
               selectedScheduling =
-                  ItemScheduling.fromRepeatConfiguration(newRepeatConfig);
+                  ItemScheduling.fromRepeatConfig(newRepeatConfig);
               setState(() {});
             },
-            repeatConfig: selectedScheduling?.repeatConfiguration));
+            repeatConfig: selectedScheduling?.repeatConfig));
   }
 
   void _submitNewItemValue() {

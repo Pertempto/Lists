@@ -132,11 +132,11 @@ class _ItemWidgetState extends State<ItemWidget> {
                 builder: (context) => RepeatDialog(
                     onSubmit: (newRepeatConfig) async {
                       widget.item.scheduling =
-                          ItemScheduling.fromRepeatConfiguration(
+                          ItemScheduling.fromRepeatConfig(
                               newRepeatConfig);
                       updateThis();
                     },
-                    repeatConfig: widget.item.scheduling?.repeatConfiguration)),
+                    repeatConfig: widget.item.scheduling?.repeatConfig)),
           ),
         ),
       );

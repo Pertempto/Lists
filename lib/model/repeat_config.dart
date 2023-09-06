@@ -1,27 +1,27 @@
 import 'package:collection/collection.dart';
 import 'package:isar/isar.dart';
-part 'repeat_configuration.g.dart';
+part 'repeat_config.g.dart';
 
-/// RepeatConfiguration:
+/// RepeatConfig:
 ///   - This class contains the information used by `ItemScheduling` to 
 ///     schedule/reschedule a repeating item.
 @embedded
-class RepeatConfiguration {
+class RepeatConfig {
   late List<int> weekdays;
   int hour = 0;
   int minute = 0;
 
   // We need a default constructor for isar.
-  RepeatConfiguration();
+  RepeatConfig();
 
-  RepeatConfiguration.weekly(
+  RepeatConfig.weekly(
       {required this.weekdays, this.hour = 0, this.minute = 0});
 
-  factory RepeatConfiguration.fromNow() =>
-      RepeatConfiguration.weekly(weekdays: [DateTime.now().weekday]);
+  factory RepeatConfig.fromNow() =>
+      RepeatConfig.weekly(weekdays: [DateTime.now().weekday]);
 
   /// Used by `Item.copyOnto()`. Returns a deep copy of `this`.
-  RepeatConfiguration copy() => RepeatConfiguration.weekly(
+  RepeatConfig copy() => RepeatConfig.weekly(
       weekdays: weekdays.toList(), hour: hour, minute: minute);
 
   DateTime get nextRepeat {

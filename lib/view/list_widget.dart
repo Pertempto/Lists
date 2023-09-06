@@ -5,10 +5,12 @@ import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
+import 'package:lists/view/repeat_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:reorderables/reorderables.dart';
 
+import '../model/item_scheduling.dart';
 import 'confirmation_dialog.dart';
 
 /// ListWidget:
@@ -127,7 +129,9 @@ class _ListWidgetState extends State<ListWidget> {
           .map((item) => ItemWidget(item,
               tappable: tappable,
               onFocus: () => setState(() => selectedItem = item),
-              onUnfocus: () => setState(() => selectedItem = null),
+              onUnfocus: () => print(
+                  'unfocus'), // TODO: figure out how to handle this better
+              // onUnfocus: () => setState(() => selectedItem = null),
               onEdited: () async => await listModel.update(item),
               key: Key(item.id.toString())))
           .toList();
@@ -148,25 +152,48 @@ class _ListWidgetState extends State<ListWidget> {
 
   Widget _buildToolBar() {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // Create a local variable to store the item, so that it will be promoted
+    // to non-nullable type inside null-check
+    // See https://stackoverflow.com/a/65035575
+    var item = selectedItem;
     return Container(
       color: colorScheme.surfaceVariant,
       child: Row(
-        children: selectedItem != null
+        children: item != null
             ? [
+                if (item.itemType == ItemType.checkbox)
+                  IconButton(
+                    onPressed: () {
+                      item.itemType = ItemType.text;
+                      listModel.update(item);
+                    },
+                    icon: const Icon(Icons.text_fields),
+                  ),
+                if (item.itemType == ItemType.text)
+                  IconButton(
+                    onPressed: () {
+                      item.itemType = ItemType.checkbox;
+                      listModel.update(item);
+                    },
+                    icon: const Icon(Icons.check_box_outlined),
+                  ),
                 IconButton(
                   onPressed: () {
-                    print('TOGGLE TYPE!');
-                  },
-                  icon: const Icon(Icons.check_box_outlined),
-                ),
-                IconButton(
-                  onPressed: () {
-                    print('REPEAT CONFIG');
+                    showDialog(
+                        context: context,
+                        builder: (context) => RepeatDialog(
+                            onSubmit: (config) {
+                              item.scheduling =
+                                  ItemScheduling.fromRepeatConfig(config);
+                              listModel.update(item);
+                            },
+                            repeatConfig:
+                                item.scheduling?.repeatConfig));
                   },
                   icon: const Icon(Icons.repeat),
                 ),
                 IconButton(
-                  onPressed: () => listModel.remove(selectedItem!),
+                  onPressed: () => listModel.remove(item),
                   icon: const Icon(Icons.delete),
                 ),
               ]
