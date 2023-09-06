@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:lists/model/item_scheduling.dart';
-import 'package:lists/model/repeat_configuration.dart';
+import 'package:lists/model/repeat_config.dart';
 part 'item.g.dart';
 
 /// Item:
