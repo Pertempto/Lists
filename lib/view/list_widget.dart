@@ -167,7 +167,7 @@ class _ListWidgetState extends State<ListWidget> {
                       item.itemType = ItemType.text;
                       listModel.update(item);
                     },
-                    icon: const Icon(Icons.text_fields),
+                    icon: const Icon(Icons.text_format),
                   ),
                 if (item.itemType == ItemType.text)
                   IconButton(
