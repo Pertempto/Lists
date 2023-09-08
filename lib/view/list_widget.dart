@@ -54,26 +54,24 @@ class _ListWidgetState extends State<ListWidget> {
               },
             ),
           ),
-          // Camera only works on these platforms
+          // Camera only works on these platforms; move to the inside of the itemBuilder if more buttons are added to the more menu
           if (kIsWeb || Platform.isAndroid || Platform.isIOS)
             PopupMenuButton(
               child: const Icon(Icons.more_vert),
               itemBuilder: (context) => [
                 PopupMenuItem(
-                    // TODO: better text
-                    child: const Text('Scan Handwritten Items'),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ScanHandwrittenListPage(
-                                      useItems: (items) async {
-                                    for (final item in items) {
-                                      await listModel.add(item);
-                                    }
-                                    await refreshItems();
-                                  })));
-                    })
+                    child: const Text('Extract Handwritten Items'),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                HandwrittenItemsExtractionPage(
+                                    useItems: (items) async {
+                                  for (final item in items) {
+                                    await listModel.add(item);
+                                  }
+                                  await refreshItems();
+                                }))))
               ],
             ),
         ],

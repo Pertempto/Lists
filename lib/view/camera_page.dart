@@ -1,8 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_camera/flutter_camera.dart';
+import 'package:flutter/services.dart';
 
-// TODO: doc and manage cam lifetime
+// CameraPage:
+//  - a page where the user can use their camera to take a picture
 class CameraPage extends StatefulWidget {
   final List<CameraDescription> cameras;
   final void Function(XFile) usePicture;
@@ -13,10 +14,16 @@ class CameraPage extends StatefulWidget {
   State<CameraPage> createState() => _CameraPageState();
 }
 
-class _CameraPageState extends State<CameraPage> {
+class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   late CameraController controller;
   bool hasError = false;
   bool takingPicture = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initCameraController(widget.cameras[0]);
+  }
 
   Future<void> _initCameraController(CameraDescription camera) async {
     controller =
@@ -30,52 +37,46 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _initCameraController(widget.cameras.first);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(children: [
-      Column(
-        children: [
-          Expanded(child: _buildCameraPreview()),
-          //TODO fix for flipped screens.
-          Container(
-              width: double.infinity,
-              height: 100,
-              child: Center(
-                child: !takingPicture
-                    ? FloatingActionButton(
-                        onPressed: controller.value.isInitialized
-                            ? () async {
-                                setState(() => takingPicture = true);
-                                final picture = await controller.takePicture();
-                                if (mounted) {
-                                  Navigator.pop(context);
-                                }
-                                widget.usePicture(picture);
-                              }
-                            : null,
-                        child: const Icon(Icons.camera_alt))
-                    : const FloatingActionButton(
-                        onPressed: null, child: CircularProgressIndicator()),
-              ))
-        ],
-      ),
-    ]));
+    return FutureBuilder(
+      future:
+          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
+      builder: (context, snapshot) =>
+          snapshot.connectionState == ConnectionState.done
+              ? Scaffold(
+                  body: Stack(children: [
+                  Column(
+                    children: [
+                      Expanded(child: _buildCameraPreview()),
+                      SizedBox(
+                          width: double.infinity,
+                          height: 100,
+                          child: Center(
+                            child: takingPicture
+                                ? const FloatingActionButton(
+                                    onPressed: null,
+                                    child: CircularProgressIndicator())
+                                : FloatingActionButton(
+                                    onPressed: controller.value.isInitialized
+                                        ? _takePicture
+                                        : null,
+                                    child: const Icon(Icons.camera_alt)),
+                          ))
+                    ],
+                  ),
+                ]))
+              : const SizedBox(),
+    );
   }
 
   Widget _buildCameraPreview() {
     if (controller.value.isInitialized) {
       return CameraPreview(controller);
     } else if (hasError) {
-      return Column(
+      return const Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Icon(Icons.error, color: Colors.red),
           Text('Camera Error', style: TextStyle(color: Colors.red)),
         ],
@@ -85,9 +86,17 @@ class _CameraPageState extends State<CameraPage> {
     }
   }
 
+  Future<void> _takePicture() async {
+    setState(() => takingPicture = true);
+    final picture = await controller.takePicture();
+    await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    if (mounted) Navigator.pop(context);
+    widget.usePicture(picture);
+  }
+
+  // For why this is needed, see https://pub.dev/packages/camera#handling-lifecycle-states
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // App state changed before we got the chance to initialize.
     if (!controller.value.isInitialized) return;
 
     if (state == AppLifecycleState.inactive) {
