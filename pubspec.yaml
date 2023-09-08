@@ -20,7 +20,7 @@ version: 1.0.0+1
 isar_version: &isar_version 3.0.0 # define the version to be used
 
 environment:
-  sdk: '>=2.19.0-444.2.beta <3.0.0'
+  sdk: '>=2.19.0 <3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -44,6 +44,10 @@ dependencies:
   reorderables: ^0.6.0
   weekday_selector: ^1.1.0
   intl: ^0.18.1
+  camera: ^0.10.5+3
+  flutter_camera: ^1.0.0
+  google_mlkit_text_recognition: ^0.10.0
+  cross_file: ^0.3.3+4
 
 dev_dependencies:
   flutter_test:

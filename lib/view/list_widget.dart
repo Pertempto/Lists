@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchBar;
 import 'package:lists/view/edit_item_dialog.dart';
+import 'package:lists/view/scan_handwritten_list_page.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:reorderables/reorderables.dart';
@@ -51,6 +54,26 @@ class _ListWidgetState extends State<ListWidget> {
               },
             ),
           ),
+          // Camera only works on these platforms; move to the inside of the itemBuilder if more buttons are added to the more menu
+          if (kIsWeb || Platform.isAndroid || Platform.isIOS)
+            PopupMenuButton(
+              child: const Icon(Icons.more_vert),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                    child: const Text('Extract Handwritten Items'),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                HandwrittenItemsExtractionPage(
+                                    useItems: (items) async {
+                                  for (final item in items) {
+                                    await listModel.add(item);
+                                  }
+                                  await refreshItems();
+                                }))))
+              ],
+            ),
         ],
       ),
       body: _buildBody(),
