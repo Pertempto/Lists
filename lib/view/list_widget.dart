@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
@@ -149,6 +151,14 @@ class _ListWidgetState extends State<ListWidget> {
       items.sorted((a, b) => a.order - b.order);
 
   Future<void> _exportAsMarkdown() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      await _exportAsMarkdownMobile();
+    } else {
+      await _exportAsMarkdownDesktop();
+    }
+  }
+
+  Future<void> _exportAsMarkdownDesktop() async {
     final filePath = await FilePicker.platform.saveFile(
         fileName: '${widget.listModel.title}.md',
         type: FileType.custom,
@@ -156,11 +166,44 @@ class _ListWidgetState extends State<ListWidget> {
 
     if (filePath != null) {
       await File(filePath).writeAsString(listModel.asMarkdown());
-      if (context.mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Exported as markdown successfully')));
+            const SnackBar(content: Text('Exported as Markdown successfully')));
       }
     }
+  }
+
+  Future<void> _exportAsMarkdownMobile() async {
+    final controller = TextEditingController(text: '${listModel.title}.md');
+
+    await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Row(children: [
+                const Text('File Name'),
+                SizedBox(width: 100, child: TextField(controller: controller)),
+              ]),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel')),
+                FilledButton(
+                    onPressed: () async {
+                      await DocumentFileSavePlus.saveFile(
+                          Uint8List.fromList(listModel.asMarkdown().codeUnits),
+                          controller.text,
+                          'text/markdown');
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content:
+                                Text('Exported as Markdown successfully')));
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text('Export'))
+              ],
+            ));
   }
 
   @override

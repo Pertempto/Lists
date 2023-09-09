@@ -45,6 +45,7 @@ dependencies:
   weekday_selector: ^1.1.0
   intl: ^0.18.1
   file_picker: ^5.5.0
+  document_file_save_plus: ^1.0.4
 
 dev_dependencies:
   flutter_test:
