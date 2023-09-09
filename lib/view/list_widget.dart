@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
@@ -12,6 +10,8 @@ import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:reorderables/reorderables.dart';
+
+import 'export_as_markdown_mobile_dialog.dart';
 
 /// ListWidget:
 ///   - a widget representing a ListModel
@@ -153,16 +153,18 @@ class _ListWidgetState extends State<ListWidget> {
   Future<void> _exportAsMarkdown() async {
     // We have to have separate exportAsMarkdown functions for mobile and desktop
     // because the file_picker package (https://pub.dev/packages/file_picker) only
-    // supports saving files (using a native file picker) in desktop. This package
-    // seemed far superior to its competitors.
-    if (Platform.isAndroid || Platform.isIOS) {
-      await _exportAsMarkdownMobile();
-    } else {
-      await _exportAsMarkdownDesktop();
+    // supports saving files in desktop. This package seemed far superior to its competitors.
+    final didExportAsMarkdown = (Platform.isAndroid || Platform.isIOS)
+        ? await _exportAsMarkdownOnMobile()
+        : await _exportAsMarkdownOnDesktop();
+
+    if (didExportAsMarkdown && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Exported as Markdown successfully')));
     }
   }
 
-  Future<void> _exportAsMarkdownDesktop() async {
+  Future<bool> _exportAsMarkdownOnDesktop() async {
     final filePath = await FilePicker.platform.saveFile(
         fileName: '${widget.listModel.title}.md',
         type: FileType.custom,
@@ -170,19 +172,17 @@ class _ListWidgetState extends State<ListWidget> {
 
     if (filePath != null) {
       await File(filePath).writeAsString(listModel.asMarkdown());
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Exported as Markdown successfully')));
-      }
+      return true;
     }
+    return false;
   }
 
-  Future<void> _exportAsMarkdownMobile() async {
-    await showDialog(
-        context: context,
-        builder: (context) =>
-            ExportAsMarkdownMobileDialog(listModel: listModel));
-  }
+  Future<bool> _exportAsMarkdownOnMobile() async =>
+      await showDialog(
+          context: context,
+          builder: (context) =>
+              ExportAsMarkdownOnMobileDialog(listModel: listModel)) ??
+      false;
 
   @override
   void dispose() {
@@ -191,39 +191,5 @@ class _ListWidgetState extends State<ListWidget> {
     // subscriptions are removed from listModel's eventStream.
     eventStreamSubscription.cancel();
     super.dispose();
-  }
-}
-
-class ExportAsMarkdownMobileDialog extends StatelessWidget {
-  ExportAsMarkdownMobileDialog({super.key, required this.listModel});
-
-  final ListModel listModel;
-  late final TextEditingController controller =
-      TextEditingController(text: '${listModel.title}.md');
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      content: SizedBox(child: TextField(controller: controller)),
-      actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel')),
-        FilledButton(
-            onPressed: () async {
-              await DocumentFileSavePlus.saveFile(
-                  Uint8List.fromList(listModel.asMarkdown().codeUnits),
-                  controller.text,
-                  'text/markdown');
-
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Exported as Markdown successfully')));
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Export'))
-      ],
-    );
   }
 }
