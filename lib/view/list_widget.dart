@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchBar;
 import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
@@ -51,6 +53,13 @@ class _ListWidgetState extends State<ListWidget> {
               },
             ),
           ),
+          PopupMenuButton(
+              child: const Icon(Icons.more_vert),
+              itemBuilder: (context) => [
+                    PopupMenuItem(
+                        onTap: _exportAsMarkdown,
+                        child: const Text('Export as Markdown'))
+                  ]),
         ],
       ),
       body: _buildBody(),
@@ -138,6 +147,21 @@ class _ListWidgetState extends State<ListWidget> {
 
   List<Item> _ordered(Iterable<Item> items) =>
       items.sorted((a, b) => a.order - b.order);
+
+  Future<void> _exportAsMarkdown() async {
+    final filePath = await FilePicker.platform.saveFile(
+        fileName: '${widget.listModel.title}.md',
+        type: FileType.custom,
+        allowedExtensions: ['md']);
+
+    if (filePath != null) {
+      await File(filePath).writeAsString(listModel.asMarkdown());
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Exported as markdown successfully')));
+      }
+    }
+  }
 
   @override
   void dispose() {

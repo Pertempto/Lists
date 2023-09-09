@@ -113,6 +113,13 @@ class ListModel {
     }
     await _eventStreamController.close();
   }
+
+  String asMarkdown() => ['## $title'].followedBy(items.map((item) {
+        final leading = (item.itemType == ItemType.checkbox
+            ? '- [${item.isChecked ? 'x' : ' '}] '
+            : '-');
+        return '$leading ${item.value}';
+      })).join('\n');
 }
 
 class ListModelError implements Exception {
