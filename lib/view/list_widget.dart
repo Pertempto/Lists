@@ -151,6 +151,10 @@ class _ListWidgetState extends State<ListWidget> {
       items.sorted((a, b) => a.order - b.order);
 
   Future<void> _exportAsMarkdown() async {
+    // We have to have separate exportAsMarkdown functions for mobile and desktop
+    // because the file_picker package (https://pub.dev/packages/file_picker) only
+    // supports saving files (using a native file picker) in desktop. This package
+    // seemed far superior to its competitors.
     if (Platform.isAndroid || Platform.isIOS) {
       await _exportAsMarkdownMobile();
     } else {
@@ -174,36 +178,10 @@ class _ListWidgetState extends State<ListWidget> {
   }
 
   Future<void> _exportAsMarkdownMobile() async {
-    final controller = TextEditingController(text: '${listModel.title}.md');
-
     await showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-              content: Row(children: [
-                const Text('File Name'),
-                SizedBox(width: 100, child: TextField(controller: controller)),
-              ]),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel')),
-                FilledButton(
-                    onPressed: () async {
-                      await DocumentFileSavePlus.saveFile(
-                          Uint8List.fromList(listModel.asMarkdown().codeUnits),
-                          controller.text,
-                          'text/markdown');
-
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content:
-                                Text('Exported as Markdown successfully')));
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text('Export'))
-              ],
-            ));
+        builder: (context) =>
+            ExportAsMarkdownMobileDialog(listModel: listModel));
   }
 
   @override
@@ -213,5 +191,39 @@ class _ListWidgetState extends State<ListWidget> {
     // subscriptions are removed from listModel's eventStream.
     eventStreamSubscription.cancel();
     super.dispose();
+  }
+}
+
+class ExportAsMarkdownMobileDialog extends StatelessWidget {
+  ExportAsMarkdownMobileDialog({super.key, required this.listModel});
+
+  final ListModel listModel;
+  late final TextEditingController controller =
+      TextEditingController(text: '${listModel.title}.md');
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: SizedBox(child: TextField(controller: controller)),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel')),
+        FilledButton(
+            onPressed: () async {
+              await DocumentFileSavePlus.saveFile(
+                  Uint8List.fromList(listModel.asMarkdown().codeUnits),
+                  controller.text,
+                  'text/markdown');
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Exported as Markdown successfully')));
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Export'))
+      ],
+    );
   }
 }
