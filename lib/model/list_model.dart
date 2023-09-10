@@ -116,7 +116,7 @@ class ListModel {
 
   String asMarkdown({required bool includeLabels}) {
     var ret = '## $title\n';
-    if (includeLabels) ret += labels.map((label) => '#label').join(' ') + '\n';
+    if (includeLabels) ret += '${labels.map((label) => '#label').join(' ')}\n';
 
     return ret +
         items.map((item) {

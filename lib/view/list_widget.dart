@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
@@ -154,36 +156,49 @@ class _ListWidgetState extends State<ListWidget> {
     // We have to have separate exportAsMarkdown functions for mobile and desktop
     // because the file_picker package (https://pub.dev/packages/file_picker) only
     // supports saving files in desktop. This package seemed far superior to its competitors.
-    final didExportAsMarkdown = (Platform.isAndroid || Platform.isIOS)
-        ? await _exportAsMarkdownOnMobile()
-        : await _exportAsMarkdownOnDesktop();
+    if (Platform.isAndroid || Platform.isIOS) {
+      await _exportAsMarkdownOnMobile();
+    } else {
+      await _exportAsMarkdownOnDesktop();
+    }
+  }
 
-    if (didExportAsMarkdown && mounted) {
+  Future<void> _exportAsMarkdownOnDesktop() async => await showDialog(
+      context: context,
+      builder: (context) => ExportListAsMarkdownDialog(
+          listModel: listModel,
+          includeFileNameTextField: false,
+          onExport: (filename, markdown) async {
+            final filePath = await FilePicker.platform.saveFile(
+                fileName: filename,
+                type: FileType.custom,
+                allowedExtensions: ['md']);
+
+            if (filePath != null) {
+              await File(filePath).writeAsString(markdown);
+              _onSuccessfulMarkdownExport();
+            }
+          }));
+
+  Future<void> _exportAsMarkdownOnMobile() async => await showDialog(
+      context: context,
+      builder: (context) => ExportListAsMarkdownDialog(
+          listModel: listModel,
+          includeFileNameTextField: true,
+          onExport: (filename, markdown) async {
+            await DocumentFileSavePlus.saveFile(
+                Uint8List.fromList(markdown.codeUnits),
+                filename,
+                'text/markdown');
+            _onSuccessfulMarkdownExport();
+          }));
+
+  void _onSuccessfulMarkdownExport() {
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Exported as Markdown successfully')));
     }
   }
-
-  Future<bool> _exportAsMarkdownOnDesktop() async {
-    final filePath = await FilePicker.platform.saveFile(
-        fileName: '${widget.listModel.title}.md',
-        type: FileType.custom,
-        allowedExtensions: ['md']);
-
-    if (filePath != null) {
-      await File(filePath)
-          .writeAsString(listModel.asMarkdown(includeLabels: false));
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> _exportAsMarkdownOnMobile() async =>
-      await showDialog(
-          context: context,
-          builder: (context) =>
-              ExportAsMarkdownOnMobileDialog(listModel: listModel)) ??
-      false;
 
   @override
   void dispose() {
