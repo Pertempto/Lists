@@ -171,7 +171,8 @@ class _ListWidgetState extends State<ListWidget> {
         allowedExtensions: ['md']);
 
     if (filePath != null) {
-      await File(filePath).writeAsString(listModel.asMarkdown());
+      await File(filePath)
+          .writeAsString(listModel.asMarkdown(includeLabels: false));
       return true;
     }
     return false;
