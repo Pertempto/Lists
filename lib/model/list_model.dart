@@ -88,7 +88,7 @@ class ListModel {
       DatabaseManager.putItems(items);
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
-    final words = _parseSearchStr(searchQuery);
+    final words = Isar.splitWords(searchQuery);
     return items
         .filter()
         .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
