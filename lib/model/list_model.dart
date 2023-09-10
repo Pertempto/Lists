@@ -95,15 +95,6 @@ class ListModel {
         .findAll();
   }
 
-  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r"([^\s]+)")
-      .allMatches(searchQuery)
-      .map((match) => match.group(0)!);
-  // note: the above regex pattern "([^\s]+)" matches a string without spaces.
-  // All-in-all, this function breaks a sentence apart into words (though
-  // it doesn't filter out punctuation).
-  // example:
-  // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
-
   bool hasLabel(String label) => labels.contains(label);
 
   /// To be called when `this` is deleted. See also `Item.dispose`.
