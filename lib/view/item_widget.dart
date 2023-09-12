@@ -43,6 +43,9 @@ class _ItemWidgetState extends State<ItemWidget> {
         widget.onUnfocus();
       }
     });
+    if (widget.item.value == '') {
+      _focusNode.requestFocus();
+    }
   }
 
   @override

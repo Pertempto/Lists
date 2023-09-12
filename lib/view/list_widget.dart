@@ -140,15 +140,7 @@ class _ListWidgetState extends State<ListWidget> {
   void _addNewItem() async {
     // Imitate the type of the last item.
     final newItem = Item('', listModel.lastItemType);
-
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => EditItemDialog(
-            onSubmit: (newItem) async => await listModel.add(newItem),
-            item: newItem),
-      );
-    }
+   await listModel.add(newItem);
   }
 
   Widget _buildToolBar() {
