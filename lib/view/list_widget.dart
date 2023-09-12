@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchBar;
 import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/repeat_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../model/item_scheduling.dart';
@@ -187,11 +188,18 @@ class _ListWidgetState extends State<ListWidget> {
                                   ItemScheduling.fromRepeatConfig(config);
                               listModel.update(item);
                             },
-                            repeatConfig:
-                                item.scheduling?.repeatConfig));
+                            repeatConfig: item.scheduling?.repeatConfig));
                   },
                   icon: const Icon(Icons.repeat),
                 ),
+                if (item.scheduling != null)
+                  IconButton(
+                    onPressed: () {
+                      item.scheduling = null;
+                      listModel.update(item);
+                    },
+                    icon: Icon(MdiIcons.repeatOff),
+                  ),
                 IconButton(
                   onPressed: () => listModel.remove(item),
                   icon: const Icon(Icons.delete),
