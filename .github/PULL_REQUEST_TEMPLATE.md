@@ -22,11 +22,3 @@
 ## QA Steps
 
 <!-- Please describe how to test what you've changed. -->
-
-## Post-Deployment
-
-<!--
-  Please describe any tasks that must be executed after this change is deployed.
--->
-
-- [ ] Nothing required
