@@ -138,7 +138,7 @@ class _ListWidgetState extends State<ListWidget> {
   void _addNewItem() async {
     // Imitate the type of the last item.
     final newItem = Item('', listModel.lastItemType);
-   await listModel.add(newItem);
+    await listModel.add(newItem);
   }
 
   Widget _buildToolBar() {
@@ -156,9 +156,10 @@ class _ListWidgetState extends State<ListWidget> {
                   IconButton(
                     onPressed: () {
                       item.itemType = ItemType.text;
+                      item.scheduling = null;
                       listModel.update(item);
                     },
-                    icon:  Icon(MdiIcons.checkboxBlankOffOutline),
+                    icon: Icon(MdiIcons.checkboxBlankOffOutline),
                   ),
                 if (item.itemType == ItemType.text)
                   IconButton(
@@ -168,20 +169,21 @@ class _ListWidgetState extends State<ListWidget> {
                     },
                     icon: const Icon(Icons.check_box_outlined),
                   ),
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) => RepeatDialog(
-                            onSubmit: (config) {
-                              item.scheduling =
-                                  ItemScheduling.fromRepeatConfig(config);
-                              listModel.update(item);
-                            },
-                            repeatConfig: item.scheduling?.repeatConfig));
-                  },
-                  icon: const Icon(Icons.repeat),
-                ),
+                if (item.itemType == ItemType.checkbox)
+                  IconButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => RepeatDialog(
+                              onSubmit: (config) {
+                                item.scheduling =
+                                    ItemScheduling.fromRepeatConfig(config);
+                                listModel.update(item);
+                              },
+                              repeatConfig: item.scheduling?.repeatConfig));
+                    },
+                    icon: const Icon(Icons.repeat),
+                  ),
                 if (item.scheduling != null)
                   IconButton(
                     onPressed: () {
