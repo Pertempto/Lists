@@ -11,14 +11,12 @@ class ItemWidget extends StatefulWidget {
   final Item item;
   final bool tappable;
   final void Function() onFocus;
-  final void Function() onUnfocus;
-  final void Function() onEdited;
+  final void Function() onUpdate;
 
   const ItemWidget(this.item,
       {this.tappable = true,
       required this.onFocus,
-      required this.onUnfocus,
-      required this.onEdited,
+      required this.onUpdate,
       super.key});
 
   @override
@@ -39,7 +37,6 @@ class _ItemWidgetState extends State<ItemWidget> {
       } else {
         widget.item.value = _controller.text;
         updateThis();
-        widget.onUnfocus();
       }
     });
     if (widget.item.value == '') {
@@ -83,36 +80,41 @@ class _ItemWidgetState extends State<ItemWidget> {
       enabled: !widget.item.isChecked,
     );
 
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              if (checkbox != null) checkbox,
-              Expanded(child: textField),
-              if (!widget.item.isChecked)
-                const Padding(
-                  padding: EdgeInsets.only(left: 16.0),
-                  child: Icon(Icons.drag_handle),
-                )
-            ]),
-            if (widget.item.isScheduled && checkbox != null)
-              Row(
-                children: [
-                  // This matches the width of the checkbox in the first row
-                  Visibility(
-                    child: checkbox,
-                    visible: false,
-                    maintainSize: true,
-                    maintainAnimation: true,
-                    maintainState: true,
-                  ),
-                  _buildScheduledTimeStampChip(),
-                ],
-              )
-          ],
-        ));
+    return GestureDetector(
+        child: Container(
+            // For some reason this makes the gesture detector work
+            color: Colors.transparent,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  if (checkbox != null) checkbox,
+                  Expanded(child: textField),
+                  if (!widget.item.isChecked)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Icon(Icons.drag_handle),
+                    )
+                ]),
+                if (widget.item.isScheduled && checkbox != null)
+                  Row(
+                    children: [
+                      // This matches the width of the checkbox in the first row
+                      Visibility(
+                        child: checkbox,
+                        visible: false,
+                        maintainSize: true,
+                        maintainAnimation: true,
+                        maintainState: true,
+                      ),
+                      _buildScheduledTimeStampChip(),
+                    ],
+                  )
+              ],
+            )),
+        onTap: () => widget.onFocus());
   }
 
   void _onNewCheckedState(bool? value) {
@@ -134,8 +136,7 @@ class _ItemWidgetState extends State<ItemWidget> {
                 builder: (context) => RepeatDialog(
                     onSubmit: (newRepeatConfig) async {
                       widget.item.scheduling =
-                          ItemScheduling.fromRepeatConfig(
-                              newRepeatConfig);
+                          ItemScheduling.fromRepeatConfig(newRepeatConfig);
                       updateThis();
                     },
                     repeatConfig: widget.item.scheduling?.repeatConfig)),
@@ -144,6 +145,6 @@ class _ItemWidgetState extends State<ItemWidget> {
       );
 
   void updateThis() {
-    widget.onEdited();
+    widget.onUpdate();
   }
 }

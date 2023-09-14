@@ -42,31 +42,33 @@ class _ListWidgetState extends State<ListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(listModel.title),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: SearchBar(
-              onChanged: (searchQuery) async {
-                this.searchQuery = searchQuery;
-                await refreshItems();
-              },
+    return GestureDetector(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(listModel.title),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: SearchBar(
+                  onChanged: (searchQuery) async {
+                    this.searchQuery = searchQuery;
+                    await refreshItems();
+                  },
+                ),
+              ),
+            ],
+          ),
+          body: _buildBody(),
+          floatingActionButton: Visibility(
+            visible: searchQuery.isEmpty,
+            child: FloatingActionButton(
+              onPressed: _addNewItem,
+              tooltip: 'Add a new item',
+              child: const Icon(Icons.add),
             ),
           ),
-        ],
-      ),
-      body: _buildBody(),
-      floatingActionButton: Visibility(
-        visible: searchQuery.isEmpty,
-        child: FloatingActionButton(
-          onPressed: _addNewItem,
-          tooltip: 'Add a new item',
-          child: const Icon(Icons.add),
         ),
-      ),
-    );
+        onTap: () => setState(() => selectedItem = null));
   }
 
   Widget _buildBody() {
@@ -128,10 +130,7 @@ class _ListWidgetState extends State<ListWidget> {
           .map((item) => ItemWidget(item,
               tappable: tappable,
               onFocus: () => setState(() => selectedItem = item),
-              onUnfocus: () => print(
-                  'unfocus'), // TODO: figure out how to handle this better
-              // onUnfocus: () => setState(() => selectedItem = null),
-              onEdited: () async => await listModel.update(item),
+              onUpdate: () => listModel.update(item),
               key: Key(item.id.toString())))
           .toList();
 
@@ -146,6 +145,7 @@ class _ListWidgetState extends State<ListWidget> {
     // Create a local variable to store the item, so that it will be promoted
     // to non-nullable type inside null-check
     // See https://stackoverflow.com/a/65035575
+
     var item = selectedItem;
     return Container(
       color: colorScheme.surfaceVariant,
@@ -193,7 +193,10 @@ class _ListWidgetState extends State<ListWidget> {
                     icon: Icon(MdiIcons.repeatOff),
                   ),
                 IconButton(
-                  onPressed: () => listModel.remove(item),
+                  onPressed: () {
+                    listModel.remove(item);
+                    setState(() => selectedItem = null);
+                  },
                   icon: const Icon(Icons.delete),
                 ),
               ]
