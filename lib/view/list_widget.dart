@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart' hide SearchBar;
-import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/repeat_dialog.dart';
 import 'package:lists/view/search_bar.dart';
 import 'package:lists/view/item_widget.dart';
