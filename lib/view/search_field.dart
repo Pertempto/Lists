@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-/// SearchBar:
-///   - a widget representing a search bar.
-class SearchBar extends StatefulWidget {
+/// SearchField:
+///   - a widget representing a search field.
+class SearchField extends StatefulWidget {
   final void Function(String)? onChanged;
 
-  const SearchBar({super.key, this.onChanged});
+  const SearchField({super.key, this.onChanged});
 
   @override
-  State<SearchBar> createState() => _SearchBarState();
+  State<SearchField> createState() => _SearchFieldState();
 }
 
-class _SearchBarState extends State<SearchBar> {
+class _SearchFieldState extends State<SearchField> {
   final TextEditingController editingController = TextEditingController();
 
   @override

@@ -5,7 +5,7 @@ import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/view/edit_item_dialog.dart';
-import 'package:lists/view/search_bar.dart';
+import 'package:lists/view/search_field.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -44,7 +44,7 @@ class _ListWidgetState extends State<ListWidget> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
-            child: SearchBar(
+            child: SearchField(
               onChanged: (searchQuery) async {
                 this.searchQuery = searchQuery;
                 await refreshItems();
