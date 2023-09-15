@@ -4,9 +4,9 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide SearchBar;
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
+import 'package:lists/view/search_field.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:lists/view/repeat_dialog.dart';
-import 'package:lists/view/search_bar.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -49,7 +49,7 @@ class _ListWidgetState extends State<ListWidget> {
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 12.0),
-                child: SearchBar(
+                child: SearchField(
                   onChanged: (searchQuery) async {
                     this.searchQuery = searchQuery;
                     await refreshItems();

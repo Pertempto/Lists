@@ -88,21 +88,12 @@ class ListModel {
       DatabaseManager.putItems(items);
 
   Future<Iterable<Item>> searchItems(String searchQuery) {
-    final words = _parseSearchStr(searchQuery);
+    final words = Isar.splitWords(searchQuery);
     return items
         .filter()
         .allOf(words, (q, word) => q.valueContains(word, caseSensitive: false))
         .findAll();
   }
-
-  Iterable<String> _parseSearchStr(String searchQuery) => RegExp(r"([^\s]+)")
-      .allMatches(searchQuery)
-      .map((match) => match.group(0)!);
-  // note: the above regex pattern "([^\s]+)" matches a string without spaces.
-  // All-in-all, this function breaks a sentence apart into words (though
-  // it doesn't filter out punctuation).
-  // example:
-  // "The  great,    blue sky!?!? #@  " --> ["The", "great,", "blue", "sky!?!?", "#@"]
 
   bool hasLabel(String label) => labels.contains(label);
 
