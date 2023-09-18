@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-// used for `Item.scheduledTimeStamp` and `RepeatConfiguration.nextRepeat`. 
+// Used for formatting repeat timestamps.
 // Examples:
 //  Mon, Jun 22
 //  Wed, Aug 1

@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 import 'package:lists/model/item_scheduling.dart';
-import 'package:lists/model/repeat_configuration.dart';
+import 'package:lists/model/repeat_config.dart';
 part 'item.g.dart';
 
 /// Item:
@@ -32,7 +32,7 @@ class Item {
   @ignore
   bool get isScheduled => scheduling != null;
 
-  Item([this.value = '', this.itemType = ItemType.text, this._scheduling]);
+  Item([this.value = '', this.itemType = ItemType.checkbox, this._scheduling]);
 
   // This method is needed to update the fields of a cached `Item`
   // in the `IsarLinks` of a `ListModel` with the same `id` as `this`,

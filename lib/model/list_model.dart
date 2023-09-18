@@ -21,7 +21,7 @@ class ListModel {
   List<String> labels = [];
 
   @ignore
-  ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.text;
+  ItemType get lastItemType => items.lastOrNull?.itemType ?? ItemType.checkbox;
 
   @ignore
   int get itemCount => items.length;

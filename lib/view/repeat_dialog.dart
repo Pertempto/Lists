@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:lists/model/repeat_configuration.dart';
+import 'package:lists/model/repeat_config.dart';
 import 'package:weekday_selector/weekday_selector.dart';
 
 class RepeatDialog extends StatefulWidget {
-  final void Function(RepeatConfiguration) onSubmit;
-  final RepeatConfiguration? repeatConfig;
+  final void Function(RepeatConfig) onSubmit;
+  final RepeatConfig? repeatConfig;
 
   const RepeatDialog(
       {required this.onSubmit, required this.repeatConfig, super.key});
@@ -14,8 +14,8 @@ class RepeatDialog extends StatefulWidget {
 }
 
 class _RepeatDialogState extends State<RepeatDialog> {
-  late RepeatConfiguration selectedRepeatConfig =
-      widget.repeatConfig?.copy() ?? RepeatConfiguration.fromNow();
+  late RepeatConfig selectedRepeatConfig =
+      widget.repeatConfig?.copy() ?? RepeatConfig.fromNow();
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,7 @@ class _RepeatDialogState extends State<RepeatDialog> {
                 onChanged: (int weekday) => setState(() {
                       if (values[weekday % 7]) {
                         // If there is only one weekday selected we don't unselect it, because 
-                        // having a `RepeatConfiguration` with an empty weekdays field
+                        // having a `RepeatConfig` with an empty weekdays field
                         // is not implemented.
                         if (selectedRepeatConfig.weekdays.length - 1 > 0) {
                           selectedRepeatConfig.weekdays.remove(weekday);

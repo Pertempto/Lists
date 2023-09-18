@@ -54,7 +54,7 @@ const ItemSchema = CollectionSchema(
   links: {},
   embeddedSchemas: {
     r'ItemScheduling': ItemSchedulingSchema,
-    r'RepeatConfiguration': RepeatConfigurationSchema
+    r'RepeatConfig': RepeatConfigSchema
   },
   getId: _itemGetId,
   getLinks: _itemGetLinks,
@@ -107,7 +107,7 @@ Item _itemDeserialize(
   final object = Item(
     reader.readStringOrNull(offsets[4]) ?? '',
     _ItemitemTypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
-        ItemType.text,
+        ItemType.checkbox,
   );
   object.id = id;
   object.isChecked = reader.readBool(offsets[0]);
@@ -131,7 +131,7 @@ P _itemDeserializeProp<P>(
       return (reader.readBool(offset)) as P;
     case 1:
       return (_ItemitemTypeValueEnumMap[reader.readByteOrNull(offset)] ??
-          ItemType.text) as P;
+          ItemType.checkbox) as P;
     case 2:
       return (reader.readLong(offset)) as P;
     case 3:

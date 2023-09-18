@@ -17,10 +17,9 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 version: 1.0.0+1
-isar_version: &isar_version 3.0.0 # define the version to be used
 
 environment:
-  sdk: '>=2.19.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -32,8 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
     
-  isar: *isar_version
-  isar_flutter_libs: *isar_version 
+  isar: 3.0.0
+  isar_flutter_libs: 3.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -44,6 +43,7 @@ dependencies:
   reorderables: ^0.6.0
   weekday_selector: ^1.1.0
   intl: ^0.18.1
+  material_design_icons_flutter: ^7.0.7296
 
 dev_dependencies:
   flutter_test:
@@ -56,7 +56,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
-  isar_generator: *isar_version
+  isar_generator: 3.0.0
   build_runner: ^2.3.3
 
   flutter_launcher_icons: ^0.13.1

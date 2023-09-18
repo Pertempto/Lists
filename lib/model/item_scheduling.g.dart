@@ -13,11 +13,11 @@ const ItemSchedulingSchema = Schema(
   name: r'ItemScheduling',
   id: -1957547151972966020,
   properties: {
-    r'repeatConfiguration': PropertySchema(
+    r'repeatConfig': PropertySchema(
       id: 0,
-      name: r'repeatConfiguration',
+      name: r'repeatConfig',
       type: IsarType.object,
-      target: r'RepeatConfiguration',
+      target: r'RepeatConfig',
     ),
     r'scheduledTimeStamp': PropertySchema(
       id: 1,
@@ -38,8 +38,8 @@ int _itemSchedulingEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 +
-      RepeatConfigurationSchema.estimateSize(object.repeatConfiguration,
-          allOffsets[RepeatConfiguration]!, allOffsets);
+      RepeatConfigSchema.estimateSize(
+          object.repeatConfig, allOffsets[RepeatConfig]!, allOffsets);
   return bytesCount;
 }
 
@@ -49,11 +49,11 @@ void _itemSchedulingSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeObject<RepeatConfiguration>(
+  writer.writeObject<RepeatConfig>(
     offsets[0],
     allOffsets,
-    RepeatConfigurationSchema.serialize,
-    object.repeatConfiguration,
+    RepeatConfigSchema.serialize,
+    object.repeatConfig,
   );
   writer.writeDateTime(offsets[1], object.scheduledTimeStamp);
 }
@@ -65,12 +65,12 @@ ItemScheduling _itemSchedulingDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = ItemScheduling();
-  object.repeatConfiguration = reader.readObjectOrNull<RepeatConfiguration>(
+  object.repeatConfig = reader.readObjectOrNull<RepeatConfig>(
         offsets[0],
-        RepeatConfigurationSchema.deserialize,
+        RepeatConfigSchema.deserialize,
         allOffsets,
       ) ??
-      RepeatConfiguration();
+      RepeatConfig();
   object.scheduledTimeStamp = reader.readDateTime(offsets[1]);
   return object;
 }
@@ -83,12 +83,12 @@ P _itemSchedulingDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readObjectOrNull<RepeatConfiguration>(
+      return (reader.readObjectOrNull<RepeatConfig>(
             offset,
-            RepeatConfigurationSchema.deserialize,
+            RepeatConfigSchema.deserialize,
             allOffsets,
           ) ??
-          RepeatConfiguration()) as P;
+          RepeatConfig()) as P;
     case 1:
       return (reader.readDateTime(offset)) as P;
     default:
@@ -158,9 +158,9 @@ extension ItemSchedulingQueryFilter
 extension ItemSchedulingQueryObject
     on QueryBuilder<ItemScheduling, ItemScheduling, QFilterCondition> {
   QueryBuilder<ItemScheduling, ItemScheduling, QAfterFilterCondition>
-      repeatConfiguration(FilterQuery<RepeatConfiguration> q) {
+      repeatConfig(FilterQuery<RepeatConfig> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.object(q, r'repeatConfiguration');
+      return query.object(q, r'repeatConfig');
     });
   }
 }
