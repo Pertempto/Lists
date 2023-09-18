@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart' hide SearchBar;
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:flutter/material.dart' hide SearchBar;
-import 'package:lists/view/edit_item_dialog.dart';
-import 'package:lists/view/search_bar.dart';
+import 'package:lists/view/export_as_markdown_dialog.dart';
+import 'package:lists/view/search_field.dart';
 import 'package:lists/view/item_widget.dart';
+import 'package:lists/view/repeat_dialog.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 
-import 'export_as_markdown_mobile_dialog.dart';
+import '../model/item_scheduling.dart';
 
 /// ListWidget:
 ///   - a widget representing a ListModel
@@ -26,6 +28,7 @@ class _ListWidgetState extends State<ListWidget> {
   late Iterable<Item> itemsToBeDisplayed;
   String searchQuery = '';
   bool isReordering = false;
+  Item? selectedItem;
 
   late final StreamSubscription<ListModelEvent> eventStreamSubscription;
 
@@ -39,38 +42,40 @@ class _ListWidgetState extends State<ListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(listModel.title),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: SearchBar(
-              onChanged: (searchQuery) async {
-                this.searchQuery = searchQuery;
-                await refreshItems();
-              },
+    return GestureDetector(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(listModel.title),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: SearchField(
+                    onChanged: (searchQuery) async {
+                      this.searchQuery = searchQuery;
+                      await refreshItems();
+                    },
+                    onFocus: () => setState(() => selectedItem = null)),
+              ),
+              PopupMenuButton(
+                  child: const Icon(Icons.more_vert),
+                  itemBuilder: (context) => [
+                        PopupMenuItem(
+                            onTap: _exportAsMarkdown,
+                            child: const Text('Export as Markdown'))
+                      ]),
+            ],
+          ),
+          body: _buildBody(),
+          floatingActionButton: Visibility(
+            visible: searchQuery.isEmpty,
+            child: FloatingActionButton(
+              onPressed: _addNewItem,
+              tooltip: 'Add a new item',
+              child: const Icon(Icons.add),
             ),
           ),
-          PopupMenuButton(
-              child: const Icon(Icons.more_vert),
-              itemBuilder: (context) => [
-                    PopupMenuItem(
-                        onTap: _exportAsMarkdown,
-                        child: const Text('Export as Markdown'))
-                  ]),
-        ],
-      ),
-      body: _buildBody(),
-      floatingActionButton: Visibility(
-        visible: searchQuery.isEmpty,
-        child: FloatingActionButton(
-          onPressed: _addNewItem,
-          tooltip: 'Add a new item',
-          child: const Icon(Icons.add),
         ),
-      ),
-    );
+        onTap: () => setState(() => selectedItem = null));
   }
 
   Widget _buildBody() {
@@ -109,11 +114,21 @@ class _ListWidgetState extends State<ListWidget> {
         delegate: SliverChildListDelegate(_buildItemWidgets(
             fromItems: checkedItems, tappable: !isReordering)));
 
-    return CustomScrollView(slivers: [
-      unCheckedItemWidgetsSliver,
-      if (checkedItems.isNotEmpty) dividerSliver,
-      checkedItemWidgetsSliver
-    ]);
+    return Column(
+      children: [
+        Expanded(
+          child: CustomScrollView(
+            slivers: [
+              unCheckedItemWidgetsSliver,
+              if (checkedItems.isNotEmpty) dividerSliver,
+              checkedItemWidgetsSliver
+            ],
+            shrinkWrap: true,
+          ),
+        ),
+        _buildToolBar()
+      ],
+    );
   }
 
   List<Widget> _buildItemWidgets(
@@ -121,22 +136,80 @@ class _ListWidgetState extends State<ListWidget> {
       fromItems
           .map((item) => ItemWidget(item,
               tappable: tappable,
-              onDelete: () async => await listModel.remove(item),
-              onEdited: () async => await listModel.update(item)))
+              onFocus: () => setState(() => selectedItem = item),
+              onUpdate: () => listModel.update(item),
+              key: Key(item.id.toString())))
           .toList();
 
   void _addNewItem() async {
     // Imitate the type of the last item.
     final newItem = Item('', listModel.lastItemType);
+    await listModel.add(newItem);
+  }
 
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) => EditItemDialog(
-            onSubmit: (newItem) async => await listModel.add(newItem),
-            item: newItem),
-      );
-    }
+  Widget _buildToolBar() {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // Create a local variable to store the item, so that it will be promoted
+    // to non-nullable type inside null-check
+    // See https://stackoverflow.com/a/65035575
+
+    var item = selectedItem;
+    return Container(
+      color: colorScheme.surfaceVariant,
+      child: Row(
+        children: item != null
+            ? [
+                if (item.itemType == ItemType.checkbox)
+                  IconButton(
+                    onPressed: () {
+                      item.itemType = ItemType.text;
+                      item.scheduling = null;
+                      listModel.update(item);
+                    },
+                    icon: Icon(MdiIcons.checkboxBlankOffOutline),
+                  ),
+                if (item.itemType == ItemType.text)
+                  IconButton(
+                    onPressed: () {
+                      item.itemType = ItemType.checkbox;
+                      listModel.update(item);
+                    },
+                    icon: const Icon(Icons.check_box_outlined),
+                  ),
+                if (item.itemType == ItemType.checkbox)
+                  IconButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => RepeatDialog(
+                              onSubmit: (config) {
+                                item.scheduling =
+                                    ItemScheduling.fromRepeatConfig(config);
+                                listModel.update(item);
+                              },
+                              repeatConfig: item.scheduling?.repeatConfig));
+                    },
+                    icon: const Icon(Icons.repeat),
+                  ),
+                if (item.scheduling != null)
+                  IconButton(
+                    onPressed: () {
+                      item.scheduling = null;
+                      listModel.update(item);
+                    },
+                    icon: Icon(MdiIcons.repeatOff),
+                  ),
+                IconButton(
+                  onPressed: () {
+                    listModel.remove(item);
+                    setState(() => selectedItem = null);
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+              ]
+            : [],
+      ),
+    );
   }
 
   Future<void> refreshItems() async {

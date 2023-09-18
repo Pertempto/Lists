@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lists/common/time_stamp_format.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/item_scheduling.dart';
-import 'package:lists/view/edit_item_dialog.dart';
 import 'package:lists/view/repeat_dialog.dart';
 
 /// ItemWidget:
@@ -11,13 +10,13 @@ import 'package:lists/view/repeat_dialog.dart';
 class ItemWidget extends StatefulWidget {
   final Item item;
   final bool tappable;
-  final void Function() onDelete;
-  final void Function() onEdited;
+  final void Function() onFocus;
+  final void Function() onUpdate;
 
   const ItemWidget(this.item,
       {this.tappable = true,
-      required this.onDelete,
-      required this.onEdited,
+      required this.onFocus,
+      required this.onUpdate,
       super.key});
 
   @override
@@ -25,6 +24,32 @@ class ItemWidget extends StatefulWidget {
 }
 
 class _ItemWidgetState extends State<ItemWidget> {
+  late TextEditingController _controller;
+  FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.item.value);
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        widget.onFocus();
+      } else {
+        widget.item.value = _controller.text;
+        updateThis();
+      }
+    });
+    if (widget.item.value == '') {
+      _focusNode.requestFocus();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final itemTextStyle =
@@ -39,37 +64,57 @@ class _ItemWidgetState extends State<ItemWidget> {
           child: Checkbox(
             value: widget.item.isChecked,
             onChanged: _onNewCheckedState,
-            visualDensity: const VisualDensity(
-                horizontal: VisualDensity.maximumDensity,
-                vertical: VisualDensity.maximumDensity),
+            visualDensity: VisualDensity.compact,
           ));
 
       textDecoration =
           widget.item.isChecked ? TextDecoration.lineThrough : null;
     }
 
-    return InkWell(
-        onTap: widget.tappable ? _showEditDialog : null,
-        child: Padding(
+    Widget textField = TextField(
+      controller: _controller,
+      decoration:
+          const InputDecoration(border: InputBorder.none, isDense: true),
+      style: itemTextStyle.copyWith(decoration: textDecoration),
+      focusNode: _focusNode,
+      enabled: !widget.item.isChecked,
+    );
+
+    return GestureDetector(
+        child: Container(
+            // For some reason this makes the gesture detector work
+            color: Colors.transparent,
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (checkbox != null) checkbox,
-                Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.item.value,
-                            style: itemTextStyle.copyWith(
-                                decoration: textDecoration)),
-                        if (widget.item.isScheduled)
-                          _buildScheduledTimeStampChip()
-                      ]),
-                )
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  if (checkbox != null) checkbox,
+                  Expanded(child: textField),
+                  if (!widget.item.isChecked)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Icon(Icons.drag_handle),
+                    )
+                ]),
+                if (widget.item.isScheduled && checkbox != null)
+                  Row(
+                    children: [
+                      // This matches the width of the checkbox in the first row
+                      Visibility(
+                        child: checkbox,
+                        visible: false,
+                        maintainSize: true,
+                        maintainAnimation: true,
+                        maintainState: true,
+                      ),
+                      _buildScheduledTimeStampChip(),
+                    ],
+                  )
               ],
-            )));
+            )),
+        onTap: () => widget.onFocus());
   }
 
   void _onNewCheckedState(bool? value) {
@@ -91,23 +136,15 @@ class _ItemWidgetState extends State<ItemWidget> {
                 builder: (context) => RepeatDialog(
                     onSubmit: (newRepeatConfig) async {
                       widget.item.scheduling =
-                          ItemScheduling.fromRepeatConfiguration(
-                              newRepeatConfig);
+                          ItemScheduling.fromRepeatConfig(newRepeatConfig);
                       updateThis();
                     },
-                    repeatConfig: widget.item.scheduling?.repeatConfiguration)),
+                    repeatConfig: widget.item.scheduling?.repeatConfig)),
           ),
         ),
       );
 
-  void _showEditDialog() => showDialog(
-      context: context,
-      builder: (context) => EditItemDialog(
-          onSubmit: (_) => updateThis(),
-          onDelete: widget.onDelete,
-          item: widget.item));
-
   void updateThis() {
-    widget.onEdited();
+    widget.onUpdate();
   }
 }

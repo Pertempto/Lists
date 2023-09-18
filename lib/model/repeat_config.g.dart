@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'repeat_configuration.dart';
+part of 'repeat_config.dart';
 
 // **************************************************************************
 // IsarEmbeddedGenerator
@@ -9,9 +9,9 @@ part of 'repeat_configuration.dart';
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
 
-const RepeatConfigurationSchema = Schema(
-  name: r'RepeatConfiguration',
-  id: 1538701297182978727,
+const RepeatConfigSchema = Schema(
+  name: r'RepeatConfig',
+  id: 978321493024545680,
   properties: {
     r'hour': PropertySchema(
       id: 0,
@@ -34,14 +34,14 @@ const RepeatConfigurationSchema = Schema(
       type: IsarType.longList,
     )
   },
-  estimateSize: _repeatConfigurationEstimateSize,
-  serialize: _repeatConfigurationSerialize,
-  deserialize: _repeatConfigurationDeserialize,
-  deserializeProp: _repeatConfigurationDeserializeProp,
+  estimateSize: _repeatConfigEstimateSize,
+  serialize: _repeatConfigSerialize,
+  deserialize: _repeatConfigDeserialize,
+  deserializeProp: _repeatConfigDeserializeProp,
 );
 
-int _repeatConfigurationEstimateSize(
-  RepeatConfiguration object,
+int _repeatConfigEstimateSize(
+  RepeatConfig object,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -50,8 +50,8 @@ int _repeatConfigurationEstimateSize(
   return bytesCount;
 }
 
-void _repeatConfigurationSerialize(
-  RepeatConfiguration object,
+void _repeatConfigSerialize(
+  RepeatConfig object,
   IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
@@ -62,20 +62,20 @@ void _repeatConfigurationSerialize(
   writer.writeLongList(offsets[3], object.weekdays);
 }
 
-RepeatConfiguration _repeatConfigurationDeserialize(
+RepeatConfig _repeatConfigDeserialize(
   Id id,
   IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = RepeatConfiguration();
+  final object = RepeatConfig();
   object.hour = reader.readLong(offsets[0]);
   object.minute = reader.readLong(offsets[1]);
   object.weekdays = reader.readLongList(offsets[3]) ?? [];
   return object;
 }
 
-P _repeatConfigurationDeserializeProp<P>(
+P _repeatConfigDeserializeProp<P>(
   IsarReader reader,
   int propertyId,
   int offset,
@@ -95,10 +95,10 @@ P _repeatConfigurationDeserializeProp<P>(
   }
 }
 
-extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
-    RepeatConfiguration, QFilterCondition> {
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      hourEqualTo(int value) {
+extension RepeatConfigQueryFilter
+    on QueryBuilder<RepeatConfig, RepeatConfig, QFilterCondition> {
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition> hourEqualTo(
+      int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'hour',
@@ -107,7 +107,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       hourGreaterThan(
     int value, {
     bool include = false,
@@ -121,8 +121,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      hourLessThan(
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition> hourLessThan(
     int value, {
     bool include = false,
   }) {
@@ -135,8 +134,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      hourBetween(
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition> hourBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -153,8 +151,8 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      minuteEqualTo(int value) {
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition> minuteEqualTo(
+      int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'minute',
@@ -163,7 +161,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       minuteGreaterThan(
     int value, {
     bool include = false,
@@ -177,7 +175,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       minuteLessThan(
     int value, {
     bool include = false,
@@ -191,8 +189,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
-      minuteBetween(
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition> minuteBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -209,7 +206,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       nextRepeatEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -219,7 +216,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       nextRepeatGreaterThan(
     DateTime value, {
     bool include = false,
@@ -233,7 +230,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       nextRepeatLessThan(
     DateTime value, {
     bool include = false,
@@ -247,7 +244,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       nextRepeatBetween(
     DateTime lower,
     DateTime upper, {
@@ -265,7 +262,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysElementEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -275,7 +272,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysElementGreaterThan(
     int value, {
     bool include = false,
@@ -289,7 +286,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysElementLessThan(
     int value, {
     bool include = false,
@@ -303,7 +300,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysElementBetween(
     int lower,
     int upper, {
@@ -321,7 +318,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -334,7 +331,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -347,7 +344,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.listLength(
@@ -360,7 +357,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysLengthLessThan(
     int length, {
     bool include = false,
@@ -376,7 +373,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysLengthGreaterThan(
     int length, {
     bool include = false,
@@ -392,7 +389,7 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
     });
   }
 
-  QueryBuilder<RepeatConfiguration, RepeatConfiguration, QAfterFilterCondition>
+  QueryBuilder<RepeatConfig, RepeatConfig, QAfterFilterCondition>
       weekdaysLengthBetween(
     int lower,
     int upper, {
@@ -411,5 +408,5 @@ extension RepeatConfigurationQueryFilter on QueryBuilder<RepeatConfiguration,
   }
 }
 
-extension RepeatConfigurationQueryObject on QueryBuilder<RepeatConfiguration,
-    RepeatConfiguration, QFilterCondition> {}
+extension RepeatConfigQueryObject
+    on QueryBuilder<RepeatConfig, RepeatConfig, QFilterCondition> {}

@@ -1,7 +1,7 @@
 import 'dart:async' show Timer;
 
 import 'package:isar/isar.dart';
-import 'package:lists/model/repeat_configuration.dart';
+import 'package:lists/model/repeat_config.dart';
 part 'item_scheduling.g.dart';
 
 /// ItemScheduling:
@@ -9,24 +9,24 @@ part 'item_scheduling.g.dart';
 @embedded
 class ItemScheduling {
   late DateTime scheduledTimeStamp;
-  late RepeatConfiguration repeatConfiguration;
+  late RepeatConfig repeatConfig;
   @ignore
   Timer? scheduledTimer;
 
   ItemScheduling();
-  ItemScheduling.fromRepeatConfiguration(this.repeatConfiguration)
-      : scheduledTimeStamp = repeatConfiguration.nextRepeat;
+  ItemScheduling.fromRepeatConfig(this.repeatConfig)
+      : scheduledTimeStamp = repeatConfig.nextRepeat;
 
   ItemScheduling copy() => ItemScheduling()
     ..scheduledTimeStamp = scheduledTimeStamp
-    ..repeatConfiguration = repeatConfiguration.copy();
+    ..repeatConfig = repeatConfig.copy();
 
   void updateScheduledTimer({required void Function() timerCallback}) {
     cancelTimerIfScheduled();
     scheduledTimer = Timer(
       scheduledTimeStamp.difference(DateTime.now()),
       () {
-        scheduledTimeStamp = repeatConfiguration.nextRepeat;
+        scheduledTimeStamp = repeatConfig.nextRepeat;
         timerCallback();
       },
     );
