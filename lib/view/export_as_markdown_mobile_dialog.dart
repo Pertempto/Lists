@@ -44,7 +44,7 @@ class _ExportListAsMarkdownDialogState
             TextField(controller: controller, autofocus: true),
           const SizedBox(height: 16),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            const Text('Include Labels?'),
+            const Text('Include Labels'),
             Checkbox(
                 value: includeLabels,
                 onChanged: (newValue) =>
