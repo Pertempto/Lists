@@ -1,3 +1,8 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:document_file_save_plus/document_file_save_plus.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
 
@@ -7,14 +12,10 @@ import 'package:lists/model/list_model.dart';
 ///     `Navigator.pop`
 class ExportListAsMarkdownDialog extends StatefulWidget {
   final ListModel listModel;
-  final bool includeFileNameTextField;
-  final void Function(String filename, String markdown) onExport;
+  final void Function() onSuccessfulExport;
 
   const ExportListAsMarkdownDialog(
-      {super.key,
-      required this.listModel,
-      required this.includeFileNameTextField,
-      required this.onExport});
+      {super.key, required this.listModel, required this.onSuccessfulExport});
 
   @override
   State<ExportListAsMarkdownDialog> createState() =>
@@ -40,7 +41,7 @@ class _ExportListAsMarkdownDialogState
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.includeFileNameTextField)
+          if (Platform.isAndroid || Platform.isIOS)
             TextField(controller: controller, autofocus: true),
           const SizedBox(height: 16),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -59,11 +60,32 @@ class _ExportListAsMarkdownDialogState
         FilledButton(
             onPressed: () {
               Navigator.pop(context);
-              widget.onExport(controller.text,
-                  widget.listModel.asMarkdown(includeLabels: includeLabels));
+              _onExport();
             },
             child: const Text('Export'))
       ],
     );
+  }
+
+  void _onExport() async {
+    final markdown = widget.listModel.asMarkdown(includeLabels: includeLabels);
+    final filename = controller.text;
+    // We have to have to use a different package for mobile and desktop
+    // because the file_picker package (https://pub.dev/packages/file_picker) only
+    // supports saving files in desktop (with a native file picker). This package
+    // seemed far superior to its competitors.
+    if (Platform.isAndroid || Platform.isIOS) {
+      await DocumentFileSavePlus.saveFile(
+          Uint8List.fromList(markdown.codeUnits), filename, 'text/markdown');
+      widget.onSuccessfulExport();
+    } else {
+      final filePath = await FilePicker.platform.saveFile(
+          fileName: filename, type: FileType.custom, allowedExtensions: ['md']);
+
+      if (filePath != null) {
+        await File(filePath).writeAsString(markdown);
+        widget.onSuccessfulExport();
+      }
+    }
   }
 }

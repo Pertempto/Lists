@@ -1,10 +1,5 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:collection/collection.dart';
-import 'package:document_file_save_plus/document_file_save_plus.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
 import 'package:flutter/material.dart' hide SearchBar;
@@ -153,45 +148,12 @@ class _ListWidgetState extends State<ListWidget> {
       items.sorted((a, b) => a.order - b.order);
 
   Future<void> _exportAsMarkdown() async {
-    // We have to have separate exportAsMarkdown functions for mobile and desktop
-    // because the file_picker package (https://pub.dev/packages/file_picker) only
-    // supports saving files in desktop. This package seemed far superior to its competitors.
-    if (Platform.isAndroid || Platform.isIOS) {
-      await _exportAsMarkdownOnMobile();
-    } else {
-      await _exportAsMarkdownOnDesktop();
-    }
+    await showDialog(
+        context: context,
+        builder: (context) => ExportListAsMarkdownDialog(
+            listModel: listModel,
+            onSuccessfulExport: _onSuccessfulMarkdownExport));
   }
-
-  Future<void> _exportAsMarkdownOnDesktop() async => await showDialog(
-      context: context,
-      builder: (context) => ExportListAsMarkdownDialog(
-          listModel: listModel,
-          includeFileNameTextField: false,
-          onExport: (filename, markdown) async {
-            final filePath = await FilePicker.platform.saveFile(
-                fileName: filename,
-                type: FileType.custom,
-                allowedExtensions: ['md']);
-
-            if (filePath != null) {
-              await File(filePath).writeAsString(markdown);
-              _onSuccessfulMarkdownExport();
-            }
-          }));
-
-  Future<void> _exportAsMarkdownOnMobile() async => await showDialog(
-      context: context,
-      builder: (context) => ExportListAsMarkdownDialog(
-          listModel: listModel,
-          includeFileNameTextField: true,
-          onExport: (filename, markdown) async {
-            await DocumentFileSavePlus.saveFile(
-                Uint8List.fromList(markdown.codeUnits),
-                filename,
-                'text/markdown');
-            _onSuccessfulMarkdownExport();
-          }));
 
   void _onSuccessfulMarkdownExport() {
     if (mounted) {
