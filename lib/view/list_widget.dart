@@ -54,6 +54,7 @@ class _ListWidgetState extends State<ListWidget> {
                     this.searchQuery = searchQuery;
                     await refreshItems();
                   },
+                  onFocus: () => setState(() => selectedItem = null)
                 ),
               ),
             ],
