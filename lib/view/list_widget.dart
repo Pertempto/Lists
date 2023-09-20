@@ -223,16 +223,7 @@ class _ListWidgetState extends State<ListWidget> {
   Future<void> _exportAsMarkdown() async {
     await showDialog(
         context: context,
-        builder: (context) => ExportListAsMarkdownDialog(
-            listModel: listModel,
-            onSuccessfulExport: _onSuccessfulMarkdownExport));
-  }
-
-  void _onSuccessfulMarkdownExport() {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Exported as Markdown successfully')));
-    }
+        builder: (context) => ExportListAsMarkdownDialog(listModel: listModel));
   }
 
   @override

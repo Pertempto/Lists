@@ -12,10 +12,8 @@ import 'package:lists/model/list_model.dart';
 ///     `Navigator.pop`
 class ExportListAsMarkdownDialog extends StatefulWidget {
   final ListModel listModel;
-  final void Function() onSuccessfulExport;
 
-  const ExportListAsMarkdownDialog(
-      {super.key, required this.listModel, required this.onSuccessfulExport});
+  const ExportListAsMarkdownDialog({super.key, required this.listModel});
 
   @override
   State<ExportListAsMarkdownDialog> createState() =>
@@ -77,15 +75,18 @@ class _ExportListAsMarkdownDialogState
     if (Platform.isAndroid || Platform.isIOS) {
       await DocumentFileSavePlus.saveFile(
           Uint8List.fromList(markdown.codeUnits), filename, 'text/markdown');
-      widget.onSuccessfulExport();
+      _onSuccess();
     } else {
       final filePath = await FilePicker.platform.saveFile(
           fileName: filename, type: FileType.custom, allowedExtensions: ['md']);
 
       if (filePath != null) {
         await File(filePath).writeAsString(markdown);
-        widget.onSuccessfulExport();
+        _onSuccess();
       }
     }
   }
+
+  void _onSuccess() => ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Exported as Markdown successfully')));
 }
