@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
+import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 /// ExportListAsMarkdownDialog:
@@ -21,14 +22,14 @@ class ExportListAsMarkdownDialog extends StatefulWidget {
 class _ExportListAsMarkdownDialogState
     extends State<ExportListAsMarkdownDialog> {
   bool includeLabels = true;
-  late final TextEditingController controller =
+  late final TextEditingController fileNameController =
       TextEditingController(text: '${widget.listModel.title}.md');
 
   @override
   void initState() {
     super.initState();
-    controller.selection = TextSelection(
-        baseOffset: 0, extentOffset: controller.text.lastIndexOf('.'));
+    fileNameController.selection = TextSelection(
+        baseOffset: 0, extentOffset: fileNameController.text.lastIndexOf('.'));
   }
 
   @override
@@ -39,7 +40,7 @@ class _ExportListAsMarkdownDialogState
         children: [
           if (Platform.isAndroid || Platform.isIOS)
             // a Textfield to enter the file name on android and ios (see _onExport())
-            TextField(controller: controller, autofocus: true),
+            TextField(controller: fileNameController, autofocus: true),
           const SizedBox(height: 16),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             const Text('Include Labels'),
@@ -56,34 +57,33 @@ class _ExportListAsMarkdownDialogState
             child: const Text('Cancel')),
         FilledButton(
             onPressed: () async {
-              final capturedScaffoldMessenger = ScaffoldMessenger.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
-              if (await Permission.storage.request() !=
-                  PermissionStatus.granted) {
-                return;
-              }
-
-              final markdown =
-                  widget.listModel.asMarkdown(includeLabels: includeLabels);
-              final filename = controller.text;
-              final filePath = Platform.isAndroid || Platform.isIOS
-                  ? (dirPath) {
-                      return dirPath != null ? dirPath + '/$filename' : null;
-                    }(await FilePicker.platform
-                      .getDirectoryPath()) // `FilePicker.saveFile` isn't supported on android/ios'
-                  : await FilePicker.platform.saveFile(
-                      fileName: filename,
-                      type: FileType.custom,
-                      allowedExtensions: ['md']);
-
-              if (filePath != null) {
-                await File(filePath).writeAsString(markdown);
-                capturedScaffoldMessenger.showSnackBar(const SnackBar(
-                    content: Text('Exported as Markdown successfully')));
+              if (await Permission.storage.request().isGranted) {
+                final fileName = fileNameController.text;
+                final filePath = await _saveFile(fileName: fileName);
+                if (filePath != null) {
+                  final markdown =
+                      widget.listModel.asMarkdown(includeLabels: includeLabels);
+                  await File(filePath).writeAsString(markdown);
+                  scaffoldMessenger.showSnackBar(const SnackBar(
+                      content: Text('Exported as Markdown successfully')));
+                }
               }
             },
             child: const Text('Export'))
       ],
     );
+  }
+
+  Future<String?> _saveFile({required String fileName}) async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      // `FilePicker.saveFile` isn't supported on android/ios
+      final dirPath = await FilePicker.platform.getDirectoryPath();
+      return dirPath != null ? join(dirPath, fileName) : null;
+    } else {
+      return await FilePicker.platform.saveFile(
+          fileName: fileName, type: FileType.custom, allowedExtensions: ['md']);
+    }
   }
 }

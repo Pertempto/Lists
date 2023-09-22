@@ -220,11 +220,9 @@ class _ListWidgetState extends State<ListWidget> {
   List<Item> _ordered(Iterable<Item> items) =>
       items.sorted((a, b) => a.order - b.order);
 
-  Future<void> _exportAsMarkdown() async {
-    await showDialog(
-        context: context,
-        builder: (context) => ExportListAsMarkdownDialog(listModel: listModel));
-  }
+  Future<void> _exportAsMarkdown() async => await showDialog(
+      context: context,
+      builder: (context) => ExportListAsMarkdownDialog(listModel: listModel));
 
   @override
   void dispose() {
