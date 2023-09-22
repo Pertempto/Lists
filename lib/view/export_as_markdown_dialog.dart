@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lists/model/list_model.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// ExportListAsMarkdownDialog:
 ///   - Dialog for exporting the passed-in list model as a markdown file on mobile.
@@ -40,6 +38,7 @@ class _ExportListAsMarkdownDialogState
         mainAxisSize: MainAxisSize.min,
         children: [
           if (Platform.isAndroid || Platform.isIOS)
+            // a Textfield to enter the file name on android and ios (see _onExport())
             TextField(controller: controller, autofocus: true),
           const SizedBox(height: 16),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -56,9 +55,29 @@ class _ExportListAsMarkdownDialogState
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel')),
         FilledButton(
-            onPressed: () {
+            onPressed: () async {
+              final capturedScaffoldMessenger = ScaffoldMessenger.of(context);
+
               Navigator.pop(context);
-              _onExport();
+              print(await Permission.storage.request());
+              final markdown =
+                  widget.listModel.asMarkdown(includeLabels: includeLabels);
+              final filename = controller.text;
+              final filePath = Platform.isAndroid || Platform.isIOS
+                  ? (dirPath) {
+                      return dirPath + '/$filename';
+                    }(await FilePicker.platform
+                      .getDirectoryPath()) // `FilePicker.saveFile` isn't supported on android/ios'
+                  : await FilePicker.platform.saveFile(
+                      fileName: filename,
+                      type: FileType.custom,
+                      allowedExtensions: ['md']);
+
+              if (filePath != null) {
+                await File(filePath).writeAsString(markdown);
+                capturedScaffoldMessenger.showSnackBar(const SnackBar(
+                    content: Text('Exported as Markdown successfully')));
+              }
             },
             child: const Text('Export'))
       ],
@@ -68,25 +87,25 @@ class _ExportListAsMarkdownDialogState
   void _onExport() async {
     final markdown = widget.listModel.asMarkdown(includeLabels: includeLabels);
     final filename = controller.text;
-    // We have to have to use a different package for mobile and desktop
-    // because the file_picker package (https://pub.dev/packages/file_picker) only
-    // supports saving files in desktop (with a native file picker). This package
-    // seemed far superior to its competitors.
-    if (Platform.isAndroid || Platform.isIOS) {
-      await DocumentFileSavePlus.saveFile(
-          Uint8List.fromList(markdown.codeUnits), filename, 'text/markdown');
-      _onSuccess();
-    } else {
-      final filePath = await FilePicker.platform.saveFile(
-          fileName: filename, type: FileType.custom, allowedExtensions: ['md']);
+    print(await [
+      Permission.manageExternalStorage,
+      Permission.mediaLibrary,
+      Permission.accessMediaLocation
+    ].request());
+    final filePath = Platform.isAndroid || Platform.isIOS
+        ? await FilePicker.platform
+            .getDirectoryPath() // `FilePicker.saveFile` isn't supported on android/ios'
+        : await FilePicker.platform.saveFile(
+            fileName: filename,
+            type: FileType.custom,
+            allowedExtensions: ['md']);
 
-      if (filePath != null) {
-        await File(filePath).writeAsString(markdown);
-        _onSuccess();
-      }
+    if (filePath != null) {
+      await File(filePath).writeAsString(markdown);
+      final capturedContext = context;
+      await Future.delayed(const Duration(seconds: 1));
+      ScaffoldMessenger.of(capturedContext).showSnackBar(
+          const SnackBar(content: Text('Exported as Markdown successfully')));
     }
   }
-
-  void _onSuccess() => ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Exported as Markdown successfully')));
 }
