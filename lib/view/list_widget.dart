@@ -3,7 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide SearchBar;
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
-import 'package:lists/view/export_as_markdown_dialog.dart';
+import 'package:lists/view/export_list_as_markdown_dialog.dart';
 import 'package:lists/view/search_field.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:lists/view/repeat_dialog.dart';
