@@ -83,29 +83,4 @@ class _ExportListAsMarkdownDialogState
       ],
     );
   }
-
-  void _onExport() async {
-    final markdown = widget.listModel.asMarkdown(includeLabels: includeLabels);
-    final filename = controller.text;
-    print(await [
-      Permission.manageExternalStorage,
-      Permission.mediaLibrary,
-      Permission.accessMediaLocation
-    ].request());
-    final filePath = Platform.isAndroid || Platform.isIOS
-        ? await FilePicker.platform
-            .getDirectoryPath() // `FilePicker.saveFile` isn't supported on android/ios'
-        : await FilePicker.platform.saveFile(
-            fileName: filename,
-            type: FileType.custom,
-            allowedExtensions: ['md']);
-
-    if (filePath != null) {
-      await File(filePath).writeAsString(markdown);
-      final capturedContext = context;
-      await Future.delayed(const Duration(seconds: 1));
-      ScaffoldMessenger.of(capturedContext).showSnackBar(
-          const SnackBar(content: Text('Exported as Markdown successfully')));
-    }
-  }
 }
