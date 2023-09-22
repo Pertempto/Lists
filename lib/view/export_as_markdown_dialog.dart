@@ -57,15 +57,18 @@ class _ExportListAsMarkdownDialogState
         FilledButton(
             onPressed: () async {
               final capturedScaffoldMessenger = ScaffoldMessenger.of(context);
-
               Navigator.pop(context);
-              print(await Permission.storage.request());
+              if (await Permission.storage.request() !=
+                  PermissionStatus.granted) {
+                return;
+              }
+
               final markdown =
                   widget.listModel.asMarkdown(includeLabels: includeLabels);
               final filename = controller.text;
               final filePath = Platform.isAndroid || Platform.isIOS
                   ? (dirPath) {
-                      return dirPath + '/$filename';
+                      return dirPath != null ? dirPath + '/$filename' : null;
                     }(await FilePicker.platform
                       .getDirectoryPath()) // `FilePicker.saveFile` isn't supported on android/ios'
                   : await FilePicker.platform.saveFile(
