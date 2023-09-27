@@ -110,7 +110,7 @@ class ListModel {
     if (includeLabels) ret += '${labels.map((label) => '#label').join(' ')}\n';
 
     return ret +
-        items.map((item) {
+        items.sorted((a, b) => a.order - b.order).map((item) {
           final leading = (item.itemType == ItemType.checkbox
               ? '- [${item.isChecked ? 'x' : ' '}]'
               : '-');
