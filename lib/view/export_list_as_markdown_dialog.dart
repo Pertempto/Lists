@@ -61,13 +61,20 @@ class _ExportListAsMarkdownDialogState
               Navigator.pop(context);
               if (await Permission.storage.request().isGranted) {
                 final fileName = fileNameController.text;
-                final filePath = await _saveFile(fileName: fileName);
-                if (filePath != null) {
-                  final markdown =
-                      widget.listModel.asMarkdown(includeLabels: includeLabels);
-                  await File(filePath).writeAsString(markdown);
-                  scaffoldMessenger.showSnackBar(const SnackBar(
-                      content: Text('Exported as Markdown successfully')));
+                try {
+                  final filePath = await _saveFile(fileName: fileName);
+                  if (filePath != null) {
+                    final markdown = widget.listModel
+                        .asMarkdown(includeLabels: includeLabels);
+                    await File(filePath).writeAsString(markdown);
+                    scaffoldMessenger.showSnackBar(const SnackBar(
+                        content: Text('Exported as Markdown successfully')));
+                  }
+                } on IOException catch (e) {
+                  // report any io errors to the user
+                  scaffoldMessenger.showSnackBar(SnackBar(
+                      content: Text('Error, couldn\'t export as markdown: $e',
+                          style: const TextStyle(color: Colors.red))));
                 }
               }
             },
