@@ -59,7 +59,7 @@ class _ExportListAsMarkdownDialogState
             onPressed: () async {
               final scaffoldMessenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
-              if (await Permission.storage.request().isGranted) {
+              if (await Permission.manageExternalStorage.request().isGranted) {
                 final fileName = fileNameController.text;
                 try {
                   final filePath = await _saveFile(fileName: fileName);
