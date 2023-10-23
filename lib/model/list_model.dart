@@ -104,6 +104,19 @@ class ListModel {
     }
     await _eventStreamController.close();
   }
+
+  String asMarkdown({required bool includeLabels}) {
+    var ret = '## $title\n';
+    if (includeLabels) ret += '${labels.map((label) => '#label').join(' ')}\n';
+
+    return ret +
+        items.sorted((a, b) => a.order - b.order).map((item) {
+          final leading = (item.itemType == ItemType.checkbox
+              ? '- [${item.isChecked ? 'x' : ' '}]'
+              : '-');
+          return '$leading ${item.value}';
+        }).join('\n');
+  }
 }
 
 class ListModelError implements Exception {

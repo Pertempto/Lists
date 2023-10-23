@@ -1,9 +1,9 @@
 import 'dart:async';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide SearchBar;
 import 'package:lists/model/item.dart';
 import 'package:lists/model/list_model.dart';
+import 'package:lists/view/export_list_as_markdown_dialog.dart';
 import 'package:lists/view/search_field.dart';
 import 'package:lists/view/item_widget.dart';
 import 'package:lists/view/repeat_dialog.dart';
@@ -50,13 +50,19 @@ class _ListWidgetState extends State<ListWidget> {
               Padding(
                 padding: const EdgeInsets.only(right: 12.0),
                 child: SearchField(
-                  onChanged: (searchQuery) async {
-                    this.searchQuery = searchQuery;
-                    await refreshItems();
-                  },
-                  onFocus: () => setState(() => selectedItem = null)
-                ),
+                    onChanged: (searchQuery) async {
+                      this.searchQuery = searchQuery;
+                      await refreshItems();
+                    },
+                    onFocus: () => setState(() => selectedItem = null)),
               ),
+              PopupMenuButton(
+                  child: const Icon(Icons.more_vert),
+                  itemBuilder: (context) => [
+                        PopupMenuItem(
+                            onTap: _exportAsMarkdown,
+                            child: const Text('Export as Markdown'))
+                      ]),
             ],
           ),
           body: _buildBody(),
@@ -213,6 +219,10 @@ class _ListWidgetState extends State<ListWidget> {
 
   List<Item> _ordered(Iterable<Item> items) =>
       items.sorted((a, b) => a.order - b.order);
+
+  Future<void> _exportAsMarkdown() async => await showDialog(
+      context: context,
+      builder: (context) => ExportListAsMarkdownDialog(listModel: listModel));
 
   @override
   void dispose() {
